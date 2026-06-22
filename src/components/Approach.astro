@@ -1,0 +1,37 @@
+---
+import { IMAGES } from '../consts';
+---
+
+<section class="grid md:min-h-[560px] md:grid-cols-2">
+  <div class="reveal flex flex-col justify-center bg-crema px-6 py-16 md:px-16 md:py-20">
+    <h2 class="mb-6 font-display text-4xl font-light leading-[1.05] md:text-[3.25rem]">
+      Por qué mi<br />enfoque es<br />diferente
+    </h2>
+    <p class="mb-5 max-w-[60ch] font-display text-xl italic leading-snug text-olivaDk md:text-2xl">
+      La comida es solo una pieza del rompecabezas. La pérdida de peso y la salud metabólica no
+      son de talla única.
+    </p>
+    <p class="mb-4 max-w-[65ch] leading-relaxed text-cafe">
+      Mi trabajo se enfoca en marcadores metabólicos más allá de la báscula: laboratorios,
+      digestión, glucosa e inflamación. Uso una nutrición estratégica que apoya tu metabolismo en
+      lugar de restringirlo.
+    </p>
+    <p class="max-w-[65ch] leading-relaxed text-cafe">
+      Abordo hábitos de estilo de vida con impacto profundo en la salud: exposición a la luz,
+      ritmo circadiano, sueño y movimiento diario. El objetivo no son los extremos, es
+      sostenibilidad, flexibilidad y confianza.
+    </p>
+  </div>
+  <!-- Imagen en absoluto: no dicta la altura de la fila (evita que la foto
+       vertical estire la sección); así ambas split miden lo mismo. -->
+  <div class="zoom-parent relative min-h-[320px] overflow-hidden">
+    <img
+      src={IMAGES.mesa.src}
+      alt={IMAGES.mesa.alt}
+      width={IMAGES.mesa.width}
+      height={IMAGES.mesa.height}
+      loading="lazy"
+      class="zoom-img absolute inset-0 h-full w-full object-cover"
+    />
+  </div>
+</section>

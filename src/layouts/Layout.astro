@@ -1,0 +1,143 @@
+---
+import '@fontsource-variable/karla';
+import '../styles/global.css';
+import { SITE, CONTACT, WHATSAPP_NUMBER, SERVICES } from '../consts';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = SITE.title, description = SITE.description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? SITE.url).href;
+const ogImage = new URL('/og-image.svg', Astro.site ?? SITE.url).href;
+
+// JSON-LD: negocio local de salud para SEO en San Luis Potosí
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalBusiness',
+  name: `${SITE.brand} · ${SITE.role}`,
+  description: SITE.description,
+  url: SITE.url,
+  image: ogImage,
+  ...(WHATSAPP_NUMBER ? { telephone: `+${WHATSAPP_NUMBER}` } : {}),
+  priceRange: '$$',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: CONTACT.address,
+    addressLocality: 'San Luis Potosí',
+    addressRegion: 'SLP',
+    postalCode: '78210',
+    addressCountry: 'MX',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: CONTACT.geo.lat,
+    longitude: CONTACT.geo.lng,
+  },
+  openingHours: 'Mo-Fr 09:00-19:00, Sa 09:00-14:00',
+  areaServed: 'San Luis Potosí y zona metropolitana',
+  medicalSpecialty: 'Nutrition',
+  availableService: SERVICES.map((s) => ({
+    '@type': 'MedicalProcedure',
+    name: s.name,
+  })),
+  founder: {
+    '@type': 'Person',
+    name: SITE.name,
+    jobTitle: 'Licenciada en Nutrición',
+    identifier: {
+      '@type': 'PropertyValue',
+      name: 'Cédula Profesional',
+      value: SITE.license,
+    },
+  },
+};
+---
+
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Google Fonts: Instrument Serif (títulos) + Homemade Apple (cursivas) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Homemade+Apple&family=Instrument+Serif:ital@0;1&display=swap"
+    />
+    <link rel="canonical" href={canonical} />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={SITE.name} />
+    <meta name="theme-color" content={SITE.themeColor} />
+    <meta name="geo.region" content="MX-SLP" />
+    <meta name="geo.placename" content="San Luis Potosí" />
+    <meta name="geo.position" content={`${CONTACT.geo.lat};${CONTACT.geo.lng}`} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_MX" />
+    <meta property="og:site_name" content={SITE.brand} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    <!-- Activa el modo "reveal" solo cuando hay JS; sin JS todo es visible -->
+    <script is:inline>
+      document.documentElement.setAttribute('data-reveal', '');
+    </script>
+  </head>
+  <body class="bg-crema font-body text-tinta antialiased">
+    <a
+      href="#contenido"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:bg-tinta focus:px-4 focus:py-2 focus:text-crema"
+    >
+      Saltar al contenido
+    </a>
+    <slot />
+
+    <script>
+      // Revelado suave al hacer scroll (el CSS respeta reduced-motion).
+      const reveals = document.querySelectorAll<HTMLElement>('.reveal');
+
+      // Escalonado: cada elemento toma el índice que ocupa entre sus hermanos
+      // `.reveal`, de modo que las grillas y filas entran en cascada.
+      reveals.forEach((el) => {
+        const siblings = el.parentElement
+          ? Array.from(el.parentElement.children).filter((c) => c.classList.contains('reveal'))
+          : [el];
+        el.style.setProperty('--reveal-i', String(Math.min(siblings.indexOf(el), 6)));
+      });
+
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add('in');
+              io.unobserve(e.target);
+            }
+          });
+        },
+        // Dispara un poco antes de que el bloque entre del todo: el movimiento
+        // ocurre mientras el elemento sube, no después de detenerse.
+        { threshold: 0.1, rootMargin: '0px 0px -8% 0px' }
+      );
+      reveals.forEach((el) => io.observe(el));
+    </script>
+  </body>
+</html>

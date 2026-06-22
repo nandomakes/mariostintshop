@@ -1,0 +1,144 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Curvas de easing (emil-design-eng): ease-out fuerte para entradas y
+       hovers; ease-in-out marcado para movimiento en pantalla. */
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Compensa el nav sticky al saltar a una sección con ancla. */
+    scroll-padding-top: 5rem;
+  }
+
+  /* Foco visible y consistente en toda la página */
+  :focus-visible {
+    outline: 2px solid theme('colors.olivaDk');
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: theme('colors.terra');
+    color: theme('colors.tinta');
+  }
+
+  /* Equilibra títulos y evita huérfanos en prosa larga */
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Tipografía más nítida y con ligaduras activas. */
+  body {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+@layer components {
+  /* Revelado al hacer scroll: el contenido es visible por defecto y el
+     estado oculto solo se activa cuando JS marca <html data-reveal>.
+     Así nunca queda una sección en blanco sin JS o en renderers headless.
+     `--reveal-i` lo fija el Layout según la posición entre hermanos para
+     crear un escalonado (stagger) en grillas y filas. */
+  html[data-reveal] .reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition:
+      opacity 0.62s var(--ease-out) calc(var(--reveal-i, 0) * 75ms),
+      transform 0.62s var(--ease-out) calc(var(--reveal-i, 0) * 75ms);
+  }
+  html[data-reveal] .reveal.in {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Feedback táctil en cualquier elemento presionable */
+  .pressable {
+    transition: transform 160ms var(--ease-out);
+  }
+  .pressable:active {
+    transform: scale(0.97);
+  }
+
+  /* Elevación suave para tarjetas e ítems interactivos (solo en dispositivos
+     con hover real, para no disparar el efecto al tocar en móvil). */
+  .lift {
+    transition:
+      transform 0.4s var(--ease-out),
+      box-shadow 0.4s var(--ease-out),
+      border-color 0.4s var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .lift:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 26px 50px -30px rgba(51, 46, 37, 0.5);
+    }
+  }
+
+  /* Zoom sutil de imágenes dentro de contenedores con overflow-hidden. */
+  .zoom-img {
+    transition: transform 1.2s var(--ease-out);
+    will-change: transform;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .zoom-parent:hover .zoom-img {
+      transform: scale(1.06);
+    }
+  }
+
+  /* Subrayado animado para enlaces de navegación. */
+  .nav-link {
+    position: relative;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0.5rem;
+    height: 1.5px;
+    background: theme('colors.terra');
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .nav-link:hover::after {
+      transform: scaleX(1);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  html[data-reveal] .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .lift:hover,
+  .zoom-parent:hover .zoom-img {
+    transform: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

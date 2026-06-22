@@ -1,0 +1,128 @@
+---
+import { CONTACT, SERVICES, WHATSAPP_NUMBER, SITE } from '../consts';
+---
+
+<section id="agenda" class="mx-auto grid max-w-6xl items-start gap-12 px-5 py-16 md:grid-cols-2 md:py-24">
+  <div class="reveal">
+    <span class="font-script text-3xl text-terraInk">da el primer paso</span>
+    <h2 class="mb-6 mt-1 font-display text-4xl font-light leading-tight md:text-5xl">
+      Agenda tu consulta<br />en San Luis Potosí
+    </h2>
+    <p class="mb-8 max-w-[65ch] leading-relaxed text-cafe">
+      Cuéntame brevemente tu situación y te contacto en menos de 24 horas hábiles para agendar tu
+      valoración inicial, presencial o en línea.
+    </p>
+    <ul class="space-y-3 text-sm text-cafe">
+      <li>
+        <strong class="text-tinta">Consultorio:</strong> {CONTACT.address}, {CONTACT.city}
+      </li>
+      <li><strong class="text-tinta">WhatsApp:</strong> {CONTACT.phoneDisplay}</li>
+      <li><strong class="text-tinta">Horario:</strong> {CONTACT.schedule}</li>
+      <li>
+        <strong class="text-tinta">Correo:</strong>
+        <a href={`mailto:${CONTACT.email}`} class="underline decoration-terra underline-offset-4 hover:text-olivaDk">
+          {CONTACT.email}
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <form
+    id="form-agenda"
+    class="reveal rounded-sm border border-tinta/10 bg-white/70 p-7 md:p-9"
+    novalidate
+  >
+    <div class="grid gap-5">
+      <div>
+        <label for="nombre" class="mb-2 block text-xs uppercase tracking-[0.2em] text-olivaDk">
+          Nombre completo
+        </label>
+        <input
+          id="nombre"
+          name="nombre"
+          type="text"
+          required
+          autocomplete="name"
+          class="w-full rounded-sm border border-tinta/20 bg-crema px-4 py-3 text-tinta placeholder:text-cafe/80 focus:outline-none focus:ring-2 focus:ring-oliva"
+          placeholder="Tu nombre"
+        />
+      </div>
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label for="modalidad" class="mb-2 block text-xs uppercase tracking-[0.2em] text-olivaDk">
+            Modalidad
+          </label>
+          <select
+            id="modalidad"
+            name="modalidad"
+            class="w-full rounded-sm border border-tinta/20 bg-crema px-4 py-3 text-tinta focus:outline-none focus:ring-2 focus:ring-oliva"
+          >
+            <option>Presencial · SLP</option>
+            <option>En línea</option>
+          </select>
+        </div>
+        <div>
+          <label for="servicio" class="mb-2 block text-xs uppercase tracking-[0.2em] text-olivaDk">
+            Servicio de interés
+          </label>
+          <select
+            id="servicio"
+            name="servicio"
+            class="w-full rounded-sm border border-tinta/20 bg-crema px-4 py-3 text-tinta focus:outline-none focus:ring-2 focus:ring-oliva"
+          >
+            {SERVICES.map((s) => <option>{s.name}</option>)}
+          </select>
+        </div>
+      </div>
+      <div>
+        <label for="mensaje" class="mb-2 block text-xs uppercase tracking-[0.2em] text-olivaDk">
+          ¿Qué te gustaría lograr?
+        </label>
+        <textarea
+          id="mensaje"
+          name="mensaje"
+          rows="4"
+          class="w-full rounded-sm border border-tinta/20 bg-crema px-4 py-3 text-tinta placeholder:text-cafe/80 focus:outline-none focus:ring-2 focus:ring-oliva"
+          placeholder="Cuéntame brevemente…"></textarea>
+      </div>
+      <button
+        type="submit"
+        class="pressable rounded-sm bg-tinta px-8 py-4 text-xs uppercase tracking-[0.25em] text-crema transition-colors duration-200 hover:bg-olivaDk"
+      >
+        Enviar por WhatsApp
+      </button>
+      <p id="form-error" class="hidden text-sm text-terraInk" role="alert">
+        Escribe tu nombre para poder saludarte por WhatsApp.
+      </p>
+      <p class="text-xs leading-relaxed text-cafe">
+        Al enviar se abrirá WhatsApp con tu mensaje listo. Tus datos no se guardan en ningún
+        servidor.
+      </p>
+    </div>
+  </form>
+</section>
+
+<script define:vars={{ whatsappNumber: WHATSAPP_NUMBER, firstName: SITE.firstName }}>
+  const form = document.getElementById('form-agenda');
+  const error = document.getElementById('form-error');
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+    const nombre = String(data.get('nombre') ?? '').trim();
+    if (!nombre) {
+      error?.classList.remove('hidden');
+      document.getElementById('nombre')?.focus();
+      return;
+    }
+    error?.classList.add('hidden');
+    const modalidad = String(data.get('modalidad') ?? '');
+    const servicio = String(data.get('servicio') ?? '');
+    const mensaje = String(data.get('mensaje') ?? '').trim();
+    const texto =
+      `Hola ${firstName} 🌿, soy ${nombre}. Me interesa "${servicio}" (${modalidad}).` +
+      (mensaje ? ` Mi objetivo: ${mensaje}` : '') +
+      ' ¿Me compartes disponibilidad?';
+    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(texto)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  });
+</script>

@@ -1,0 +1,27 @@
+---
+import { SERVICES } from '../consts';
+---
+
+<section id="servicios" class="mx-auto max-w-6xl px-5 py-16 md:py-24">
+  <p class="mb-2 text-center text-xs uppercase tracking-[0.3em] text-olivaDk">
+    Servicios en San Luis Potosí y en línea
+  </p>
+  <h2 class="mb-12 text-center font-display text-4xl font-light md:text-5xl">
+    Cómo podemos trabajar juntas
+  </h2>
+
+  <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    {
+      SERVICES.map((service) => (
+        <article class="reveal lift flex flex-col rounded-sm border border-tinta/10 bg-white/70 p-7 hover:border-terra/60">
+          <span class="font-script text-2xl text-terraInk" aria-hidden="true">
+            {service.kicker}
+          </span>
+          <h3 class="mb-3 mt-1 font-display text-xl">{service.name}</h3>
+          <p class="flex-1 text-sm leading-relaxed text-cafe">{service.description}</p>
+          <p class="mt-5 text-xs uppercase tracking-[0.2em] text-olivaDk">{service.meta}</p>
+        </article>
+      ))
+    }
+  </div>
+</section>

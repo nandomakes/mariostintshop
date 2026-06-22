@@ -1,0 +1,36 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TopBar from '../components/TopBar.astro';
+import Navbar from '../components/Navbar.astro';
+import Hero from '../components/Hero.astro';
+import ProgramsBand from '../components/ProgramsBand.astro';
+import Approach from '../components/Approach.astro';
+import About from '../components/About.astro';
+import Empathy from '../components/Empathy.astro';
+import Services from '../components/Services.astro';
+import Testimonials from '../components/Testimonials.astro';
+import Booking from '../components/Booking.astro';
+import Footer from '../components/Footer.astro';
+import WhatsAppFab from '../components/WhatsAppFab.astro';
+---
+
+<Layout>
+  <TopBar />
+  <Navbar />
+  <main id="contenido">
+    <!-- Hero + banda de programas ocupan juntos la altura de pantalla
+         (descontando topbar + nav sticky ≈ 100px). -->
+    <div class="flex min-h-[calc(100svh-100px)] flex-col">
+      <Hero />
+      <ProgramsBand />
+    </div>
+    <Approach />
+    <About />
+    <Empathy />
+    <Services />
+    <Testimonials />
+    <Booking />
+  </main>
+  <Footer />
+  <WhatsAppFab />
+</Layout>

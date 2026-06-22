@@ -1,0 +1,78 @@
+---
+import { SITE, CONTACT, NAV_LINKS, WHATSAPP_URL } from '../consts';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="bg-tinta text-crema/80">
+  <div
+    class="mx-auto grid max-w-6xl gap-x-8 gap-y-10 px-5 py-12 text-sm sm:grid-cols-2 md:grid-cols-[1.6fr_1fr_1fr_1.2fr]"
+  >
+    <div>
+      <span class="block font-script text-3xl text-terra">{SITE.firstName}</span>
+      <p class="mt-2 max-w-[34ch]">
+        Nutrióloga clínica en San Luis Potosí. Cédula profesional {SITE.license}.
+      </p>
+    </div>
+    <div>
+      <p class="mb-3 text-xs uppercase tracking-[0.25em] text-crema">Ubicación</p>
+      <p>
+        {CONTACT.address},<br />
+        {CONTACT.city}
+      </p>
+    </div>
+    <div>
+      <p class="mb-3 text-xs uppercase tracking-[0.25em] text-crema">Navegación</p>
+      <ul class="space-y-1">
+        {
+          NAV_LINKS.filter((l) => l.href !== '#inicio').map((link) => (
+            <li>
+              <a href={link.href} class="transition-colors duration-200 hover:text-terra">
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <div>
+      <p class="mb-3 text-xs uppercase tracking-[0.25em] text-crema">Contacto</p>
+      <ul class="space-y-1">
+        <li>
+          <a href={`mailto:${CONTACT.email}`} class="transition-colors duration-200 hover:text-terra">
+            {CONTACT.email}
+          </a>
+        </li>
+        <li>
+          <a href={WHATSAPP_URL} class="transition-colors duration-200 hover:text-terra">
+            WhatsApp
+          </a>
+        </li>
+        <li class="text-crema/60">{CONTACT.schedule}</li>
+      </ul>
+    </div>
+  </div>
+  <div
+    class="mx-auto flex max-w-6xl flex-col items-center gap-5 border-t border-crema/10 px-5 py-6 sm:flex-row sm:justify-between"
+  >
+    <p class="text-xs text-crema/50">
+      © {year} {SITE.brand} · {SITE.role}
+    </p>
+    <a
+      href="https://clicksrun.com"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="group flex items-center gap-3 opacity-70 transition-opacity duration-200 hover:opacity-100"
+      aria-label="Diseñado por ClicksRun"
+    >
+      <span class="text-[10px] uppercase tracking-[0.25em] text-crema/50">Diseñado por</span>
+      <img
+        src="/logos-clicksrun/logo-claro.svg"
+        alt="ClicksRun"
+        height="56"
+        class="h-14 w-auto"
+        loading="lazy"
+      />
+    </a>
+  </div>
+</footer>
