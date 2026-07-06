@@ -1,0 +1,136 @@
+---
+import { CONTACT, SERVICES, WHY_US, WHATSAPP_NUMBER } from '../consts';
+
+interface Props {
+  defaultService?: string; // preselect a service on per-service pages
+}
+const { defaultService } = Astro.props;
+
+const inputClass =
+  'w-full border border-sand bg-whisper px-4 py-3 text-sm text-char placeholder:text-ash focus:outline-none focus:ring-2 focus:ring-accent';
+---
+
+<section id="contact" class="bg-ink">
+  <div class="mx-auto max-w-6xl px-5 py-20 md:py-24">
+    <div class="grid gap-12 lg:grid-cols-2 lg:gap-16">
+      <!-- Left: white form card. Submitting opens WhatsApp with the message
+           pre-filled (no backend needed). -->
+      <form
+        id="quote-form"
+        class="reveal bg-paper p-8 shadow-[0_30px_60px_-30px_rgba(0,0,0,0.6)] md:p-10"
+        novalidate
+      >
+        <p class="kicker text-accentDk">Get a tailored solution</p>
+        <h3 class="headline mt-2 text-3xl text-ink">Request a Quote via WhatsApp</h3>
+
+        <div class="mt-7 grid gap-4">
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label for="firstname" class="sr-only">First name</label>
+              <input id="firstname" name="firstname" type="text" required autocomplete="given-name" class={inputClass} placeholder="First name" />
+            </div>
+            <div>
+              <label for="lastname" class="sr-only">Last name</label>
+              <input id="lastname" name="lastname" type="text" autocomplete="family-name" class={inputClass} placeholder="Last name" />
+            </div>
+          </div>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label for="vehicle" class="sr-only">Vehicle</label>
+              <input id="vehicle" name="vehicle" type="text" class={inputClass} placeholder="Year, make, and model" />
+            </div>
+            <div>
+              <label for="service" class="sr-only">Service</label>
+              <select id="service" name="service" class={inputClass}>
+                {SERVICES.map((s) => <option selected={s.name === defaultService}>{s.name}</option>)}
+              </select>
+            </div>
+          </div>
+          <div>
+            <label for="message" class="sr-only">Message</label>
+            <textarea id="message" name="message" rows="4" class={inputClass} placeholder="Message"></textarea>
+          </div>
+
+          <button
+            type="submit"
+            class="pressable sticker mt-1 inline-flex items-center justify-center gap-2.5 bg-accent px-8 py-4 text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.5.1-.2.2-.6.8-.7.9-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4 0-.5.2-.7l.4-.5c.1-.2.1-.3 0-.5l-.8-1.9c-.2-.5-.4-.4-.5-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1.1 2.7c.1.2 1.8 2.8 4.4 3.9 2.6 1.1 2.6.7 3.1.7.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.4-.3Z" />
+            </svg>
+            Send via WhatsApp
+          </button>
+          <p id="form-error" class="hidden text-sm font-semibold text-accentDk" role="alert">
+            Please add your name so we know who's writing.
+          </p>
+        </div>
+      </form>
+
+      <!-- Right: text content -->
+      <div class="reveal lg:self-center">
+        <p class="kicker text-accent">Protect. Enhance. Transform.</p>
+        <h2 class="headline mt-3 text-[clamp(1.4rem,2.8vw,2.2rem)] text-paper">
+          Get a quote today!
+        </h2>
+        <p class="mt-5 max-w-[54ch] text-[15px] leading-relaxed text-smoke">
+          Tell us about your vehicle and what you want to protect. Your message opens
+          directly in WhatsApp and we reply the same business day with an honest
+          recommendation and a clear price — no obligation.
+        </p>
+        <ul class="mt-8 space-y-4">
+          {
+            WHY_US.bullets.slice(0, 4).map((b) => (
+              <li class="flex items-start gap-3.5 text-[15px] leading-relaxed text-paper">
+                <span
+                  class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center bg-accent text-ink"
+                  aria-hidden="true"
+                >
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6.5" /></svg>
+                </span>
+                {b}
+              </li>
+            ))
+          }
+        </ul>
+        <p class="mt-8 text-sm text-smoke">
+          Prefer to talk? Message us any time at
+          <a
+            href={`https://wa.me/${WHATSAPP_NUMBER}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="font-bold text-accent underline underline-offset-4 hover:text-accentDk"
+          >
+            WhatsApp {CONTACT.phoneDisplay}
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script define:vars={{ whatsapp: WHATSAPP_NUMBER }}>
+  const form = document.getElementById('quote-form');
+  const error = document.getElementById('form-error');
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+    const firstname = String(data.get('firstname') ?? '').trim();
+    if (!firstname) {
+      error?.classList.remove('hidden');
+      document.getElementById('firstname')?.focus();
+      return;
+    }
+    error?.classList.add('hidden');
+    const lastname = String(data.get('lastname') ?? '').trim();
+    const service = String(data.get('service') ?? '');
+    const vehicle = String(data.get('vehicle') ?? '').trim();
+    const message = String(data.get('message') ?? '').trim();
+    const text =
+      `Hi! I'm ${firstname} ${lastname}`.trim() +
+      `. I'd like a quote for ${service}` +
+      (vehicle ? ` on my ${vehicle}` : '') +
+      '.' +
+      (message ? `\n${message}` : '');
+    window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+  });
+</script>

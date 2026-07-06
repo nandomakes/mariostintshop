@@ -1,0 +1,186 @@
+{
+  "page": "Landing Page Detallado Automotriz",
+  "globalSettings": {
+    "fontFamily": "Sans-serif (cuerpo), Display Grunge (títulos)",
+    "colors": {
+      "primaryAccent": "#00FF00",
+      "backgroundDark": "#111111",
+      "backgroundLight": "#FFFFFF",
+      "textDark": "#333333",
+      "textLight": "#FFFFFF"
+    },
+    "containerMaxWidth": "1200px"
+  },
+  "sections": [
+    {
+      "id": "header",
+      "name": "Encabezado y Navegación",
+      "background": "#000000",
+      "padding": "0",
+      "margin": "0",
+      "elements": [
+        {
+          "name": "TopBar",
+          "layout": "flex",
+          "justifyContent": "space-between",
+          "padding": "10px 5%"
+        },
+        {
+          "name": "NavBar",
+          "layout": "flex",
+          "alignItems": "center",
+          "justifyContent": "space-between",
+          "padding": "20px 5%",
+          "position": "absolute o fixed top"
+        }
+      ]
+    },
+    {
+      "id": "hero",
+      "name": "Sección Principal (Hero)",
+      "background": "image_url_with_dark_overlay",
+      "padding": "150px 20px",
+      "layout": "flex-column-center",
+      "textAlign": "center"
+    },
+    {
+      "id": "about",
+      "name": "Sobre Nosotros",
+      "background": "#FFFFFF",
+      "padding": "80px 5% 0 5%",
+      "layout": "grid",
+      "columns": 2,
+      "gap": "40px",
+      "specialFeatures": [
+        {
+          "element": "Car Image Split",
+          "position": "relative",
+          "zIndex": 10,
+          "margin": "40px auto -150px auto",
+          "description": "Imagen dividida que se superpone a la siguiente sección negra"
+        }
+      ]
+    },
+    {
+      "id": "services",
+      "name": "Servicios",
+      "background": "#111111",
+      "padding": "150px 5% 100px 5%",
+      "layout": "grid",
+      "columns": 2,
+      "gap": "50px",
+      "contentLayout": {
+        "leftColumn": "Relative container with image and absolute badge top right (-20px, 20px)",
+        "rightColumn": "Flex column, gap 15px for service cards. Cards padding 20px, bg white"
+      }
+    },
+    {
+      "id": "features-stats",
+      "name": "Características y Estadísticas",
+      "background": "#FFFFFF",
+      "padding": "80px 5%",
+      "blocks": [
+        {
+          "name": "Features Grid",
+          "layout": "grid",
+          "columns": 4,
+          "gap": "20px",
+          "textAlign": "center",
+          "cardPadding": "30px 20px"
+        },
+        {
+          "name": "Stats Row",
+          "margin": "60px 0 0 0",
+          "padding": "40px 0 0 0",
+          "borderTop": "1px solid #EEEEEE",
+          "layout": "grid",
+          "columns": 4,
+          "textAlign": "center"
+        }
+      ]
+    },
+    {
+      "id": "gallery",
+      "name": "Galería",
+      "background": "#111111",
+      "padding": "100px 5%",
+      "layout": "grid",
+      "columns": 4,
+      "gap": "20px",
+      "controls": "Absolute positioned left and right arrows"
+    },
+    {
+      "id": "testimonials",
+      "name": "Testimonios",
+      "background": "#FFFFFF",
+      "padding": "100px 5%",
+      "layout": "grid",
+      "columns": 3,
+      "gap": "30px",
+      "cardStyles": {
+        "background": "#F0FDF0",
+        "padding": "40px",
+        "borderRadius": "4px"
+      }
+    },
+    {
+      "id": "contact-quote",
+      "name": "Formulario de Cotización",
+      "background": "#111111",
+      "padding": "80px 5%",
+      "layout": "grid",
+      "columns": 2,
+      "gap": "50px",
+      "leftColumn": {
+        "type": "Form Container",
+        "background": "#FFFFFF",
+        "padding": "40px",
+        "boxShadow": "0 10px 30px rgba(0,0,0,0.1)",
+        "formLayout": "Grid 2 cols for inputs, gap 15px"
+      },
+      "rightColumn": {
+        "type": "Text Content",
+        "alignSelf": "center"
+      }
+    },
+    {
+      "id": "blog",
+      "name": "Últimas Publicaciones",
+      "background": "#FFFFFF",
+      "padding": "80px 5%",
+      "layout": "grid",
+      "columns": "40% 60%",
+      "gap": "40px",
+      "rightColumnLayout": "Flex column, gap 20px (List of post rows)"
+    },
+    {
+      "id": "location",
+      "name": "Ubicación",
+      "background": "#FFFFFF",
+      "padding": "80px 5%",
+      "headerMarginBottom": "50px",
+      "contentLayout": {
+        "type": "grid",
+        "columns": 2,
+        "gap": "40px",
+        "leftColumn": "Flex column, gap 20px (Icon + Text items)",
+        "rightColumn": "Iframe map container, 100% width/height"
+      }
+    },
+    {
+      "id": "footer",
+      "name": "Pie de Página",
+      "background": "#111111",
+      "padding": "60px 5% 20px 5%",
+      "layout": "grid",
+      "columns": 4,
+      "gap": "30px",
+      "bottomBar": {
+        "borderTop": "1px solid #333333",
+        "paddingTop": "20px",
+        "marginTop": "40px",
+        "textAlign": "center"
+      }
+    }
+  ]
+}

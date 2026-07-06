@@ -1,0 +1,126 @@
+{
+  "brand": {
+    "name": "Auto Surface & Styling",
+    "industry": "Automotive Detailing & Protection",
+    "personality": [
+      "Profesional",
+      "Industrial",
+      "Premium",
+      "Dinámico"
+    ]
+  },
+  "colors": {
+    "primaryAccent": {
+      "hex": "#00FF00",
+      "name": "Neon Green / Verde Neón",
+      "usage": "Botones CTA (Call to Action), iconos, separadores, textos destacados, insignias."
+    },
+    "backgrounds": {
+      "dark": {
+        "hex": "#111111",
+        "name": "Jet Black / Negro Profundo",
+        "usage": "Fondos de secciones alternas, footer, barra superior, overlays en imágenes."
+      },
+      "light": {
+        "hex": "#FFFFFF",
+        "name": "Pure White / Blanco Puro",
+        "usage": "Fondos de secciones principales, contenedores de tarjetas, fondos de formularios."
+      }
+    },
+    "surfaces": {
+      "paleGreen": {
+        "hex": "#F0FDF0",
+        "name": "Mint Tint",
+        "usage": "Fondo de las tarjetas de testimonios para dar un respiro visual."
+      },
+      "lightGray": {
+        "hex": "#F9F9F9",
+        "name": "Whisper Gray",
+        "usage": "Fondo de los inputs (campos) en el formulario de contacto."
+      }
+    },
+    "text": {
+      "onLight": {
+        "hex": "#333333",
+        "usage": "Cuerpo de texto general sobre fondos blancos."
+      },
+      "onDark": {
+        "hex": "#FFFFFF",
+        "usage": "Cuerpo de texto y títulos sobre fondos negros."
+      },
+      "muted": {
+        "hex": "#888888",
+        "usage": "Textos secundarios, fechas en el blog, placeholders en formularios."
+      }
+    }
+  },
+  "typography": {
+    "headings": {
+      "fontFamily": "Impact, 'Bebas Neue', 'Oswald', sans-serif",
+      "style": "Industrial, gruesa (bold), ligeramente desgastada (grunge).",
+      "weight": [
+        "700",
+        "900"
+      ],
+      "textTransform": "uppercase",
+      "letterSpacing": "1px",
+      "usage": "Títulos H1, H2, H3 y números grandes en la sección de estadísticas."
+    },
+    "body": {
+      "fontFamily": "'Inter', 'Roboto', 'Open Sans', sans-serif",
+      "style": "Limpia, geométrica y de alta legibilidad.",
+      "weight": [
+        "400",
+        "500",
+        "700"
+      ],
+      "lineHeight": "1.6",
+      "usage": "Párrafos descriptivos, enlaces de navegación, reseñas."
+    }
+  },
+  "uiComponents": {
+    "buttons": {
+      "primary": {
+        "backgroundColor": "#00FF00",
+        "textColor": "#111111",
+        "borderRadius": "4px",
+        "padding": "12px 30px",
+        "textTransform": "uppercase",
+        "fontWeight": "bold",
+        "border": "none"
+      }
+    },
+    "cards": {
+      "serviceCard": {
+        "backgroundColor": "#FFFFFF",
+        "padding": "20px",
+        "borderRadius": "4px",
+        "boxShadow": "0 2px 10px rgba(0,0,0,0.05)"
+      },
+      "testimonialCard": {
+        "backgroundColor": "#F0FDF0",
+        "padding": "40px",
+        "borderRadius": "4px",
+        "border": "none"
+      }
+    },
+    "forms": {
+      "inputs": {
+        "backgroundColor": "#F9F9F9",
+        "border": "1px solid #EEEEEE",
+        "borderRadius": "4px",
+        "padding": "15px",
+        "color": "#333333"
+      }
+    },
+    "imagery": {
+      "hero": "Uso de overlays oscuros (rgba(0,0,0,0.6)) sobre imágenes a pantalla completa para mejorar el contraste del texto blanco y verde.",
+      "graphics": "Uso de gráficos divididos (auto mitad verde, mitad blanco) para enfatizar 'el antes y el después' o 'la protección'."
+    }
+  },
+  "layout": {
+    "containerMaxWidth": "1200px",
+    "gridSystem": "Basado en CSS Grid y Flexbox de 12 columnas",
+    "sectionPadding": "Promedio de 80px a 100px verticales"
+  }
+}

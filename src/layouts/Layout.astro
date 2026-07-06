@@ -1,7 +1,7 @@
 ---
-import '@fontsource-variable/karla';
+import '@fontsource-variable/inter';
 import '../styles/global.css';
-import { SITE, CONTACT, WHATSAPP_NUMBER, SERVICES } from '../consts';
+import { SITE, CONTACT, PHONE_TEL, SERVICES } from '../consts';
 
 interface Props {
   title?: string;
@@ -12,77 +12,68 @@ const { title = SITE.title, description = SITE.description } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? SITE.url).href;
 const ogImage = new URL('/og-image.svg', Astro.site ?? SITE.url).href;
 
-// JSON-LD: negocio local de salud para SEO en San Luis Potosí
+// JSON-LD: local automotive business for SEO in Murfreesboro, TN
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'MedicalBusiness',
-  name: `${SITE.brand} · ${SITE.role}`,
+  '@type': 'AutoRepair',
+  name: SITE.brand,
   description: SITE.description,
   url: SITE.url,
   image: ogImage,
-  ...(WHATSAPP_NUMBER ? { telephone: `+${WHATSAPP_NUMBER}` } : {}),
-  priceRange: '$$',
+  telephone: PHONE_TEL,
+  email: CONTACT.email,
+  priceRange: '$$$',
   address: {
     '@type': 'PostalAddress',
     streetAddress: CONTACT.address,
-    addressLocality: 'San Luis Potosí',
-    addressRegion: 'SLP',
-    postalCode: '78210',
-    addressCountry: 'MX',
+    addressLocality: 'Murfreesboro',
+    addressRegion: 'TN',
+    postalCode: '37129',
+    addressCountry: 'US',
   },
   geo: {
     '@type': 'GeoCoordinates',
     latitude: CONTACT.geo.lat,
     longitude: CONTACT.geo.lng,
   },
-  openingHours: 'Mo-Fr 09:00-19:00, Sa 09:00-14:00',
-  areaServed: 'San Luis Potosí y zona metropolitana',
-  medicalSpecialty: 'Nutrition',
-  availableService: SERVICES.map((s) => ({
-    '@type': 'MedicalProcedure',
-    name: s.name,
-  })),
-  founder: {
-    '@type': 'Person',
-    name: SITE.name,
-    jobTitle: 'Licenciada en Nutrición',
-    identifier: {
-      '@type': 'PropertyValue',
-      name: 'Cédula Profesional',
-      value: SITE.license,
-    },
+  openingHours: 'Mo-Fr 09:00-18:00, Sa 09:00-15:00',
+  areaServed: 'Murfreesboro, TN and surrounding Middle Tennessee',
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Services',
+    itemListElement: SERVICES.map((s) => ({
+      '@type': 'Offer',
+      itemOffered: { '@type': 'Service', name: s.name },
+    })),
   },
 };
 ---
 
 <!doctype html>
-<html lang="es-MX">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-
-    <!-- Google Fonts: Instrument Serif (títulos) + Homemade Apple (cursivas) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
+      href="https://fonts.googleapis.com/css2?family=Sedgwick+Ave&family=Special+Gothic+Expanded+One&family=Gabarito:wght@400&display=swap"
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Homemade+Apple&family=Instrument+Serif:ital@0;1&display=swap"
     />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href={canonical} />
     <meta name="generator" content={Astro.generator} />
 
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="author" content={SITE.name} />
     <meta name="theme-color" content={SITE.themeColor} />
-    <meta name="geo.region" content="MX-SLP" />
-    <meta name="geo.placename" content="San Luis Potosí" />
+    <meta name="geo.region" content="US-TN" />
+    <meta name="geo.placename" content="Murfreesboro" />
     <meta name="geo.position" content={`${CONTACT.geo.lat};${CONTACT.geo.lng}`} />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:locale" content="es_MX" />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content={SITE.brand} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -97,26 +88,26 @@ const jsonLd = {
 
     <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
-    <!-- Activa el modo "reveal" solo cuando hay JS; sin JS todo es visible -->
+    <!-- Enable "reveal" mode only when JS is present; without JS everything is visible -->
     <script is:inline>
       document.documentElement.setAttribute('data-reveal', '');
     </script>
   </head>
-  <body class="bg-crema font-body text-tinta antialiased">
+  <body class="bg-paper font-body text-char antialiased">
     <a
-      href="#contenido"
-      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:bg-tinta focus:px-4 focus:py-2 focus:text-crema"
+      href="#content"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:bg-accent focus:px-4 focus:py-2 focus:font-bold focus:text-ink"
     >
-      Saltar al contenido
+      Skip to content
     </a>
     <slot />
 
     <script>
-      // Revelado suave al hacer scroll (el CSS respeta reduced-motion).
+      // Smooth reveal on scroll (the CSS respects reduced-motion).
       const reveals = document.querySelectorAll<HTMLElement>('.reveal');
 
-      // Escalonado: cada elemento toma el índice que ocupa entre sus hermanos
-      // `.reveal`, de modo que las grillas y filas entran en cascada.
+      // Stagger: each element takes its index among its `.reveal` siblings,
+      // so grids and rows cascade in.
       reveals.forEach((el) => {
         const siblings = el.parentElement
           ? Array.from(el.parentElement.children).filter((c) => c.classList.contains('reveal'))
@@ -133,11 +124,46 @@ const jsonLd = {
             }
           });
         },
-        // Dispara un poco antes de que el bloque entre del todo: el movimiento
-        // ocurre mientras el elemento sube, no después de detenerse.
         { threshold: 0.1, rootMargin: '0px 0px -8% 0px' }
       );
       reveals.forEach((el) => io.observe(el));
+
+      // Header: intensify on scroll for a subtle depth cue.
+      const header = document.querySelector('header');
+      if (header) {
+        const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 20);
+        onScroll();
+        window.addEventListener('scroll', onScroll, { passive: true });
+      }
+
+      // Count-up for stat numbers when they scroll into view.
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const counters = document.querySelectorAll<HTMLElement>('[data-count]');
+      const countIO = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (!e.isIntersecting) return;
+            const el = e.target as HTMLElement;
+            const target = Number(el.dataset.count) || 0;
+            countIO.unobserve(el);
+            if (reduce) {
+              el.textContent = String(target);
+              return;
+            }
+            const dur = 1100;
+            const start = performance.now();
+            const tick = (now: number) => {
+              const p = Math.min((now - start) / dur, 1);
+              const eased = 1 - Math.pow(1 - p, 3);
+              el.textContent = String(Math.round(eased * target));
+              if (p < 1) requestAnimationFrame(tick);
+            };
+            requestAnimationFrame(tick);
+          });
+        },
+        { threshold: 0.5 }
+      );
+      counters.forEach((c) => countIO.observe(c));
     </script>
   </body>
 </html>

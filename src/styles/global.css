@@ -4,8 +4,6 @@
 
 @layer base {
   :root {
-    /* Curvas de easing (emil-design-eng): ease-out fuerte para entradas y
-       hovers; ease-in-out marcado para movimiento en pantalla. */
     --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
     --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
@@ -13,23 +11,20 @@
 
   html {
     scroll-behavior: smooth;
-    /* Compensa el nav sticky al saltar a una sección con ancla. */
     scroll-padding-top: 5rem;
   }
 
-  /* Foco visible y consistente en toda la página */
   :focus-visible {
-    outline: 2px solid theme('colors.olivaDk');
+    outline: 2px solid theme('colors.accent');
     outline-offset: 3px;
     border-radius: 2px;
   }
 
   ::selection {
-    background: theme('colors.terra');
-    color: theme('colors.tinta');
+    background: theme('colors.accent');
+    color: theme('colors.ink');
   }
 
-  /* Equilibra títulos y evita huérfanos en prosa larga */
   h1,
   h2,
   h3 {
@@ -39,32 +34,39 @@
     text-wrap: pretty;
   }
 
-  /* Tipografía más nítida y con ligaduras activas. */
   body {
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
+
+  header {
+    transition:
+      box-shadow 0.4s var(--ease-out),
+      background-color 0.4s var(--ease-out);
+  }
+  header.is-scrolled {
+    box-shadow: 0 14px 34px -24px rgba(0, 0, 0, 0.95);
+  }
 }
 
 @layer components {
-  /* Revelado al hacer scroll: el contenido es visible por defecto y el
-     estado oculto solo se activa cuando JS marca <html data-reveal>.
-     Así nunca queda una sección en blanco sin JS o en renderers headless.
-     `--reveal-i` lo fija el Layout según la posición entre hermanos para
-     crear un escalonado (stagger) en grillas y filas. */
+  /* Scroll reveal: visible by default; hidden state only when JS marks
+     <html data-reveal>. `--reveal-i` staggers siblings. */
   html[data-reveal] .reveal {
     opacity: 0;
-    transform: translateY(22px);
+    transform: translateY(24px);
+    filter: blur(8px);
     transition:
-      opacity 0.62s var(--ease-out) calc(var(--reveal-i, 0) * 75ms),
-      transform 0.62s var(--ease-out) calc(var(--reveal-i, 0) * 75ms);
+      opacity 0.85s var(--ease-out-soft) calc(var(--reveal-i, 0) * 85ms),
+      transform 0.85s var(--ease-out-soft) calc(var(--reveal-i, 0) * 85ms),
+      filter 0.85s var(--ease-out-soft) calc(var(--reveal-i, 0) * 85ms);
   }
   html[data-reveal] .reveal.in {
     opacity: 1;
     transform: none;
+    filter: none;
   }
 
-  /* Feedback táctil en cualquier elemento presionable */
   .pressable {
     transition: transform 160ms var(--ease-out);
   }
@@ -72,8 +74,6 @@
     transform: scale(0.97);
   }
 
-  /* Elevación suave para tarjetas e ítems interactivos (solo en dispositivos
-     con hover real, para no disparar el efecto al tocar en móvil). */
   .lift {
     transition:
       transform 0.4s var(--ease-out),
@@ -83,22 +83,20 @@
   @media (hover: hover) and (pointer: fine) {
     .lift:hover {
       transform: translateY(-6px);
-      box-shadow: 0 26px 50px -30px rgba(51, 46, 37, 0.5);
+      box-shadow: 0 30px 60px -28px rgba(0, 0, 0, 0.35);
     }
   }
 
-  /* Zoom sutil de imágenes dentro de contenedores con overflow-hidden. */
   .zoom-img {
-    transition: transform 1.2s var(--ease-out);
+    transition: transform 1s var(--ease-out);
     will-change: transform;
   }
   @media (hover: hover) and (pointer: fine) {
     .zoom-parent:hover .zoom-img {
-      transform: scale(1.06);
+      transform: scale(1.05);
     }
   }
 
-  /* Subrayado animado para enlaces de navegación. */
   .nav-link {
     position: relative;
   }
@@ -107,9 +105,9 @@
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 0.5rem;
-    height: 1.5px;
-    background: theme('colors.terra');
+    bottom: 0.35rem;
+    height: 2px;
+    background: theme('colors.accent');
     transform: scaleX(0);
     transform-origin: left;
     transition: transform 0.3s var(--ease-out);
@@ -118,6 +116,155 @@
     .nav-link:hover::after {
       transform: scaleX(1);
     }
+  }
+
+  /* Expanded display headline — font is already wide, so no extra tracking. */
+  .headline {
+    font-family: theme('fontFamily.display');
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0em;
+    line-height: 1.12;
+  }
+
+  /* Script eyebrow — small label above section titles. */
+  .kicker {
+    font-family: theme('fontFamily.script');
+    font-weight: 400;
+    font-size: 1.1rem;
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+
+  /* Small uppercase sans label (dates, tags). */
+  .num {
+    font-family: theme('fontFamily.body');
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.6875rem;
+  }
+
+  /* Hollow "outline" text used in the ticker strips. */
+  .outline-text {
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.35);
+  }
+
+  /* "Peeled sticker" shape — BUTTONS ONLY. The top-right and bottom-left
+     corners are cut diagonally, with a darker triangle suggesting the
+     peeled-back fold of the sticker. */
+  .sticker {
+    position: relative;
+    border-radius: 0;
+    clip-path: polygon(
+      0 0,
+      calc(100% - 14px) 0,
+      100% 14px,
+      100% 100%,
+      14px 100%,
+      0 calc(100% - 14px)
+    );
+  }
+  .sticker::before,
+  .sticker::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background: rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+  }
+  .sticker::before {
+    top: 0;
+    right: 0;
+    clip-path: polygon(0 0, 100% 100%, 0 100%);
+  }
+  .sticker::after {
+    bottom: 0;
+    left: 0;
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
+  }
+
+  /* Subtle hexagonal tile pattern for white sections. */
+  .hex-bg {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24.25' height='42'%3E%3Cpath d='M12.12 0 L24.25 7 L24.25 21 L12.12 28 L0 21 L0 7 Z' fill='none' stroke='%23b0bcd8' stroke-opacity='0.22' stroke-width='0.8'/%3E%3Cpath d='M12.12 28 L12.12 42' fill='none' stroke='%23b0bcd8' stroke-opacity='0.22' stroke-width='0.8'/%3E%3C/svg%3E");
+    background-size: 24.25px 42px;
+  }
+
+  /* Premium diagonal flowing-wave pattern (gray, like the hex tiles). */
+  .wave-bg {
+    background-color: #FFFFFF;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2760%27 height=%2760%27%3E%3Cg fill=%27none%27 stroke=%27%23b0bcd8%27 stroke-opacity=%270.45%27 stroke-width=%271%27%3E%3Cpath d=%27M0.0%20-15.0%20L6.0%20-14.1%20L12.0%20-14.2%20L18.0%20-15.7%20L24.0%20-18.6%20L30.0%20-22.5%20L36.0%20-26.4%20L42.0%20-29.3%20L48.0%20-30.8%20L54.0%20-30.9%20L60.0%20-30.0%27/%3E%3Cpath d=%27M0.0%200.0%20L6.0%200.9%20L12.0%200.8%20L18.0%20-0.7%20L24.0%20-3.6%20L30.0%20-7.5%20L36.0%20-11.4%20L42.0%20-14.3%20L48.0%20-15.8%20L54.0%20-15.9%20L60.0%20-15.0%27/%3E%3Cpath d=%27M0.0%2015.0%20L6.0%2015.9%20L12.0%2015.8%20L18.0%2014.3%20L24.0%2011.4%20L30.0%207.5%20L36.0%203.6%20L42.0%200.7%20L48.0%20-0.8%20L54.0%20-0.9%20L60.0%20-0.0%27/%3E%3Cpath d=%27M0.0%2030.0%20L6.0%2030.9%20L12.0%2030.8%20L18.0%2029.3%20L24.0%2026.4%20L30.0%2022.5%20L36.0%2018.6%20L42.0%2015.7%20L48.0%2014.2%20L54.0%2014.1%20L60.0%2015.0%27/%3E%3Cpath d=%27M0.0%2045.0%20L6.0%2045.9%20L12.0%2045.8%20L18.0%2044.3%20L24.0%2041.4%20L30.0%2037.5%20L36.0%2033.6%20L42.0%2030.7%20L48.0%2029.2%20L54.0%2029.1%20L60.0%2030.0%27/%3E%3Cpath d=%27M0.0%2060.0%20L6.0%2060.9%20L12.0%2060.8%20L18.0%2059.3%20L24.0%2056.4%20L30.0%2052.5%20L36.0%2048.6%20L42.0%2045.7%20L48.0%2044.2%20L54.0%2044.1%20L60.0%2045.0%27/%3E%3Cpath d=%27M0.0%2075.0%20L6.0%2075.9%20L12.0%2075.8%20L18.0%2074.3%20L24.0%2071.4%20L30.0%2067.5%20L36.0%2063.6%20L42.0%2060.7%20L48.0%2059.2%20L54.0%2059.1%20L60.0%2060.0%27/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 60px 60px;
+  }
+
+  /* Hide scrollbar on horizontal sliders (keeps native scroll/drag). */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Slow cinematic zoom on hero/background imagery. */
+  .kenburns {
+    animation: kenburns 24s var(--ease-out) infinite alternate;
+    transform-origin: 62% 45%;
+  }
+
+  /* Continuous trust marquee. */
+  .marquee {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 8%,
+      #000 92%,
+      transparent
+    );
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+  .marquee-track {
+    display: inline-flex;
+    white-space: nowrap;
+    animation: marquee 32s linear infinite;
+  }
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+
+  /* Smooth reveal of FAQ answer content. */
+  details.faq > *:not(summary) {
+    animation: faqin 0.35s var(--ease-out);
+  }
+}
+
+@keyframes kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.09);
+  }
+}
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes faqin {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -133,6 +280,11 @@
   .lift:hover,
   .zoom-parent:hover .zoom-img {
     transform: none;
+  }
+  .kenburns,
+  .marquee-track,
+  details.faq > *:not(summary) {
+    animation: none !important;
   }
   *,
   *::before,

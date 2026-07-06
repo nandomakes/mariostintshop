@@ -1,9 +1,13 @@
 ---
-import { SITE, IMAGES } from '../consts';
+import { HERO, IMAGES } from '../consts';
+import Ticker from './Ticker.astro';
 ---
 
-<section id="inicio" class="relative flex flex-1 flex-col justify-center overflow-hidden">
-  <!-- Fondo: la imagen cubre todo el hero. -->
+<section
+  id="home"
+  class="relative flex min-h-[calc(100svh-64px)] flex-col overflow-hidden bg-ink md:min-h-[calc(100svh-100px)]"
+>
+  <!-- Full-bleed image with dark overlay for legibility -->
   <div class="absolute inset-0" aria-hidden="true">
     <img
       src={IMAGES.heroBg.src}
@@ -11,64 +15,33 @@ import { SITE, IMAGES } from '../consts';
       width={IMAGES.heroBg.width}
       height={IMAGES.heroBg.height}
       fetchpriority="high"
-      class="h-full w-full object-cover"
+      class="h-full w-full object-contain object-center"
     />
+    <div class="absolute inset-0 bg-black/45"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-ink/60 via-transparent to-ink"></div>
   </div>
-  <!-- Scrim para legibilidad del texto sobre la imagen -->
-  <div class="absolute inset-0 bg-gradient-to-b from-tinta/45 via-tinta/20 to-tinta/55"></div>
 
-  <div class="relative mx-auto w-full max-w-6xl px-5 py-10 md:py-12">
-    <!-- 3 columnas: texto · retrato (centro) · script -->
-    <div class="grid items-center gap-8 md:grid-cols-3">
-      <!-- Izquierda: subcopy breve con keyword SEO -->
-      <div class="reveal order-1 text-center">
-        <p class="mx-auto max-w-[22rem] text-sm leading-relaxed text-crema [text-shadow:0_1px_8px_rgba(51,46,37,0.6)]">
-          <strong class="font-semibold">Nutrióloga en San Luis Potosí</strong> especializada en
-          salud metabólica femenina. Pierde peso, recupera tu energía y equilibra tus hormonas con
-          comida real, sin dietas extremas.
-        </p>
-      </div>
+  <div class="relative mx-auto w-full max-w-4xl flex-1 content-center px-4 py-10 text-center sm:px-5 sm:py-12 md:py-16">
+    <p class="reveal kicker text-[clamp(1rem,3vw,1.35rem)] text-accent">{HERO.kicker}</p>
 
-      <!-- Centro: retrato de la nutrióloga, foco de la composición -->
-      <div class="order-3 flex justify-center md:order-2">
-        <img
-          src={IMAGES.heroPortrait.src}
-          alt={IMAGES.heroPortrait.alt}
-          width={IMAGES.heroPortrait.width}
-          height={IMAGES.heroPortrait.height}
-          fetchpriority="high"
-          class="reveal aspect-[4/5] w-64 rounded-sm object-cover shadow-2xl sm:w-72 md:w-full md:max-w-[22rem]"
-        />
-      </div>
+    <h1 class="reveal headline mt-3 text-[clamp(1.6rem,4.5vw,3.25rem)] text-paper md:mt-4">
+      {HERO.line1}<br />{HERO.line2}
+    </h1>
 
-      <!-- Derecha: acento manuscrito -->
-      <div class="order-2 flex justify-center md:order-3 md:justify-end">
-        <span
-          class="font-script text-4xl text-blush [text-shadow:0_2px_12px_rgba(51,46,37,0.6)] md:text-5xl"
-          aria-hidden="true"
-        >
-          ¡encuentra tu balance!
-        </span>
-      </div>
-    </div>
+    <p class="reveal mx-auto mt-5 max-w-[52ch] text-[clamp(0.9rem,2.5vw,1.125rem)] leading-relaxed text-smoke md:mt-6">
+      {HERO.sub}
+    </p>
 
-    <!-- Título superpuesto al borde inferior del retrato + CTA -->
-    <div class="reveal relative z-10 -mt-10 text-center md:-mt-20">
-      <h1
-        class="whitespace-nowrap font-display text-[clamp(1.5rem,6.3vw,5rem)] font-light leading-none tracking-[0.01em] text-crema [text-shadow:0_2px_18px_rgba(51,46,37,0.55),0_1px_3px_rgba(51,46,37,0.45)]"
-      >
-        NUTRICIÓN CON {SITE.firstName.toUpperCase()}
-        <span class="sr-only">· Nutrióloga en San Luis Potosí</span>
-      </h1>
-      <p class="mt-4 text-[11px] uppercase tracking-[0.25em] text-crema/90 [text-shadow:0_1px_8px_rgba(51,46,37,0.6)]">
-        {SITE.name} · Cédula {SITE.license}
-      </p>
+    <div class="reveal mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row md:mt-9">
       <a
-        href="#servicios"
-        class="pressable mt-7 inline-block rounded-none bg-terra px-9 py-3.5 text-xs uppercase tracking-[0.25em] text-tinta transition-colors duration-200 hover:bg-blush"
+        href="/#contact"
+        class="pressable sticker w-full bg-accent px-8 py-3.5 text-center text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk sm:w-auto"
       >
-        Programas y planes
+        Get a Quote →
       </a>
     </div>
   </div>
+
+  <!-- Single ticker strip for the whole site -->
+  <Ticker />
 </section>

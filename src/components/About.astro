@@ -1,42 +1,74 @@
 ---
-import { SITE, IMAGES } from '../consts';
+import { ABOUT, IMAGES } from '../consts';
+
+// Words for the band that runs behind the lambo artwork.
+const bandItems = ['Window Tint', 'PPF', 'Ceramic Coating', 'Tesla', 'Commercial Film'];
+const bandSeq = [...bandItems, ...bandItems, ...bandItems, ...bandItems];
 ---
 
-<section id="sobre-mi" class="grid md:min-h-[560px] md:grid-cols-2">
-  <!-- Imagen en absoluto: no dicta la altura de la fila (mantiene ambas split
-       en la misma altura sin importar el formato de la foto). -->
-  <div class="zoom-parent relative order-2 min-h-[320px] overflow-hidden md:order-1">
-    <img
-      src={IMAGES.cocina.src}
-      alt="Rincón verde y luminoso del consultorio en San Luis Potosí"
-      width={IMAGES.cocina.width}
-      height={IMAGES.cocina.height}
-      loading="lazy"
-      class="zoom-img absolute inset-0 h-full w-full object-cover"
-    />
-  </div>
-  <div class="reveal order-1 flex flex-col justify-center bg-arena px-6 py-16 md:order-2 md:px-16 md:py-20">
-    <h2 class="mb-6 font-display text-4xl font-light leading-[1.05] md:text-[3.25rem]">
-      Si te sientes<br />estancada
-    </h2>
-    <p class="mb-5 max-w-[60ch] font-display text-xl italic leading-snug text-olivaDk md:text-2xl">
-      Estoy lista para trabajar contigo si buscas un enfoque personalizado.
-    </p>
-    <p class="mb-4 max-w-[65ch] leading-relaxed text-cafe">
-      Soy la {SITE.name}, nutrióloga clínica con cédula profesional y más de 10 años acompañando
-      a mujeres que se sienten atascadas en su cuerpo y frustradas porque lo que antes funcionaba
-      ya no funciona.
-    </p>
-    <p class="mb-8 max-w-[65ch] leading-relaxed text-cafe">
-      Mis pacientes han probado dietas múltiples sin éxito duradero, viven con poca energía o mal
-      sueño, lidian con problemas digestivos o de glucosa, y sienten que algo más profundo está
-      pasando. Están listas para un enfoque más inteligente, con resultados que sí se mantienen.
-    </p>
-    <a
-      href="#agenda"
-      class="pressable self-start rounded-sm border border-tinta/40 px-8 py-3.5 text-xs uppercase tracking-[0.25em] transition-colors duration-200 hover:bg-tinta hover:text-crema"
-    >
-      Agendar
-    </a>
+<section id="about" class="hex-bg relative overflow-hidden bg-paper">
+  <div class="mx-auto max-w-6xl px-5 py-20 md:py-28">
+    <!-- Two-column intro: title + CTA left, copy right -->
+    <div class="grid gap-10 md:grid-cols-2 md:items-start">
+      <div class="reveal">
+        <p class="kicker text-accentDk">About us</p>
+        <h2 class="headline mt-3 text-[clamp(1.4rem,2.8vw,2.2rem)] text-ink">
+          Crafting excellence in surface protection & style
+        </h2>
+        <a
+          href="/#contact"
+          class="pressable sticker mt-8 inline-block bg-accent px-8 py-3.5 text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
+        >
+          Get a Quote →
+        </a>
+      </div>
+      <div class="reveal space-y-4 text-[15px] leading-relaxed text-char md:pt-8">
+        <p>{ABOUT.lead}</p>
+        <p>{ABOUT.body1}</p>
+        <p>{ABOUT.body2}</p>
+      </div>
+    </div>
+
+    <!-- Centered artwork with a light-blue band running behind it -->
+    <div class="reveal relative mx-auto mt-12 max-w-5xl">
+      <!-- Solid white cover: hides the hex pattern from the band downward -->
+      <div
+        class="pointer-events-none absolute left-1/2 top-1/2 h-screen w-screen -translate-x-1/2 bg-paper"
+        aria-hidden="true"
+      ></div>
+
+      <!-- Light-blue marquee band, vertically centered behind the image -->
+      <div
+        class="marquee absolute left-1/2 top-1/2 w-screen -translate-x-1/2 -translate-y-1/2 -rotate-2 bg-[#5FC2FF] py-3"
+        aria-hidden="true"
+      >
+        <div class="marquee-track">
+          {
+            bandSeq.map((label, i) => (
+              <span class="mx-5 flex items-center gap-10 whitespace-nowrap">
+                <span
+                  class:list={[
+                    'headline text-xl tracking-[0.08em]',
+                    i % 2 === 0 ? 'text-paper' : 'text-ink/70',
+                  ]}
+                >
+                  {label}
+                </span>
+                <span class="text-paper">✦</span>
+              </span>
+            ))
+          }
+        </div>
+      </div>
+
+      <img
+        src={IMAGES.install.src}
+        alt={IMAGES.install.alt}
+        width={IMAGES.install.width}
+        height={IMAGES.install.height}
+        loading="lazy"
+        class="relative mx-auto w-full object-contain"
+      />
+    </div>
   </div>
 </section>

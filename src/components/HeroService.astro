@@ -1,0 +1,49 @@
+---
+import { CONTACT } from '../consts';
+
+interface Props {
+  kicker: string;
+  title: string;
+  subcopy: string;
+  imageSrc?: string;
+}
+const { kicker, title, subcopy, imageSrc } = Astro.props;
+---
+
+<section class="relative overflow-hidden border-b border-line bg-ink">
+  {
+    imageSrc && (
+      <div class="absolute inset-0" aria-hidden="true">
+        <img src={imageSrc} alt="" class="h-full w-full object-cover opacity-50" />
+        <div class="absolute inset-0 bg-black/60" />
+        <div class="absolute inset-0 bg-gradient-to-t from-ink via-transparent to-ink/60" />
+      </div>
+    )
+  }
+
+  <div class="relative mx-auto max-w-4xl px-5 py-20 text-center md:py-28">
+    <nav class="reveal mb-6 text-[11px] font-bold uppercase tracking-[0.16em] text-smoke" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-paper">Home</a>
+      <span class="mx-2 text-line">/</span>
+      <a href="/#services" class="hover:text-paper">Services</a>
+      <span class="mx-2 text-line">/</span>
+      <span class="text-accent">{kicker}</span>
+    </nav>
+    <h1 class="reveal headline text-[clamp(2.25rem,5.5vw,4rem)] text-paper">{title}</h1>
+    <p class="reveal mx-auto mt-6 max-w-[52ch] leading-relaxed text-smoke md:text-lg">{subcopy}</p>
+    <div class="reveal mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+      <a
+        href="/#contact"
+        class="pressable sticker w-full bg-accent px-8 py-3.5 text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk sm:w-auto"
+      >
+        Get a Quote →
+      </a>
+      <a
+        href={`tel:${CONTACT.phoneTel}`}
+        class="pressable sticker w-full border border-paper/40 px-8 py-3.5 text-xs font-bold uppercase tracking-[0.12em] text-paper transition-colors duration-200 hover:border-accent hover:text-accent sm:w-auto"
+      >
+        Call {CONTACT.phoneDisplay}
+      </a>
+    </div>
+  </div>
+</section>

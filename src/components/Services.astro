@@ -1,27 +1,157 @@
 ---
-import { SERVICES } from '../consts';
+import { SERVICES, IMAGES, CONTACT } from '../consts';
+
+// Scalloped "certification seal" outline: symmetric rounded lobes with rounded
+// valleys, traced with Catmull-Rom → bézier for a smooth, cusp-free wave edge.
+const seal = (() => {
+  const N = 15,
+    cx = 100,
+    cy = 100,
+    base = 88,
+    amp = 11;
+  const steps = N * 8;
+  const pts: [number, number][] = [];
+  for (let i = 0; i < steps; i++) {
+    const t = (i / steps) * Math.PI * 2 - Math.PI / 2;
+    const phase = N * (t + Math.PI / 2);
+    const r = base + amp * Math.cos(phase);
+    pts.push([cx + r * Math.cos(t), cy + r * Math.sin(t)]);
+  }
+  const p = (i: number) => pts[(i + pts.length) % pts.length];
+  let d = `M ${p(0)[0].toFixed(2)} ${p(0)[1].toFixed(2)}`;
+  for (let i = 0; i < pts.length; i++) {
+    const p0 = p(i - 1),
+      p1 = p(i),
+      p2 = p(i + 1),
+      p3 = p(i + 2);
+    const c1x = p1[0] + (p2[0] - p0[0]) / 6;
+    const c1y = p1[1] + (p2[1] - p0[1]) / 6;
+    const c2x = p2[0] - (p3[0] - p1[0]) / 6;
+    const c2y = p2[1] - (p3[1] - p1[1]) / 6;
+    d += ` C ${c1x.toFixed(2)} ${c1y.toFixed(2)}, ${c2x.toFixed(2)} ${c2y.toFixed(2)}, ${p2[0].toFixed(2)} ${p2[1].toFixed(2)}`;
+  }
+  return d + ' Z';
+})();
+
+// Distinct line icon per service (inner SVG paths, 24×24 stroke grid).
+const ICONS: Record<string, string> = {
+  'window-tinting':
+    '<path d="M3 12l2-5.5A2.5 2.5 0 0 1 7.4 5h9.2a2.5 2.5 0 0 1 2.4 1.5L21 12"/><path d="M3 12h18v4.5a1 1 0 0 1-1 1h-1.2a2 2 0 0 1-3.9 0H9.1a2 2 0 0 1-3.9 0H4a1 1 0 0 1-1-1z"/><path d="M12 6v6"/>',
+  ppf: '<path d="M12 3l7 3v5c0 4.6-3 7.7-7 9-4-1.3-7-4.4-7-9V6z"/><path d="M9.2 12l2 2 3.6-3.7"/>',
+  'ceramic-coating':
+    '<path d="M12 3.5s5.5 5.6 5.5 9.5a5.5 5.5 0 0 1-11 0C6.5 9.1 12 3.5 12 3.5z"/><path d="M9.5 13a2.5 2.5 0 0 0 2.5 2.5"/>',
+  tesla: '<path d="M13 3L5 13h5l-1 8 8-11h-5z"/>',
+  'commercial-films':
+    '<path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16"/><path d="M14 9h5a1 1 0 0 1 1 1v11"/><path d="M7.5 8h3M7.5 12h3M7.5 16h3M17 13h0M17 17h0"/>',
+};
 ---
 
-<section id="servicios" class="mx-auto max-w-6xl px-5 py-16 md:py-24">
-  <p class="mb-2 text-center text-xs uppercase tracking-[0.3em] text-olivaDk">
-    Servicios en San Luis Potosí y en línea
-  </p>
-  <h2 class="mb-12 text-center font-display text-4xl font-light md:text-5xl">
-    Cómo podemos trabajar juntas
-  </h2>
+<section id="services" class="relative bg-ink">
+  <div class="mx-auto max-w-6xl px-5 py-20 md:py-24">
+    <div class="grid gap-14 md:grid-cols-[2fr_3fr] md:items-start">
+      <!-- Left: image with badge -->
+      <div class="reveal relative min-w-0">
+        <img
+          src={IMAGES.fleet.src}
+          alt={IMAGES.fleet.alt}
+          width={IMAGES.fleet.width}
+          height={IMAGES.fleet.height}
+          loading="lazy"
+          class="aspect-[4/5] w-full object-cover"
+        />
+        <!-- Certification seal: 100% satisfaction guarantee -->
+        <div class="absolute -right-5 -bottom-5 hidden h-28 w-28 drop-shadow-[0_8px_16px_rgba(0,0,0,0.3)] md:block lg:-right-6 lg:h-32 lg:w-32">
+          <svg viewBox="-12 -12 224 224" class="h-full w-full" aria-hidden="true">
+            <defs>
+              <linearGradient id="seal-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#2CB8FF" />
+                <stop offset="1" stop-color="#0086D6" />
+              </linearGradient>
+              <path id="seal-top" d="M100 100 m-61 0 a61 61 0 1 1 122 0" fill="none" />
+              <path id="seal-bottom" d="M100 100 m-73 0 a73 73 0 1 0 146 0" fill="none" />
+            </defs>
+            <path d={seal} fill="url(#seal-grad)" />
+            <!-- Faint concentric guilloche rings -->
+            <circle cx="100" cy="100" r="52" fill="none" stroke="#0A6FB0" stroke-opacity="0.35" stroke-width="1" />
+            <circle cx="100" cy="100" r="47" fill="none" stroke="#0A6FB0" stroke-opacity="0.35" stroke-width="1" />
+            <circle cx="100" cy="100" r="42" fill="none" stroke="#0A6FB0" stroke-opacity="0.35" stroke-width="1" />
+            <text fill="#FFFFFF" font-family="Gabarito, sans-serif" font-size="17.5" font-weight="400">
+              <textPath href="#seal-top" startOffset="50%" text-anchor="middle" textLength="170" lengthAdjust="spacing">100% SATISFACTION</textPath>
+            </text>
+            <text fill="#FFFFFF" font-family="Gabarito, sans-serif" font-size="17.5" font-weight="400">
+              <textPath href="#seal-bottom" startOffset="50%" text-anchor="middle" textLength="124" lengthAdjust="spacing">GUARANTEE</textPath>
+            </text>
+          </svg>
+          <!-- Static center emblem: black shield with circled check -->
+          <div class="absolute inset-0 grid place-items-center">
+            <svg viewBox="0 0 48 48" class="h-[30%] w-[30%]" aria-hidden="true">
+              <path d="M24 3l16 6v11c0 10.5-6.8 17.6-16 21C14.8 37.6 8 30.5 8 20V9z" fill="#FFFFFF" />
+              <circle cx="24" cy="22" r="7.5" fill="none" stroke="#0086D6" stroke-width="2" />
+              <path d="M20.5 22l2.4 2.4 4.6-5" fill="none" stroke="#0086D6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+        </div>
+      </div>
 
-  <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-    {
-      SERVICES.map((service) => (
-        <article class="reveal lift flex flex-col rounded-sm border border-tinta/10 bg-white/70 p-7 hover:border-terra/60">
-          <span class="font-script text-2xl text-terraInk" aria-hidden="true">
-            {service.kicker}
-          </span>
-          <h3 class="mb-3 mt-1 font-display text-xl">{service.name}</h3>
-          <p class="flex-1 text-sm leading-relaxed text-cafe">{service.description}</p>
-          <p class="mt-5 text-xs uppercase tracking-[0.2em] text-olivaDk">{service.meta}</p>
-        </article>
-      ))
-    }
+      <!-- Right: title + stacked service cards -->
+      <div class="min-w-0">
+        <p class="reveal kicker text-accent">Our services</p>
+        <h2 class="reveal headline mt-3 text-[clamp(1.4rem,2.8vw,2.2rem)] text-paper">
+          Services built for style & protection
+        </h2>
+        <p class="reveal mt-5 max-w-[58ch] text-[15px] leading-relaxed text-smoke">
+          From daily drivers to show cars, Teslas, and commercial glass — every install is
+          precision-cut, warranty-backed, and finished to factory standards.
+        </p>
+
+        <div class="mt-9 flex flex-col gap-3">
+          {
+            SERVICES.slice(0, 4).map((service) => (
+              <a
+                href={`/services/${service.slug}`}
+                class="lift group relative flex items-center gap-4 overflow-hidden bg-paper p-5 shadow-[0_2px_10px_rgba(0,0,0,0.05)] md:p-6"
+              >
+                <img
+                  src={IMAGES[service.image].src}
+                  alt=""
+                  aria-hidden="true"
+                  loading="lazy"
+                  class="pointer-events-none absolute inset-y-0 right-0 h-full w-44 object-cover opacity-[0.24] transition-opacity duration-500 group-hover:opacity-40 [mask-image:linear-gradient(to_left,#000,transparent)]"
+                />
+                <span class="relative flex h-12 w-12 shrink-0 items-center justify-center bg-accent text-ink">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS[service.id]} />
+                </span>
+                <span class="relative min-w-0 flex-1">
+                  <h3 class="headline text-base tracking-[0.06em] text-ink">{service.name}</h3>
+                  <p class="mt-1 line-clamp-2 text-sm leading-relaxed text-char">{service.short}</p>
+                </span>
+                <span
+                  class="relative shrink-0 self-center text-accentDk transition-transform duration-300 ease-out group-hover:translate-x-1"
+                  aria-hidden="true"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                </span>
+              </a>
+            ))
+          }
+        </div>
+
+        <div class="reveal mt-9 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <a
+            href="/#contact"
+            class="pressable sticker bg-accent px-8 py-3.5 text-center text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
+          >
+            Get a Quote →
+          </a>
+          <a
+            href={`tel:${CONTACT.phoneTel}`}
+            class="pressable inline-flex items-center justify-center gap-2 px-2 py-3.5 text-sm font-bold text-paper transition-colors hover:text-accent"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#00A8FF" aria-hidden="true"><path d="M6.62 10.79a15.53 15.53 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2Z" /></svg>
+            {CONTACT.phoneDisplay}
+          </a>
+        </div>
+      </div>
+    </div>
   </div>
 </section>

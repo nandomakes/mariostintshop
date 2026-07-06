@@ -1,0 +1,32 @@
+---
+// Scrolling ticker strip with alternating solid-green and hollow words.
+interface Props {
+  items?: string[];
+}
+const {
+  items = ['Window Tint', 'PPF', 'Ceramic Coating', 'Tesla', 'Commercial Film'],
+} = Astro.props;
+
+// Duplicate the sequence so the -50% marquee loop is seamless.
+const seq = [...items, ...items, ...items, ...items];
+---
+
+<div class="marquee border-y border-line bg-ink py-3.5" aria-hidden="true">
+  <div class="marquee-track">
+    {
+      seq.map((label, i) => (
+        <span class="mx-5 flex items-center gap-10 whitespace-nowrap">
+          <span
+            class:list={[
+              'headline text-xl tracking-[0.08em]',
+              i % 2 === 0 ? 'text-accent' : 'outline-text',
+            ]}
+          >
+            {label}
+          </span>
+          <span class="text-accent">✦</span>
+        </span>
+      ))
+    }
+  </div>
+</div>

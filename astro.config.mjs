@@ -5,7 +5,8 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://www.nutricionconmariana.mx',
+  // ⚠️ REPLACE with the real domain before deploy.
+  site: 'https://www.mariostintshop.com',
   integrations: [tailwind(), sitemap()],
   build: {
     inlineStylesheets: 'auto',

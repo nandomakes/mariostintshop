@@ -1,0 +1,89 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import HeroService from '../../components/HeroService.astro';
+import FeatureSplit from '../../components/FeatureSplit.astro';
+import Faq from '../../components/Faq.astro';
+import QuoteCTA from '../../components/QuoteCTA.astro';
+import Footer from '../../components/Footer.astro';
+import CallFab from '../../components/CallFab.astro';
+import { SERVICES, SITE, IMAGES } from '../../consts';
+
+export function getStaticPaths() {
+  return SERVICES.map((service) => ({
+    params: { slug: service.slug },
+    props: { service },
+  }));
+}
+
+const { service } = Astro.props;
+const img = IMAGES[service.image];
+const title = `${service.name} in Murfreesboro, TN | ${SITE.brand}`;
+const description = service.heroSubcopy;
+---
+
+<Layout title={title} description={description}>
+  <Header />
+  <main id="content">
+    <HeroService
+      kicker={service.kicker}
+      title={service.name}
+      subcopy={service.heroSubcopy}
+      imageSrc={img.src}
+    />
+
+    <FeatureSplit
+      title={`Why ${service.name}?`}
+      paragraphs={[service.intro]}
+      imageSrc={img.src}
+      imageAlt={img.alt}
+      imageW={img.width}
+      imageH={img.height}
+    />
+
+    <!-- Feature highlights -->
+    <section class="bg-ink">
+      <div class="mx-auto max-w-6xl px-5 py-16 md:py-24">
+        <p class="kicker mb-2 text-center text-accent">What you get</p>
+        <h2 class="mb-12 text-center headline text-[clamp(1.8rem,4vw,2.75rem)] text-paper">
+          Built to protect
+        </h2>
+        <div class="grid gap-5 sm:grid-cols-2">
+          {
+            service.features.map((f) => (
+              <div class="lift border border-line bg-coal p-7">
+                <h3 class="headline text-base tracking-[0.06em] text-accent">{f.title}</h3>
+                <p class="mt-3 text-sm leading-relaxed text-smoke">{f.body}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Process -->
+    <section class="border-y border-sand bg-whisper">
+      <div class="mx-auto max-w-6xl px-5 py-16 md:py-24">
+        <p class="kicker mb-2 text-center text-accentDk">Our process</p>
+        <h2 class="mb-12 text-center headline text-[clamp(1.8rem,4vw,2.75rem)] text-ink">
+          How it works
+        </h2>
+        <ol class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {
+            service.process.map((step, i) => (
+              <li class="border border-sand bg-paper p-6 shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
+                <span class="headline text-3xl text-accentDk">{String(i + 1).padStart(2, '0')}</span>
+                <p class="mt-3 text-sm leading-relaxed text-char">{step}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </section>
+
+    <Faq items={service.faqs} />
+    <QuoteCTA defaultService={service.name} />
+  </main>
+  <Footer />
+  <CallFab />
+</Layout>

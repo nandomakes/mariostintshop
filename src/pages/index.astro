@@ -1,36 +1,30 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import TopBar from '../components/TopBar.astro';
-import Navbar from '../components/Navbar.astro';
+import Header from '../components/Header.astro';
 import Hero from '../components/Hero.astro';
-import ProgramsBand from '../components/ProgramsBand.astro';
-import Approach from '../components/Approach.astro';
 import About from '../components/About.astro';
-import Empathy from '../components/Empathy.astro';
 import Services from '../components/Services.astro';
+import Features from '../components/Features.astro';
+import Gallery from '../components/Gallery.astro';
 import Testimonials from '../components/Testimonials.astro';
-import Booking from '../components/Booking.astro';
+import QuoteCTA from '../components/QuoteCTA.astro';
+import Location from '../components/Location.astro';
 import Footer from '../components/Footer.astro';
-import WhatsAppFab from '../components/WhatsAppFab.astro';
+import CallFab from '../components/CallFab.astro';
 ---
 
 <Layout>
-  <TopBar />
-  <Navbar />
-  <main id="contenido">
-    <!-- Hero + banda de programas ocupan juntos la altura de pantalla
-         (descontando topbar + nav sticky ≈ 100px). -->
-    <div class="flex min-h-[calc(100svh-100px)] flex-col">
-      <Hero />
-      <ProgramsBand />
-    </div>
-    <Approach />
+  <Header />
+  <main id="content">
+    <Hero />
     <About />
-    <Empathy />
     <Services />
+    <Features />
+    <Gallery />
     <Testimonials />
-    <Booking />
+    <QuoteCTA />
+    <Location />
   </main>
   <Footer />
-  <WhatsAppFab />
+  <CallFab />
 </Layout>

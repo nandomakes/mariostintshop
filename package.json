@@ -1,5 +1,5 @@
 {
-  "name": "nutriologa-slp-1",
+  "name": "marios-tint-shop",
   "type": "module",
   "version": "1.0.0",
   "private": true,
@@ -14,9 +14,9 @@
     "@astrojs/check": "^0.9.4",
     "@astrojs/sitemap": "^3.3.0",
     "@astrojs/tailwind": "^5.1.5",
-    "@fontsource-variable/fraunces": "^5.2.5",
-    "@fontsource-variable/karla": "^5.2.5",
-    "@fontsource/la-belle-aurore": "^5.2.5",
+    "@fontsource-variable/inter": "^5.2.5",
+    "@fontsource/caveat": "^5.2.8",
+    "@fontsource/oswald": "^5.2.8",
     "astro": "^5.7.0",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.2"

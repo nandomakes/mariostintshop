@@ -4,26 +4,32 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Paleta del prototipo 1 — crema / oliva / terracota.
-        // `cafe` y `terraInk` ajustados para cumplir WCAG AA sobre crema.
-        crema: '#F5EFE3',
-        arena: '#EAE0CC',
-        oliva: '#9A9456',
-        olivaDk: '#6E6A3C',
-        salvia: '#B9BC8F',
-        terra: '#E9A48E',
-        terraInk: '#B05A3C', // versión texto del terra (≥3:1 sobre crema)
-        blush: '#F0B9A6',
-        tinta: '#332E25',
-        cafe: '#6B5C45', // cuerpo de texto (≥4.5:1 sobre crema)
+        // "Neon Garage" — jet black + pure white + electric blue accent.
+        accent: '#00A8FF', // electric blue: CTAs, icons, highlights
+        accentDk: '#0086D6', // pressed / hover blue
+        ink: '#111111', // jet black backgrounds
+        coal: '#1A1A1A', // elevated dark surface
+        line: '#2A2A2A', // borders / hairlines on dark
+        smoke: '#A3A3A3', // muted text on dark
+        paper: '#FFFFFF', // pure white
+        mint: '#F0F7FD', // testimonial card surface (pale blue tint)
+        whisper: '#F9F9F9', // input / light card surface
+        sand: '#EEEEEE', // hairline borders on light
+        ash: '#888888', // muted text on light (dates, placeholders)
+        char: '#333333', // body text on light
       },
       fontFamily: {
-        display: ['"Instrument Serif"', 'Georgia', 'serif'],
-        body: ['"Karla Variable"', 'Karla', 'sans-serif'],
-        script: ['"Homemade Apple"', 'cursive'],
+        // Industrial condensed uppercase for headings; clean sans for body;
+        // handwritten script for section eyebrows.
+        display: ['"Special Gothic Expanded One"', 'Impact', 'sans-serif'],
+        body: ['"Inter Variable"', 'Inter', 'system-ui', 'sans-serif'],
+        script: ['"Sedgwick Ave"', 'cursive'],
+      },
+      borderRadius: {
+        '4xl': '2rem',
+        '5xl': '2.75rem',
       },
       transitionTimingFunction: {
-        // ease-out fuerte para entradas y hovers (emil-design-eng)
         out: 'cubic-bezier(0.23, 1, 0.32, 1)',
       },
     },

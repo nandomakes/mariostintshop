@@ -1,78 +1,120 @@
 ---
-import { SITE, CONTACT, NAV_LINKS, WHATSAPP_URL } from '../consts';
+import { SITE, CONTACT, SERVICES, SOCIALS } from '../consts';
+import Logo from './Logo.astro';
 
 const year = new Date().getFullYear();
+
+// Monochrome brand glyphs (site blue via currentColor) on black chips.
+const SOCIAL_ICONS: Record<string, string> = {
+  Google:
+    '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 11v3.6h5.1c-.2 1.3-1.6 3.9-5.1 3.9-3.1 0-5.6-2.5-5.6-5.6S8.9 6.4 12 6.4c1.8 0 2.9.8 3.6 1.4l2.4-2.3C16.5 3.9 14.5 3 12 3 6.9 3 2.8 7.1 2.8 12S6.9 21 12 21c5.2 0 8.6-3.6 8.6-8.7 0-.6-.1-1-.2-1.3H12z"/></svg>',
+  Facebook:
+    '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.3-1.5 1.6-1.5h1.7V3.7c-.3 0-1.3-.1-2.5-.1-2.4 0-4 1.5-4 4.1v2.2H7.6V13h2.3v8z"/></svg>',
+  Instagram:
+    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><rect x="2.6" y="2.6" width="18.8" height="18.8" rx="5.5" stroke-width="2"/><circle cx="12" cy="12" r="4.2" stroke-width="2"/><circle cx="17.4" cy="6.6" r="1.25" fill="currentColor" stroke="none"/></svg>',
+};
 ---
 
-<footer class="bg-tinta text-crema/80">
-  <div
-    class="mx-auto grid max-w-6xl gap-x-8 gap-y-10 px-5 py-12 text-sm sm:grid-cols-2 md:grid-cols-[1.6fr_1fr_1fr_1.2fr]"
-  >
+<footer class="border-t border-line bg-ink text-smoke">
+  <div class="mx-auto grid max-w-6xl gap-x-8 gap-y-12 px-5 py-16 text-sm sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
+    <!-- Brand + socials -->
     <div>
-      <span class="block font-script text-3xl text-terra">{SITE.firstName}</span>
-      <p class="mt-2 max-w-[34ch]">
-        Nutrióloga clínica en San Luis Potosí. Cédula profesional {SITE.license}.
+      <div class="inline-block"><Logo /></div>
+      <p class="mt-5 max-w-[36ch] leading-relaxed">
+        Premium window tint, paint protection film, and ceramic coating in
+        Murfreesboro, TN. BBB A+ accredited · {SITE.yearsInBusiness} years.
       </p>
-    </div>
-    <div>
-      <p class="mb-3 text-xs uppercase tracking-[0.25em] text-crema">Ubicación</p>
-      <p>
-        {CONTACT.address},<br />
-        {CONTACT.city}
-      </p>
-    </div>
-    <div>
-      <p class="mb-3 text-xs uppercase tracking-[0.25em] text-crema">Navegación</p>
-      <ul class="space-y-1">
+      <div class="mt-6 flex items-center gap-3">
         {
-          NAV_LINKS.filter((l) => l.href !== '#inicio').map((link) => (
+          SOCIALS.map((s) => (
+            <a
+              href={s.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={s.name}
+              class="pressable flex h-10 w-10 items-center justify-center rounded-full border border-line bg-black text-accent transition-colors duration-200 hover:border-accent hover:text-accentDk"
+            >
+              <span class="flex" set:html={SOCIAL_ICONS[s.name]} />
+            </a>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- Services -->
+    <div>
+      <p class="headline mb-4 text-base tracking-[0.08em] text-paper">Our Services</p>
+      <ul class="space-y-2.5">
+        {
+          SERVICES.map((s) => (
             <li>
-              <a href={link.href} class="transition-colors duration-200 hover:text-terra">
-                {link.label}
+              <a href={`/services/${s.slug}`} class="transition-colors duration-200 hover:text-accent">
+                {s.name}
               </a>
             </li>
           ))
         }
       </ul>
     </div>
+
+    <!-- Contact -->
     <div>
-      <p class="mb-3 text-xs uppercase tracking-[0.25em] text-crema">Contacto</p>
-      <ul class="space-y-1">
+      <p class="headline mb-4 text-base tracking-[0.08em] text-paper">Contact</p>
+      <ul class="space-y-2.5">
+        <li>{CONTACT.address},<br />{CONTACT.city}</li>
         <li>
-          <a href={`mailto:${CONTACT.email}`} class="transition-colors duration-200 hover:text-terra">
+          <a href={`tel:${CONTACT.phoneTel}`} class="transition-colors duration-200 hover:text-accent">
+            {CONTACT.phoneDisplay}
+          </a>
+        </li>
+        <li>
+          <a href={`mailto:${CONTACT.email}`} class="transition-colors duration-200 hover:text-accent">
             {CONTACT.email}
           </a>
         </li>
-        <li>
-          <a href={WHATSAPP_URL} class="transition-colors duration-200 hover:text-terra">
-            WhatsApp
+      </ul>
+    </div>
+
+    <!-- Hours + CTA -->
+    <div>
+      <p class="headline mb-4 text-base tracking-[0.08em] text-paper">Store Hours</p>
+      <ul class="space-y-2.5">
+        <li>{CONTACT.schedule}</li>
+        <li>Sunday · Closed</li>
+        <li class="pt-3">
+          <a
+            href="/#contact"
+            class="pressable sticker inline-block bg-accent px-6 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
+          >
+            Get a Quote →
           </a>
         </li>
-        <li class="text-crema/60">{CONTACT.schedule}</li>
       </ul>
     </div>
   </div>
-  <div
-    class="mx-auto flex max-w-6xl flex-col items-center gap-5 border-t border-crema/10 px-5 py-6 sm:flex-row sm:justify-between"
-  >
-    <p class="text-xs text-crema/50">
-      © {year} {SITE.brand} · {SITE.role}
-    </p>
-    <a
-      href="https://clicksrun.com"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="group flex items-center gap-3 opacity-70 transition-opacity duration-200 hover:opacity-100"
-      aria-label="Diseñado por ClicksRun"
-    >
-      <span class="text-[10px] uppercase tracking-[0.25em] text-crema/50">Diseñado por</span>
-      <img
-        src="/logos-clicksrun/logo-claro.svg"
-        alt="ClicksRun"
-        height="56"
-        class="h-14 w-auto"
-        loading="lazy"
-      />
-    </a>
+
+  <!-- Bottom bar -->
+  <div class="border-t border-line">
+    <div class="mx-auto flex max-w-6xl flex-col items-center gap-5 px-5 py-6 sm:flex-row sm:justify-between">
+      <p class="text-xs text-smoke/70">
+        © {year} {SITE.brand} · Murfreesboro, TN. All rights reserved.
+      </p>
+      <a
+        href="https://clicksrun.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="group flex items-center gap-3 opacity-70 transition-opacity duration-200 hover:opacity-100"
+        aria-label="Designed by ClicksRun"
+      >
+        <span class="text-[10px] uppercase tracking-[0.25em] text-smoke/60">Designed by</span>
+        <img
+          src="/logos-clicksrun/logo-claro.svg"
+          alt="ClicksRun"
+          height="56"
+          class="h-14 w-auto"
+          loading="lazy"
+        />
+      </a>
+    </div>
   </div>
 </footer>

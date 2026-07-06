@@ -1,0 +1,15 @@
+---
+// Official Mario's Tint Shop logo (used in header/footer on dark surfaces).
+interface Props {
+  class?: string;
+}
+const { class: className = 'h-12 w-auto md:h-14' } = Astro.props;
+---
+
+<img
+  src="/images/logo-mario.svg"
+  alt="Mario's Tint Shop"
+  width="1500"
+  height="1500"
+  class:list={['block', className]}
+/>

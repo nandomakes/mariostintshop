@@ -1,0 +1,77 @@
+---
+import { SITE, CONTACT } from '../consts';
+
+const mapQuery = encodeURIComponent(`${CONTACT.address}, ${CONTACT.city}`);
+const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${mapQuery}`;
+---
+
+<section id="location" class="hex-bg border-t border-sand bg-paper">
+  <div class="mx-auto max-w-6xl px-5 py-20 md:py-24">
+    <div class="text-center">
+      <p class="reveal kicker text-accentDk">Serving Murfreesboro</p>
+      <h2 class="reveal headline mx-auto mt-3 max-w-3xl text-[clamp(1.4rem,2.8vw,2.2rem)] text-ink">
+        Murfreesboro's #1 for auto tint & paint protection
+      </h2>
+    </div>
+
+    <div class="mt-12 grid gap-8 md:grid-cols-[2fr_3fr] md:gap-10">
+      <!-- Left: contact info card -->
+      <div class="reveal border border-sand bg-paper p-8 shadow-[0_2px_10px_rgba(0,0,0,0.05)] md:p-9">
+        <p class="headline text-2xl text-ink">{SITE.brand}</p>
+        <dl class="mt-7 space-y-6">
+          <div class="flex items-start gap-4">
+            <span class="flex h-11 w-11 shrink-0 items-center justify-center bg-accent text-ink" aria-hidden="true">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
+            </span>
+            <div>
+              <dt class="num text-ash">Address</dt>
+              <dd class="mt-1 text-[15px] text-char">{CONTACT.address}, {CONTACT.city}</dd>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <span class="flex h-11 w-11 shrink-0 items-center justify-center bg-accent text-ink" aria-hidden="true">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.53 15.53 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2Z" /></svg>
+            </span>
+            <div>
+              <dt class="num text-ash">Phone</dt>
+              <dd class="mt-1">
+                <a href={`tel:${CONTACT.phoneTel}`} class="text-[15px] font-bold text-ink hover:text-accentDk">
+                  {CONTACT.phoneDisplay}
+                </a>
+              </dd>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <span class="flex h-11 w-11 shrink-0 items-center justify-center bg-accent text-ink" aria-hidden="true">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></svg>
+            </span>
+            <div>
+              <dt class="num text-ash">Working hours</dt>
+              <dd class="mt-1 text-[15px] text-char">{CONTACT.schedule}</dd>
+            </div>
+          </div>
+        </dl>
+        <a
+          href={directionsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="pressable sticker mt-8 inline-block bg-accent px-8 py-3.5 text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
+        >
+          Get Directions →
+        </a>
+      </div>
+
+      <!-- Right: map -->
+      <div class="reveal overflow-hidden border border-sand">
+        <iframe
+          title="Map to Mario's Tint Shop"
+          src={`https://maps.google.com/maps?q=${mapQuery}&z=13&output=embed`}
+          width="100%"
+          height="100%"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          class="block h-full min-h-[340px] w-full border-0"></iframe>
+      </div>
+    </div>
+  </div>
+</section>
