@@ -23,7 +23,7 @@ const slides = [...TESTIMONIALS, ...TESTIMONIALS];
       {
         slides.map((t, i) => (
           <figure
-            class="w-full shrink-0 bg-mint sm:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-3rem)/3)]"
+            class="flex w-full shrink-0 flex-col bg-mint sm:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-3rem)/3)]"
             aria-hidden={i >= TESTIMONIALS.length ? 'true' : undefined}
           >
             <!-- Evidence shot: the customer's finished vehicle -->
@@ -35,7 +35,7 @@ const slides = [...TESTIMONIALS, ...TESTIMONIALS];
               loading="lazy"
               class="aspect-[8/5] w-full object-cover"
             />
-            <div class="relative p-8">
+            <div class="relative flex flex-1 flex-col p-8">
               <div class="flex gap-1 text-accentDk" aria-label="5 out of 5 stars">
                 {Array.from({ length: 5 }).map(() => (
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -43,7 +43,7 @@ const slides = [...TESTIMONIALS, ...TESTIMONIALS];
                   </svg>
                 ))}
               </div>
-              <blockquote class="mt-4 text-[15px] leading-relaxed text-char">“{t.quote}”</blockquote>
+              <blockquote class="mt-4 flex-1 text-[15px] leading-relaxed text-char">“{t.quote}”</blockquote>
               <hr class="my-5 border-accentDk/15" />
               <figcaption>
                 <p class="headline text-base tracking-[0.06em] text-ink">{t.author}</p>
