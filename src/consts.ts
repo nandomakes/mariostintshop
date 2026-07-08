@@ -8,45 +8,45 @@ export const SITE = {
   name: "Mario's Tint Shop",
   brand: "Mario's Tint Shop",
   shortName: 'Mario',
-  role: 'Premium Auto Tint, PPF & Ceramic Coating',
+  role: '3M Window Tinting, PPF & Ceramic Coating',
   city: 'Murfreesboro, TN',
-  yearsInBusiness: '10+',
-  license: 'BBB A+ Accredited',
+  yearsInBusiness: '25+',
+  license: 'BBB A+ Accredited · Authorized 3M Platinum Dealer',
   title:
-    "Mario's Tint Shop | Premium Window Tint, PPF & Ceramic Coating in Murfreesboro, TN",
+    "Mario's Tint Shop | 3M Window Tinting, PPF & Ceramic Coating in Murfreesboro, TN",
   description:
-    "Premium automotive window tinting, paint protection film (PPF), and ceramic coating in Murfreesboro, TN. 10+ years of experience, BBB A+ rated, Tesla specialists. Book a free call.",
-  url: 'https://www.mariostintshop.com', // ⚠️ REPLACE: real domain
+    "Murfreesboro's elite tint shop and leading 3M dealer. Professional automotive window tinting, paint protection film (PPF), and ceramic coating serving Murfreesboro, Nashville & Middle Tennessee. 25+ years of experience, BBB A+ rated, 5.0-star Google rating.",
+  url: 'https://mariostintshop.com',
   themeColor: '#111111',
 };
 
 // ── Contact / Phone ─────────────────────────────────────────────────
-// ⚠️ REPLACE: real phone in international format for the tel: link.
-export const PHONE_DISPLAY = '(615) 000-0000'; // ⚠️ REPLACE
-export const PHONE_TEL = '+16150000000'; // ⚠️ REPLACE (digits only, +1…)
-export const WHATSAPP_NUMBER = '16150000000'; // ⚠️ REPLACE (digits only, no +)
+export const PHONE_DISPLAY = '(615) 410-7170';
+export const PHONE_TEL = '+16154107170';
+export const WHATSAPP_NUMBER = '16154107170'; // digits only, no +
 
 export const CONTACT = {
-  address: '000 Old Fort Pkwy', // ⚠️ REPLACE
-  city: 'Murfreesboro, TN 37129', // ⚠️ REPLACE zip
+  address: '515 NW Broad St',
+  city: 'Murfreesboro, TN 37130',
   phoneDisplay: PHONE_DISPLAY,
   phoneTel: PHONE_TEL,
-  email: 'info@mariostintshop.com', // ⚠️ REPLACE
-  schedule: 'Mon–Sat, 9:00 a.m. to 6:00 p.m.', // ⚠️ REPLACE
-  scheduleShort: 'Mon–Sat 9–6',
-  geo: { lat: 35.8456, lng: -86.3903 }, // Murfreesboro, TN (approx.)
-  googleBusinessUrl: '#', // ⚠️ REPLACE
-  bbbUrl: '#', // ⚠️ REPLACE
+  email: 'mario@mariostintshop.com',
+  schedule: 'Mon–Fri, 8:00 a.m. to 5:00 p.m. · Sat by appointment',
+  scheduleShort: 'Mon–Fri 8–5',
+  geo: { lat: 35.8470688, lng: -86.3974265 },
+  googleBusinessUrl:
+    "https://www.google.com/maps/place/Mario's+Tint+Shop/@35.8470688,-86.4000014,17z/data=!4m8!3m7!1s0x886407f99c411c3b:0x274579f0ecaef14!8m2!3d35.8470688!4d-86.3974265!9m1!1b1!16s%2Fg%2F11c1rsgy6y",
+  bbbUrl: '#',
 };
 
 // ── Hero copy ───────────────────────────────────────────────────────
 export const HERO = {
-  kicker: "Welcome to Mario's Tint Shop",
-  line1: 'Perfecting Every Surface',
-  line2: 'with Skilled Hands',
-  sub: "We protect your vehicle with premium window tint, paint protection film, and ceramic coating — installed with precision by Murfreesboro's trusted specialists.",
+  kicker: "Murfreesboro's Elite Tint Shop",
+  line1: 'Leading 3M Dealer',
+  line2: 'in Middle Tennessee',
+  sub: "Mario's Tint Shop is the premier provider of 3M automotive and architectural window tinting, paint protection film, and ceramic coating services to customers in Middle Tennessee.",
   address: 'We are ready for you at: ',
-  addressPlace: '000 Old Fort Pkwy, Murfreesboro, TN', // ⚠️ REPLACE
+  addressPlace: '515 NW Broad St, Murfreesboro, TN 37130',
 };
 
 // ── Images (paths under /public/images) ─────────────────────────────
@@ -105,56 +105,57 @@ export interface Stat {
   label: string;
 }
 export const STATS: Stat[] = [
-  { num: 10, suffix: '+', label: 'Years Experience' },
+  { num: 25, suffix: '+', label: 'Years Experience' },
   { text: 'A+', label: 'BBB Rating' },
-  { text: 'Tesla', label: 'Specialists' },
-  { num: 500, suffix: '+', label: '5-Star Reviews' },
+  { text: '3M', label: 'Platinum Dealer' },
+  { num: 128, suffix: '+', label: '5-Star Reviews' },
 ];
 
 // ── "Why choose us" ─────────────────────────────────────────────────
 export const WHY_US = {
-  lead: "A great protection job isn't about promises — it's about results.",
-  intro: 'Everything we do is built to keep you confident in your vehicle.',
+  lead: 'Our mission is to provide top-notch automotive paint protection and window tinting services.',
+  intro:
+    'We use only the highest quality materials and tools to ensure perfect results — and our A+ rating from the Better Business Bureau is a testament to our commitment to excellence.',
   bullets: [
-    'Certified, experienced installers on every single job.',
-    "We don't push unnecessary work — we protect what matters.",
-    'Premium, warranty-backed films and coatings only.',
-    'We respect your time and hit our promised turnaround.',
-    '87% of our new customers come from referrals.',
+    'Authorized 3M Platinum Dealer — certified 3M, XPEL & SunTek installers.',
+    'Over 25 years of experience in the automotive and window film industry.',
+    'Lifetime warranty available on our window films.',
+    '5.0-star Google rating from 128+ customer reviews.',
+    'A+ rated by the Better Business Bureau.',
   ],
   cards: [
     {
-      title: 'Certified Installers',
-      body: 'Our team has years of hands-on experience with tint, PPF, and ceramic. We know how to install film flawlessly — and how to avoid the mistakes that cause peeling and bubbling.',
+      title: 'Authorized 3M Platinum Dealer',
+      body: 'As a leading 3M dealer in the Nashville area, we install the full range of 3M automotive and architectural films — from Obsidian carbon tint to Ceramic IR and Prestige series — all backed by comprehensive 3M manufacturer warranties.',
     },
     {
-      title: 'Premium Materials',
-      body: 'First, we assess your vehicle and recommend exactly what it needs. Then we use only trusted, warranty-backed films and coatings — no bargain product, no surprises, no hidden charges.',
+      title: 'Premium Materials Only',
+      body: 'We use industry-leading brands like 3M, XPEL, SunTek, and STEK on every job. First we assess your vehicle and recommend exactly what it needs — no bargain film, no surprises, no hidden charges.',
     },
   ],
 };
 
 // ── Warranty highlight ──────────────────────────────────────────────
 export const WARRANTY = {
-  headline: 'Lifetime warranty on premium tint & film',
-  body: "We stand behind our work with manufacturer-backed warranties. If an issue ever comes up, simply bring your vehicle back and we'll make it right — at our expense.",
+  headline: 'Lifetime warranty available on our window films',
+  body: "We stand behind our work with manufacturer-backed warranties — including 3M's comprehensive 10-year PPF warranty. If an issue ever comes up, simply bring your vehicle back and we'll make it right.",
 };
 
 // ── About section ───────────────────────────────────────────────────
 export const ABOUT = {
   number: '01',
   title: ["About Mario's", 'Tint Shop'],
-  lead: 'Murfreesboro’s trusted specialists for premium window tint, paint protection film, and ceramic coating.',
+  lead: "Mario's Tint Shop was built on decades of experience in the automotive accessories and window tinting industry — over 25 years working with vehicle accessories, automotive electronics, and professional window film installation.",
   body1:
-    'For over a decade we’ve treated every vehicle like our own — from daily drivers to show cars and Teslas. No shortcuts, no bargain film, no guesswork.',
+    "For more than 10 years, Mario's Tint Shop has proudly served Murfreesboro, Nashville, and the surrounding Middle Tennessee communities with professional automotive window tinting and paint protection film installation, building a strong reputation for high-quality workmanship, premium materials, and exceptional customer service.",
   body2:
-    'Our certified installers work in a clean, controlled bay using only warranty-backed materials. The result is protection that looks factory-clean and holds up for years — and a BBB A+ reputation built one flawless install at a time.',
+    "We're a one-stop shop for window tinting, paint protection film, ceramic coating, and office & commercial films. Our attention to detail and commitment to premium brands like 3M, XPEL, and SunTek ensure every installation meets the highest standards — backed by an A+ BBB rating and a 5.0-star Google rating.",
 };
 
 // ── Instagram ───────────────────────────────────────────────────────
 export const INSTAGRAM = {
-  handle: '@mariostintshop', // ⚠️ REPLACE
-  url: 'https://instagram.com/', // ⚠️ REPLACE with real profile
+  handle: '@mariostintshop',
+  url: 'https://www.instagram.com/mariostintshop/',
   label: '#OurInstagram',
 };
 
@@ -196,24 +197,24 @@ export const SERVICES: Service[] = [
     kicker: 'Window Tinting',
     name: 'Car Window Tinting',
     short:
-      'Premium ceramic and carbon window film that cuts heat, blocks UV, and gives a clean, factory-finished look — installed to last.',
-    meta: 'Ceramic & carbon films · lifetime warranty',
-    startingPrice: 'from $199', // ⚠️ REPLACE
+      'Quality 3M car window tinting that protects your vehicle, keeps your interior cooler, and blocks up to 99% of damaging UV rays.',
+    meta: '3M Obsidian · CS IR nano ceramic · Ceramic IR',
+    startingPrice: 'Free quote',
     includes: [
-      'Full vehicle ceramic or carbon film',
-      'Up to 99% UV rejection',
-      'Legal TN shade consultation',
-      'Lifetime warranty against fading & bubbling',
+      'Silver: 3M™ Obsidian Series carbon film',
+      'Gold: 3M™ CS IR nano ceramic film',
+      'Platinum: 3M™ Ceramic IR — up to 90% IR rejection',
+      'Lifetime warranty available',
     ],
     heroSubcopy:
-      'High-performance ceramic and carbon window films that reject heat, block 99% of UV, and stay bubble-free for the life of your vehicle.',
+      'Professional car window tinting with premium 3M films — increased comfort, up to 99% UV protection, improved privacy, and a stylish custom look for any vehicle.',
     intro:
-      'Not all tint is created equal. We install premium ceramic and carbon films that deliver serious heat rejection and glare control without the purple fade or bubbling of cheap film. Every install is cut and fit precisely for a factory-clean finish.',
+      "At Mario's Tint Shop in Murfreesboro, TN, we are committed to offering the best car window tinting service that enhances the appearance of your vehicle and provides numerous benefits for your daily driving. As an Authorized 3M Platinum Dealer, we offer premium 3M window films tailored for every budget and performance need.",
     features: [
-      { title: 'Heat & Glare Rejection', body: 'Ceramic films block infrared heat so your cabin stays cooler and your A/C works less on Tennessee summer days.' },
-      { title: '99% UV Protection', body: 'Protect your skin and keep your interior from cracking and fading with near-total UV blocking.' },
-      { title: 'Clean, Legal Finish', body: 'Precision-cut film with no bubbles or purple fade, installed to match Tennessee tint regulations.' },
-      { title: 'Lifetime Warranty', body: 'Our premium films are backed by a manufacturer lifetime warranty against fading, peeling, and bubbling.' },
+      { title: 'Increased Comfort', body: "Window tinting significantly reduces solar heat and harsh glare entering your car's cabin, keeping your vehicle cooler and easing the load on your A/C." },
+      { title: 'Up to 99% UV Protection', body: 'Our premium ceramic and carbon films block up to 99% of damaging UVA and UVB rays, protecting you and preventing interior fading and cracking.' },
+      { title: 'Safety & Privacy', body: 'The film helps hold shattered glass together on impact, and reduced visibility into your car deters break-ins by keeping valuables out of sight.' },
+      { title: '3M Tiered Packages', body: 'Choose Silver (3M Obsidian carbon), Gold (3M CS IR nano ceramic), or Platinum (3M Ceramic IR with up to 90% infrared heat rejection).' },
     ],
     process: [
       'Free consultation to choose the right shade and film grade',
@@ -234,24 +235,24 @@ export const SERVICES: Service[] = [
     kicker: 'Paint Protection',
     name: 'Paint Protection Film (PPF)',
     short:
-      'Clear bra film that shields your paint from rock chips, scratches, road rash, and UV damage — invisible protection that keeps your finish flawless.',
-    meta: 'Self-healing clear bra · full & partial',
-    startingPrice: 'from $899', // ⚠️ REPLACE
+      'Professional clear bra installation by certified 3M, XPEL & SunTek installers — self-healing defense against scratches, UV damage, and rock chips.',
+    meta: '3M PPF & STEK DYNO Platinum · 10-year warranty',
+    startingPrice: 'Free quote',
     includes: [
-      'Self-healing urethane clear bra',
-      'Full-front, track pack, or full-body coverage',
-      'Wrapped, invisible edges',
-      'Up to 10-year manufacturer warranty',
+      'Partial Front End: 12"–18" hood, fenders, bumper & mirrors',
+      'Full Front End: full hood, fenders, bumper & mirrors',
+      'Complete Coverage: every exposed painted surface',
+      '10-year manufacturer warranty (3M / STEK)',
     ],
     heroSubcopy:
-      'Virtually invisible, self-healing clear bra that guards your paint against rock chips, scratches, and road debris — without changing the look of your car.',
+      "Premium self-healing paint protection film (clear bra) from 3M and STEK — safeguarding your car's factory paint against scratches, chips, and road hazards.",
     intro:
-      'Paint Protection Film is the strongest defense for your finish. This transparent, self-healing urethane film absorbs impacts from rocks, sand, and road debris that would otherwise chip and scratch your paint — preserving both the look and the resale value of your vehicle.',
+      "At Mario's Tint Shop we specialize in premium paint protection film (PPF) — an invisible clear bra that protects your factory paint from scratches, chips, and road debris. We are certified dealers and installers for 3M, XPEL, and SunTek, with cutting-edge self-healing films where minor scratches vanish when exposed to heat.",
     features: [
-      { title: 'Rock Chip & Scratch Defense', body: 'A tough urethane layer takes the hits from highway debris so your paint stays flawless.' },
-      { title: 'Self-Healing Finish', body: 'Light swirls and scratches disappear with heat from the sun or warm water.' },
-      { title: 'UV & Stain Resistance', body: 'Blocks UV yellowing and resists bug acids, tar, and road salt common on TN roads.' },
-      { title: 'Invisible Protection', body: 'Optically clear film preserves your factory look while protecting high-impact areas.' },
+      { title: '3M Paint Protection', body: 'Self-healing PPF combined with ceramic coating technology — exceptional clarity, gloss, and hydrophobic performance, backed by a 10-year warranty.' },
+      { title: 'STEK DYNO Platinum', body: 'High-gloss, self-healing top coat resistant to UV, chemicals, and stains, with excellent optical clarity for a nearly invisible finish. 10-year warranty.' },
+      { title: 'Self-Healing Technology', body: "Minor scratches and swirl marks on the film's surface vanish when exposed to heat — warm water or sunlight — keeping your vehicle looking new." },
+      { title: 'Enhanced Resale Value', body: 'A vehicle protected with PPF retains its appearance and value over time, and the film is virtually invisible once applied.' },
     ],
     process: [
       'Walk-around to map high-impact zones and coverage options',
@@ -272,24 +273,24 @@ export const SERVICES: Service[] = [
     kicker: 'Ceramic Coating',
     name: 'Ceramic Coating',
     short:
-      'A durable nano-ceramic layer that bonds to your paint for deep gloss, hydrophobic protection, and resistance to scratches, swirls, and contaminants.',
-    meta: 'Nano-ceramic · multi-year protection',
-    startingPrice: 'from $699', // ⚠️ REPLACE
+      "Say goodbye to scratches, swirls, and blemishes — 3M ceramic coating keeps your vehicle's paint protected and looking great for years to come.",
+    meta: '3M ceramic coating · up to 5-year protection',
+    startingPrice: 'Free quote',
     includes: [
-      'Full decontamination & paint prep',
-      'Multi-stage paint correction',
-      'Nano-ceramic coating application',
-      '2–5+ year protection tiers',
+      '3M automotive paint ceramic coating',
+      'Bonds to paint, PPF, glass, trim & vinyl wraps',
+      'Single layer: up to 3 years · dual layer: up to 5 years',
+      'Hydrophobic "wet look" finish',
     ],
     heroSubcopy:
-      'A liquid nano-ceramic layer that bonds to your paint for years of deep gloss, easy cleaning, and protection from swirls, stains, and contaminants.',
+      "A leading-industry 3M ceramic formula that safeguards your car's paint against environmental contaminants, harsh UV rays, and damaging factors — with a durable, hydrophobic gloss.",
     intro:
-      'Ceramic coating is a semi-permanent bond that transforms how your paint looks and how easily it stays clean. It adds a hard, hydrophobic layer that repels water, dirt, and chemicals while giving your finish an incredible depth of gloss that ordinary wax can never match.',
+      "At Mario's Tint Shop in Murfreesboro, our ceramic coating service utilizes a leading-industry 3M formula designed to safeguard your car's paint against environmental contaminants, harsh UV rays, and other damaging factors. The durable, hydrophobic layer enhances gloss and clarity while repelling dirt and water — making it easy to maintain that showroom finish.",
     features: [
-      { title: 'Hydrophobic Self-Cleaning', body: 'Water, mud, and grime bead up and slide off, so washes are faster and less frequent.' },
-      { title: 'Swirl & Scratch Resistance', body: 'A hardened ceramic layer resists the fine swirls and marring from washing and daily driving.' },
-      { title: 'Deep, Lasting Gloss', body: 'A glass-like shine with real depth that outlasts and outshines traditional wax.' },
-      { title: 'Chemical & UV Protection', body: 'Guards against bird droppings, bug acids, road salt, and UV oxidation that dull your paint.' },
+      { title: 'Superior Environmental Protection', body: 'Robust defense against dirt, road debris, UV rays, chemical etching from bug splatter, and corrosive bird droppings.' },
+      { title: 'Long-Lasting Durability', body: 'A single layer protects for up to three years; a dual-layer application lasts up to five years with proper maintenance.' },
+      { title: 'Hydrophobic Easy Cleaning', body: 'Excellent water beading sheds water quickly and makes cleaning off dirt, bugs, and droppings much easier — with a lasting "wet look" finish.' },
+      { title: 'Chemical Resistance', body: 'Resistant to harsh chemicals like road salt and high/low pH cleaners, preserving your paint and boosting resale value.' },
     ],
     process: [
       'Full decontamination wash and clay treatment',
@@ -310,24 +311,24 @@ export const SERVICES: Service[] = [
     kicker: 'Tesla Services',
     name: 'Tesla Services',
     short:
-      'Specialized tint, PPF, and ceramic coating tailored to every Tesla model — precision patterns for Model 3, Y, S, and X.',
-    meta: 'Model 3 · Y · S · X · Cybertruck',
-    startingPrice: 'from $299', // ⚠️ REPLACE
+      'High-quality 3M window tint, PPF, and ceramic coating services designed to fit the needs of all Tesla models — Model 3, Y, S, and X.',
+    meta: 'Model 3 · Y · S · X · 3M Nano Ceramic',
+    startingPrice: 'Free quote',
     includes: [
-      'Model-specific tint & PPF patterns',
-      'Panoramic glass-roof ceramic tint',
-      'Soft-paint-safe installation',
-      'Tint, PPF & ceramic bundles',
+      '3M Nano Ceramic window tint for Tesla glass',
+      '3M PPF (clear bra) with 10-year warranty',
+      'Panoramic roof & large rear window expertise',
+      'Zero interference with GPS or cell signals',
     ],
     heroSubcopy:
-      'Tesla-specialized window tint, paint protection film, and ceramic coating with model-specific patterns for a flawless, factory-integrated result.',
+      'The leading 3M installer for Tesla owners in the Nashville area — precision-fit window tint, paint protection film, and ceramic coating for every Tesla model.',
     intro:
-      "Teslas deserve a specialist. From the panoramic glass roof to the delicate factory paint, we've dialed in tint, PPF, and ceramic packages built specifically for every Tesla model — so protection looks like it came from the factory, not the aftermarket.",
+      "As a leading installer of high-quality 3M automotive products in the Nashville area, Mario's Tint Shop offers Tesla owners a comprehensive range of services to enhance the comfort, appearance, and protection of their electric vehicles. We understand the unique specifications of all Tesla models, ensuring a precision fit and flawless finish for every installation.",
     features: [
-      { title: 'Model-Specific Patterns', body: 'Precision-cut coverage engineered for Model 3, Y, S, X, and Cybertruck panels and glass.' },
-      { title: 'Glass Roof Heat Control', body: 'Ceramic tint options for the panoramic roof cut cabin heat and glare dramatically.' },
-      { title: 'Soft-Paint Protection', body: "PPF tuned for Tesla's softer factory paint, guarding the most chip-prone areas." },
-      { title: 'Range-Friendly Comfort', body: 'Lower cabin heat means less A/C load — a small win for comfort and efficiency.' },
+      { title: '3M Nano Ceramic Tint', body: "High heat rejection keeps your Tesla cooler and reduces A/C strain — customized to your preference and compliant with Tennessee tint laws." },
+      { title: 'Zero Signal Interference', body: "The non-metallized ceramic construction won't interfere with your Tesla's GPS, cell phone signals, or radio reception." },
+      { title: 'Tesla Glass Expertise', body: 'Our installers understand the unique glass features of Tesla cars, including the large rear windows and panoramic roofs.' },
+      { title: '3M PPF Protection', body: "Durable 3M clear bra guards against road debris and minor abrasions, backed by 3M's comprehensive 10-year warranty." },
     ],
     process: [
       'Model-specific consultation on tint, PPF, and ceramic options',
@@ -348,24 +349,24 @@ export const SERVICES: Service[] = [
     kicker: 'Commercial Films',
     name: 'Office & Commercial Films',
     short:
-      'Architectural window films for offices and commercial buildings — cut glare and energy costs, add privacy, and protect interiors from UV fading.',
-    meta: 'Offices · storefronts · buildings',
-    startingPrice: 'Custom quote', // ⚠️ REPLACE
+      '3M and Avery Dennison window tinting solutions for office and commercial buildings — professional installation for optimal protection and energy efficiency.',
+    meta: '3M Prestige · Ceramic · Night Vision · Low-E',
+    startingPrice: 'Custom quote',
     includes: [
-      'Solar & heat-control films',
-      'Glare-reduction for workspaces',
-      'Privacy, frost & security films',
-      'After-hours installation',
+      '3M Prestige: up to 97% IR / 60% total heat rejection',
+      '3M Ceramic Architectural: up to 80% IR rejection',
+      '3M Night Vision & All Season (Low-E) films',
+      'Avery Dennison spectrally selective & reflective lines',
     ],
     heroSubcopy:
-      'Architectural window film for offices, storefronts, and commercial buildings — reduce glare and energy costs, add privacy, and protect interiors.',
+      'Enhance your business environment with 3M commercial and office window films — heat rejection up to 97% IR, 99% UV blocking, energy savings, and preserved views.',
     intro:
-      'Commercial window film is a fast, high-return upgrade for any workspace. It lowers cooling costs, eliminates screen glare, protects furnishings from UV fading, and adds privacy and security — all without replacing a single pane of glass.',
+      "At Mario's Tint Shop, we understand the importance of creating a comfortable, functional, and aesthetically pleasing environment for your business and employees. We install 3M and Avery Dennison architectural films that reject heat, block 99% of UV rays, and lower energy costs — with paybacks in as little as three years.",
     features: [
-      { title: 'Lower Energy Costs', body: 'Reject solar heat to ease HVAC load and cut cooling bills across the building.' },
-      { title: 'Glare & Comfort Control', body: 'Eliminate harsh screen glare so employees stay comfortable and productive.' },
-      { title: 'Privacy & Security', body: 'Frosted, reflective, and safety films add privacy and hold glass together on impact.' },
-      { title: 'UV Fade Protection', body: 'Block 99% of UV to protect flooring, furniture, and merchandise from fading.' },
+      { title: '3M Prestige Series', body: "The ultimate in heat rejection — blocks up to 97% of the sun's infrared light and up to 60% of total heat while remaining virtually clear." },
+      { title: 'Significant Energy Savings', body: 'By rejecting solar heat, the films reduce HVAC strain and lower air conditioning costs, with potential paybacks in as little as three years.' },
+      { title: '99% UV Protection', body: 'All 3M films block up to 99% of harmful UV rays, preventing fading of interior furnishings, flooring, and merchandise.' },
+      { title: 'Preserved Views & Comfort', body: 'Non-metallized options offer high optical clarity without a mirrored look or interference with cell phone and GPS signals.' },
     ],
     process: [
       'On-site assessment and film recommendation',
@@ -387,31 +388,62 @@ export const getService = (slug: string) =>
   SERVICES.find((s) => s.slug === slug);
 
 // ── Testimonials ────────────────────────────────────────────────────
-// ⚠️ REPLACE with real reviews (ideally from Google / BBB, with names)
-// and real photos of the customer's finished vehicle (the evidence shot).
+// Real 5-star Google reviews from the shop's Google Business profile
+// (5.0 rating · 128+ reviews). ⚠️ Photos are placeholders — swap for
+// real photos of each customer's finished vehicle when available.
 export const TESTIMONIALS = [
   {
-    quote: 'Flawless tint job on my truck — no bubbles, perfectly cut, and the cabin stays so much cooler. These guys are pros.',
-    author: 'James R.',
+    quote:
+      "Mario and his team are the best. They got my new Honda Passport Trailsport looking super clean. Thank you guys for always giving us the best tint money can buy and top notch professionalism. I'm a customer for life.",
+    author: 'Christopher Moers',
     photo: {
       src: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=800&h=500&q=80',
-      alt: "James's truck with fresh window tint",
+      alt: "Customer's SUV with fresh window tint",
     },
   },
   {
-    quote: 'Had a full-front PPF done on my Tesla Model Y. You literally cannot see the film, and the paint is bulletproof now. Worth every penny.',
-    author: 'Priya S.',
+    quote:
+      "Just had both of my Teslas tinted and protected with PPF by Mario's Tint, and I couldn't be happier! Mario's workmanship is absolutely impeccable — every detail was handled with care.",
+    author: 'Cameron Stacey',
     photo: {
       src: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&w=800&h=500&q=80',
-      alt: "Priya's Tesla with paint protection film",
+      alt: "Customer's Tesla with tint and paint protection film",
     },
   },
   {
-    quote: 'The ceramic coating made my black paint look wet. Rain just rolls off and washing takes half the time. Highly recommend.',
-    author: 'Derek M.',
+    quote:
+      'Place is awesome. Super cheap prices and got my 4 windows on my F250 done in 30 minutes. They take care of you and anything else wrong with the tint in the future. Lifetime warranty available.',
+    author: 'Ethan Stoquert',
     photo: {
       src: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&h=500&q=80',
-      alt: "Derek's car after ceramic coating",
+      alt: "Customer's truck after window tinting",
+    },
+  },
+  {
+    quote:
+      "Mario has done 4 vehicles for me, from peeling off old tint and applying new on my old truck, to a complete ceramic tint on my 2 brand new SUV's fresh off the lot. As a local it's shops like this that always make things smooth.",
+    author: 'Nathan Fair',
+    photo: {
+      src: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&h=500&q=80',
+      alt: "Customer's SUV with ceramic tint",
+    },
+  },
+  {
+    quote:
+      "Everyone I dealt with was friendly and professional, and the whole process was smooth and straightforward. The products they used were high quality and backed by a warranty, which gave me a lot of confidence in the work.",
+    author: 'Brandon Gurule',
+    photo: {
+      src: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&h=500&q=80',
+      alt: "Customer's vehicle after professional tint installation",
+    },
+  },
+  {
+    quote:
+      "Took my third vehicle here yesterday to get tinted and once again they knock it out of the park. Incredibly knowledgeable staff and impeccable work at a fair price. I'll never go anywhere else for a tint.",
+    author: 'Jamie Pearman',
+    photo: {
+      src: 'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=800&h=500&q=80',
+      alt: "Customer's car during film installation",
     },
   },
 ];
@@ -434,10 +466,9 @@ export const NAV_LINKS = [
   { href: '/#testimonials', label: 'Reviews' },
 ];
 
-// ── Social profiles (⚠️ REPLACE the # placeholders with real URLs) ──
+// ── Social profiles ─────────────────────────────────────────────────
 export const SOCIALS = [
   { name: 'Instagram', href: INSTAGRAM.url },
-  { name: 'Facebook', href: '#' }, // ⚠️ REPLACE
   { name: 'Google', href: CONTACT.googleBusinessUrl },
 ];
 
@@ -445,19 +476,19 @@ export const SOCIALS = [
 export const BENEFITS = [
   {
     title: 'Expertise & Experience',
-    body: 'Certified installers with 10+ years of hands-on tint, PPF, and ceramic work — no peeling, no bubbling, no shortcuts.',
+    body: 'Over 25 years in the automotive and window film industry — expert craftsmanship with no peeling, no bubbling, no shortcuts.',
   },
   {
-    title: 'Customized Solutions',
-    body: 'We assess your vehicle first and recommend exactly what it needs — never unnecessary work or bargain product.',
+    title: 'Authorized 3M Platinum Dealer',
+    body: 'Certified 3M, XPEL & SunTek installers using industry-leading films and coatings, backed by comprehensive manufacturer warranties.',
   },
   {
-    title: 'Value for Money',
-    body: 'Premium, warranty-backed films and coatings at honest prices. No surprises, no hidden charges.',
+    title: 'One-Stop Shop',
+    body: 'Window tinting, paint protection film, ceramic coating, and office & commercial films — everything your vehicle or building needs.',
   },
   {
-    title: 'Long-Term Benefits',
-    body: 'Protection that preserves your paint, your interior, and your resale value for years — backed by lifetime warranties.',
+    title: 'Trusted by Middle Tennessee',
+    body: 'A+ BBB rating and a 5.0-star Google rating from 128+ reviews, serving Murfreesboro, Nashville, Smyrna, La Vergne & beyond.',
   },
 ];
 

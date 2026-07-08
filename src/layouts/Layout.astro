@@ -28,7 +28,7 @@ const jsonLd = {
     streetAddress: CONTACT.address,
     addressLocality: 'Murfreesboro',
     addressRegion: 'TN',
-    postalCode: '37129',
+    postalCode: '37130',
     addressCountry: 'US',
   },
   geo: {
@@ -36,8 +36,15 @@ const jsonLd = {
     latitude: CONTACT.geo.lat,
     longitude: CONTACT.geo.lng,
   },
-  openingHours: 'Mo-Fr 09:00-18:00, Sa 09:00-15:00',
-  areaServed: 'Murfreesboro, TN and surrounding Middle Tennessee',
+  openingHours: 'Mo-Fr 08:00-17:00',
+  areaServed:
+    'Murfreesboro, Nashville, Smyrna, La Vergne, Franklin, Brentwood, Rutherford County, and Middle Tennessee',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '5.0',
+    reviewCount: '128',
+  },
+  sameAs: ['https://www.instagram.com/mariostintshop/'],
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
     name: 'Services',
