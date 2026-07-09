@@ -462,6 +462,7 @@ export const GALLERY = [
 export const NAV_LINKS = [
   { href: '/#about', label: 'About' },
   { href: '/#services', label: 'Services' },
+  { href: '/visualizer', label: 'Visualizer' },
   { href: '/#gallery', label: 'Gallery' },
   { href: '/#testimonials', label: 'Reviews' },
 ];
