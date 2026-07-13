@@ -171,8 +171,17 @@ function buildVehicle(c: VehicleCfg) {
     )
     .join('');
 
-  const gz = (id: string, d: string) => `<path class="gz" data-z="${id}" d="${d}"/>`;
-  const pz = (id: string, d: string) => `<path class="pz" data-z="${id}" d="${d}"/>`;
+  // Zone paths are also collected so the page can render mini "coverage
+  // icons" (a small gray car with the zone highlighted, SunTek-style).
+  const zones: Record<string, string> = {};
+  const gz = (id: string, d: string) => {
+    zones[id] = d;
+    return `<path class="gz" data-z="${id}" d="${d}"/>`;
+  };
+  const pz = (id: string, d: string) => {
+    zones[id] = d;
+    return `<path class="pz" data-z="${id}" d="${d}"/>`;
+  };
 
   const inner = `
     <ellipse cx="${N((c.frontX + c.rearX) / 2)}" cy="312" rx="${N((c.rearX - c.frontX) / 2 + 16)}" ry="11" fill="#000" opacity="0.42"/>
@@ -198,8 +207,22 @@ function buildVehicle(c: VehicleCfg) {
     </g>
     ${wheels}`;
 
-  return { id: c.id, label: c.label, inner };
+  return { id: c.id, label: c.label, inner, body: bodyPath(c), zones };
 }
 
 export const VEHICLES = CFGS.map(buildVehicle);
 export const initial = VEHICLES[0];
+
+/**
+ * Mini coverage icon: gray body silhouette with one zone highlighted in the
+ * accent blue — used for the SunTek-style zone pickers.
+ */
+export function zoneIcon(zoneId: string): string {
+  const v = VEHICLES[0]; // sedan is the generic icon body
+  const d = v.zones[zoneId];
+  if (!d) return '';
+  return (
+    `<path d="${v.body}" fill="#6B7280"/>` +
+    `<path d="${d}" fill="#00A8FF"/>`
+  );
+}

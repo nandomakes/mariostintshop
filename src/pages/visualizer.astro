@@ -4,25 +4,17 @@ import Header from '../components/Header.astro';
 import QuoteCTA from '../components/QuoteCTA.astro';
 import Footer from '../components/Footer.astro';
 import CallFab from '../components/CallFab.astro';
-import { SITE, WHATSAPP_NUMBER } from '../consts';
+import { SITE, IMAGES, WHATSAPP_NUMBER } from '../consts';
+import { VEHICLES, initial, zoneIcon } from '../lib/vehicles';
 
 const title = `Tint & PPF Visualizer | ${SITE.brand}`;
 const description =
-  "See window tint and paint protection film on your car before you book. Pick your vehicle type, choose coverage zones and tint shade or PPF finish, then send your build to Mario's Tint Shop in Murfreesboro, TN for a free quote.";
-
-// ════════════════════════════════════════════════════════════════════
-// PARAMETRIC VEHICLE GENERATOR
-// One topology (front fascia → hood → windshield → roof → rear → wheels)
-// driven by per-vehicle configs, so every coverage overlay is derived
-// from the same anchor points and always lines up with the body.
-// viewBox: 0 0 860 340 · ground at y=308
-// ════════════════════════════════════════════════════════════════════
-import { VEHICLES, initial } from '../lib/vehicles';
+  "See 3M window tint and paint protection film on your car. Select a car category, determine the coverage area, specify your product, and preview the look — then send your build to Mario's Tint Shop in Murfreesboro, TN for a free quote.";
 
 // ── Control data ─────────────────────────────────────────────────────
 const TINT_ZONES = [
-  { id: 'front-side', label: 'Front side windows' },
   { id: 'rear-side', label: 'Rear side windows' },
+  { id: 'front-side', label: 'Front side windows' },
   { id: 'rear', label: 'Rear window' },
   { id: 'visor', label: 'Visor strip' },
   { id: 'sunroof', label: 'Sunroof' },
@@ -73,27 +65,45 @@ const PAINTS = [
 <Layout title={title} description={description}>
   <Header />
   <main id="content">
-    <!-- Intro -->
+    <!-- Hero image band (SunTek-style banner, our own imagery) -->
+    <section class="relative overflow-hidden border-b border-line bg-ink">
+      <div class="absolute inset-0" aria-hidden="true">
+        <img
+          src={IMAGES.detail.src}
+          alt=""
+          width={IMAGES.detail.width}
+          height={IMAGES.detail.height}
+          class="h-full w-full object-cover opacity-60"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-ink/70"></div>
+      </div>
+      <div class="relative mx-auto max-w-6xl px-5 pb-14 pt-24 md:pb-20 md:pt-32">
+        <nav class="reveal text-[11px] font-bold uppercase tracking-[0.16em] text-smoke" aria-label="Breadcrumb">
+          <a href="/" class="transition-colors hover:text-paper">Home</a>
+          <span class="mx-2 text-line">/</span>
+          <span class="text-accent">Film visualizer</span>
+        </nav>
+      </div>
+    </section>
+
+    <!-- Title + intro -->
     <section class="border-b border-line bg-ink">
-      <div class="mx-auto max-w-6xl px-5 py-12 text-center md:py-16">
-        <p class="reveal kicker text-accent">Film visualizer</p>
-        <h1 class="reveal headline mt-3 text-[clamp(1.5rem,3.2vw,2.4rem)] text-paper">
-          See tint & PPF on your car
+      <div class="mx-auto max-w-4xl px-5 py-12 text-center md:py-14">
+        <h1 class="reveal headline text-[clamp(1.4rem,2.8vw,2.1rem)] text-paper">
+          Window tint & paint protection film visualizer
         </h1>
-        <p class="reveal mx-auto mt-4 max-w-[60ch] text-[15px] leading-relaxed text-smoke">
-          Select a vehicle category, choose the coverage area, pick your film — then preview
-          the look and send us your build for a free quote.
+        <p class="reveal mx-auto mt-5 max-w-[64ch] text-[15px] leading-relaxed text-smoke">
+          See 3M window tint and PPF (paint protection film) on your car. Select a car
+          category, determine the coverage area, specify your product, and then preview the
+          look of our films — before you buy.
         </p>
       </div>
     </section>
 
-    <!-- Step 1 · Vehicle type strip -->
+    <!-- Vehicle type strip -->
     <section class="border-b border-line bg-coal">
-      <div class="mx-auto max-w-6xl px-5 py-6">
-        <p class="text-center text-[11px] font-bold uppercase tracking-[0.16em] text-smoke">
-          1 · Select your vehicle type
-        </p>
-        <div class="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-6" role="radiogroup" aria-label="Vehicle type">
+      <div class="mx-auto max-w-5xl px-5 py-6">
+        <div class="grid grid-cols-3 gap-2 sm:grid-cols-6" role="radiogroup" aria-label="Vehicle type">
           {
             VEHICLES.map((v, i) => (
               <button
@@ -119,69 +129,38 @@ const PAINTS = [
       </div>
     </section>
 
-    <!-- Visualizer -->
+    <!-- Visualizer: controls left · preview right (SunTek layout) -->
     <section id="visualizer" class="bg-ink" data-mode="tint" data-shade="dark" data-finish="gloss">
-      <div class="mx-auto grid max-w-6xl gap-8 px-5 py-10 md:py-14 lg:grid-cols-[7fr_5fr] lg:items-start">
-        <!-- Preview (sticky on desktop) -->
-        <div class="min-w-0 lg:sticky lg:top-24">
-          <div class="border border-line bg-coal">
-            <!-- Mode tabs -->
-            <div class="flex items-center border-b border-line" role="tablist" aria-label="Film type">
-              <button
-                type="button" role="tab" aria-selected="true" data-tab="tint"
-                class="mode-tab relative px-5 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-accent transition-colors duration-200"
-              >
-                Window Tint
-                <span class="tab-line absolute inset-x-0 bottom-0 h-0.5 origin-left bg-accent transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"></span>
-              </button>
-              <button
-                type="button" role="tab" aria-selected="false" data-tab="ppf"
-                class="mode-tab relative px-5 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-smoke transition-colors duration-200 hover:text-paper"
-              >
-                Paint Protection
-                <span class="tab-line absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-accent transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"></span>
-              </button>
-              <button
-                type="button" id="reset-btn"
-                class="pressable ml-auto mr-3 flex items-center gap-1.5 px-2 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-smoke transition-colors hover:text-accent"
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
-                Start over
-              </button>
-            </div>
-
-            <!-- Car stage -->
-            <div class="p-4 sm:p-6">
-              <svg id="car-svg" viewBox="0 0 860 340" class="h-auto w-full" role="img" aria-label="Vehicle preview with selected film applied">
-                <defs>
-                  <linearGradient id="body-gloss" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.28" />
-                    <stop offset="0.38" stop-color="#FFFFFF" stop-opacity="0.07" />
-                    <stop offset="0.62" stop-color="#FFFFFF" stop-opacity="0" />
-                    <stop offset="1" stop-color="#000000" stop-opacity="0.2" />
-                  </linearGradient>
-                </defs>
-                <g id="car-root" set:html={initial.inner} />
-              </svg>
-
-              <!-- Live summary -->
-              <div class="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
-                <p id="build-summary" class="min-w-0 flex-1 text-xs font-semibold uppercase tracking-[0.08em] text-smoke"></p>
-                <span id="legal-badge" class="shrink-0 bg-accent/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-accent"></span>
-              </div>
-            </div>
+      <div class="mx-auto grid max-w-6xl gap-8 px-5 py-10 md:py-14 lg:grid-cols-[5fr_7fr] lg:items-start">
+        <!-- Controls column -->
+        <div class="min-w-0 lg:order-1">
+          <!-- Mode tabs + reset -->
+          <div class="flex items-center border-b border-line" role="tablist" aria-label="Film type">
+            <button
+              type="button" role="tab" aria-selected="true" data-tab="tint"
+              class="mode-tab relative px-4 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-accent transition-colors duration-200"
+            >
+              Window Tint
+              <span class="tab-line absolute inset-x-0 bottom-0 h-0.5 origin-left bg-accent transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"></span>
+            </button>
+            <button
+              type="button" role="tab" aria-selected="false" data-tab="ppf"
+              class="mode-tab relative px-4 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-smoke transition-colors duration-200 hover:text-paper"
+            >
+              Paint Protection
+              <span class="tab-line absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-accent transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"></span>
+            </button>
+            <button
+              type="button" id="reset-btn"
+              class="pressable ml-auto flex items-center gap-1.5 px-2 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-smoke transition-colors hover:text-accent"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+              <span class="hidden sm:inline">Start over</span>
+            </button>
           </div>
 
-          <p class="mt-3 text-[11px] leading-relaxed text-smoke/70">
-            Visual representations are for illustration only — actual film appearance varies by
-            vehicle, glass, and lighting. Gloss PPF is optically clear; zones are shown in blue.
-          </p>
-        </div>
-
-        <!-- Controls -->
-        <div class="min-w-0">
           <!-- Paint color -->
-          <div class="border border-line bg-coal p-6">
+          <div class="border-x border-b border-line bg-coal px-6 py-5">
             <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-smoke">Paint color</p>
             <div class="mt-3 flex flex-wrap gap-2.5">
               {
@@ -201,123 +180,222 @@ const PAINTS = [
           </div>
 
           <!-- TINT panel -->
-          <div id="tint-panel" class="mt-4 border border-line bg-coal p-6">
-            <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-smoke">2 · Select coverage</p>
-            <p class="mt-1 text-xs text-smoke/70">Tap the glass areas you want tinted.</p>
-            <div class="mt-3 flex flex-wrap gap-2">
-              {
-                TINT_ZONES.map((z) => (
-                  <button
-                    type="button"
-                    data-tint-zone={z.id}
-                    aria-pressed={z.id === 'front-side' || z.id === 'rear-side' ? 'true' : 'false'}
-                    class="zone-chip pressable border border-line px-3.5 py-2 text-xs font-bold text-paper transition-colors duration-200 hover:border-smoke/60 aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-ink"
-                  >
-                    {z.label}
-                  </button>
-                ))
-              }
+          <div id="tint-panel" class="border-x border-b border-line bg-coal">
+            <!-- Accordion: coverage -->
+            <div class="acc border-b border-line px-6" data-open="true">
+              <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
+                <span>
+                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-paper">Select the coverage</span>
+                  <span class="mt-0.5 block text-xs text-smoke/70">Select a coverage zone to get started.</span>
+                </span>
+                <svg class="acc-icon shrink-0 text-accent transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+                  <path d="M5 12h14" /><path class="acc-vert" d="M12 5v14" />
+                </svg>
+              </button>
+              <div class="acc-body grid grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]">
+                <div class="min-h-0 overflow-hidden">
+                  <div class="grid grid-cols-3 gap-2 pb-5 sm:grid-cols-3">
+                    {
+                      TINT_ZONES.map((z) => (
+                        <button
+                          type="button"
+                          data-tint-zone={z.id}
+                          aria-pressed={z.id === 'front-side' || z.id === 'rear-side' ? 'true' : 'false'}
+                          class="zone-tile pressable group flex flex-col items-center gap-1 border border-line px-1.5 pb-2 pt-2.5 transition-colors duration-200 hover:border-smoke/60 aria-pressed:border-accent aria-pressed:bg-accent/10"
+                        >
+                          <svg viewBox="60 70 740 260" class="h-7 w-full" aria-hidden="true">
+                            <g set:html={zoneIcon(z.id)} />
+                          </svg>
+                          <span class="text-center text-[10px] font-bold leading-tight text-paper group-aria-pressed:text-accent">{z.label}</span>
+                        </button>
+                      ))
+                    }
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <p class="mt-7 text-[11px] font-bold uppercase tracking-[0.16em] text-smoke">3 · Select your tint</p>
-            <div class="mt-3 grid grid-cols-4 gap-2" role="radiogroup" aria-label="Tint shade">
-              {
-                SHADES.map((s) => (
-                  <button
-                    type="button" role="radio"
-                    aria-checked={s.id === 'dark' ? 'true' : 'false'}
-                    data-shade={s.id} data-shade-label={s.label} data-op={s.op}
-                    class="shade-chip pressable group border border-line p-2 text-center transition-colors duration-200 hover:border-smoke/60 aria-checked:border-accent"
-                  >
-                    <span
-                      class="block h-8 w-full border border-line/60"
-                      style={`background: linear-gradient(rgba(11,21,36,${s.op}), rgba(11,21,36,${s.op})), linear-gradient(135deg, #E8F1F8 0%, #BFD3E2 60%, #DCE9F4 100%)`}
-                      aria-hidden="true"
-                    />
-                    <span class="mt-1.5 block text-xs font-bold text-paper">{s.label}</span>
-                    <span class="block text-[10px] text-smoke">{s.vlt}</span>
-                  </button>
-                ))
-              }
+            <!-- Accordion: tint shade -->
+            <div class="acc border-b border-line px-6" data-open="true">
+              <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
+                <span>
+                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-paper">Select the tint</span>
+                  <span class="mt-0.5 block text-xs text-smoke/70">Preview the shade on the vehicle view.</span>
+                </span>
+                <svg class="acc-icon shrink-0 text-accent transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+                  <path d="M5 12h14" /><path class="acc-vert" d="M12 5v14" />
+                </svg>
+              </button>
+              <div class="acc-body grid grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]">
+                <div class="min-h-0 overflow-hidden">
+                  <div class="grid grid-cols-4 gap-2" role="radiogroup" aria-label="Tint shade">
+                    {
+                      SHADES.map((s) => (
+                        <button
+                          type="button" role="radio"
+                          aria-checked={s.id === 'dark' ? 'true' : 'false'}
+                          data-shade={s.id} data-shade-label={s.label} data-op={s.op}
+                          class="shade-chip pressable border border-line p-2 text-center transition-colors duration-200 hover:border-smoke/60 aria-checked:border-accent"
+                        >
+                          <span
+                            class="block h-8 w-full border border-line/60"
+                            style={`background: linear-gradient(rgba(11,21,36,${s.op}), rgba(11,21,36,${s.op})), linear-gradient(135deg, #E8F1F8 0%, #BFD3E2 60%, #DCE9F4 100%)`}
+                            aria-hidden="true"
+                          />
+                          <span class="mt-1.5 block text-xs font-bold text-paper">{s.label}</span>
+                          <span class="block text-[10px] text-smoke">{s.vlt}</span>
+                        </button>
+                      ))
+                    }
+                  </div>
+                  <p class="pb-5 pt-2 text-[11px] leading-relaxed text-smoke/70">
+                    Tennessee requires 35%+ VLT on front side windows.
+                  </p>
+                </div>
+              </div>
             </div>
-            <p class="mt-2 text-[11px] leading-relaxed text-smoke/70">
-              Tennessee requires 35%+ VLT on front side windows.
-            </p>
 
-            <p class="mt-7 text-[11px] font-bold uppercase tracking-[0.16em] text-smoke">4 · What matters most?</p>
-            <p class="mt-1 text-xs text-smoke/70">
-              Prioritize these benefits so we can match the right 3M film for you.
-            </p>
-            <div class="mt-3 flex flex-wrap gap-2">
-              {
-                PRIORITIES.map((p) => (
-                  <button
-                    type="button"
-                    data-priority={p.id}
-                    aria-pressed="false"
-                    class="prio-chip pressable border border-line px-3.5 py-2 text-xs font-bold text-paper transition-colors duration-200 hover:border-smoke/60 aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-ink"
-                  >
-                    {p.label}
-                  </button>
-                ))
-              }
+            <!-- Accordion: priorities -->
+            <div class="acc px-6" data-open="true">
+              <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
+                <span>
+                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-paper">What matters most?</span>
+                  <span class="mt-0.5 block text-xs text-smoke/70">Prioritize these benefits to help us find the right tint for you.</span>
+                </span>
+                <svg class="acc-icon shrink-0 text-accent transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+                  <path d="M5 12h14" /><path class="acc-vert" d="M12 5v14" />
+                </svg>
+              </button>
+              <div class="acc-body grid grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]">
+                <div class="min-h-0 overflow-hidden">
+                  <div class="flex flex-wrap gap-2 pb-5">
+                    {
+                      PRIORITIES.map((p) => (
+                        <button
+                          type="button"
+                          data-priority={p.id}
+                          aria-pressed="false"
+                          class="prio-chip pressable border border-line px-3.5 py-2 text-xs font-bold text-paper transition-colors duration-200 hover:border-smoke/60 aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-ink"
+                        >
+                          {p.label}
+                        </button>
+                      ))
+                    }
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
           <!-- PPF panel -->
-          <div id="ppf-panel" class="mt-4 hidden border border-line bg-coal p-6">
-            <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-smoke">2 · Select coverage</p>
-            <p class="mt-1 text-xs text-smoke/70">
-              Pick individual zones or full coverage for the whole car.
-            </p>
-            <div class="mt-3 grid grid-cols-2 gap-2">
-              {
-                PPF_ZONES.map((z) => (
-                  <button
-                    type="button"
-                    data-ppf-zone={z.id}
-                    aria-pressed={['bumper-front', 'hood-full', 'fenders-partial', 'mirrors'].includes(z.id) ? 'true' : 'false'}
-                    class:list={[
-                      'zone-chip pressable border border-line px-3 py-2 text-left text-xs font-bold text-paper transition-colors duration-200 hover:border-smoke/60 aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-ink',
-                      z.id === 'full' ? 'col-span-2 text-center' : '',
-                    ]}
-                  >
-                    {z.label}
-                  </button>
-                ))
-              }
+          <div id="ppf-panel" class="hidden border-x border-b border-line bg-coal">
+            <!-- Accordion: coverage -->
+            <div class="acc border-b border-line px-6" data-open="true">
+              <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
+                <span>
+                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-paper">Select the coverage</span>
+                  <span class="mt-0.5 block text-xs text-smoke/70">Select individual zones or full coverage for the entire car.</span>
+                </span>
+                <svg class="acc-icon shrink-0 text-accent transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+                  <path d="M5 12h14" /><path class="acc-vert" d="M12 5v14" />
+                </svg>
+              </button>
+              <div class="acc-body grid grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]">
+                <div class="min-h-0 overflow-hidden">
+                  <div class="grid grid-cols-3 gap-2 pb-5">
+                    {
+                      PPF_ZONES.map((z) => (
+                        <button
+                          type="button"
+                          data-ppf-zone={z.id}
+                          aria-pressed={['bumper-front', 'hood-full', 'fenders-partial', 'mirrors'].includes(z.id) ? 'true' : 'false'}
+                          class="zone-tile pressable group flex flex-col items-center gap-1 border border-line px-1.5 pb-2 pt-2.5 transition-colors duration-200 hover:border-smoke/60 aria-pressed:border-accent aria-pressed:bg-accent/10"
+                        >
+                          <svg viewBox="60 70 740 260" class="h-7 w-full" aria-hidden="true">
+                            <g set:html={zoneIcon(z.id)} />
+                          </svg>
+                          <span class="text-center text-[10px] font-bold leading-tight text-paper group-aria-pressed:text-accent">{z.label}</span>
+                        </button>
+                      ))
+                    }
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <p class="mt-7 text-[11px] font-bold uppercase tracking-[0.16em] text-smoke">3 · Select the finish</p>
-            <div class="mt-3 grid grid-cols-3 gap-2" role="radiogroup" aria-label="PPF finish">
-              {
-                FINISHES.map((f) => (
-                  <button
-                    type="button" role="radio"
-                    aria-checked={f.id === 'gloss' ? 'true' : 'false'}
-                    data-finish={f.id} data-finish-label={f.label} data-note={f.note}
-                    class="finish-chip pressable border border-line px-2 py-2.5 text-center text-xs font-bold text-paper transition-colors duration-200 hover:border-smoke/60 aria-checked:border-accent aria-checked:bg-accent aria-checked:text-ink"
-                  >
-                    {f.label}
-                  </button>
-                ))
-              }
+            <!-- Accordion: finish -->
+            <div class="acc px-6" data-open="true">
+              <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
+                <span>
+                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-paper">Select the finish</span>
+                  <span class="mt-0.5 block text-xs text-smoke/70">Customize and combine to enhance the look of your vehicle.</span>
+                </span>
+                <svg class="acc-icon shrink-0 text-accent transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+                  <path d="M5 12h14" /><path class="acc-vert" d="M12 5v14" />
+                </svg>
+              </button>
+              <div class="acc-body grid grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]">
+                <div class="min-h-0 overflow-hidden">
+                  <div class="grid grid-cols-3 gap-2" role="radiogroup" aria-label="PPF finish">
+                    {
+                      FINISHES.map((f) => (
+                        <button
+                          type="button" role="radio"
+                          aria-checked={f.id === 'gloss' ? 'true' : 'false'}
+                          data-finish={f.id} data-finish-label={f.label} data-note={f.note}
+                          class="finish-chip pressable border border-line px-2 py-2.5 text-center text-xs font-bold text-paper transition-colors duration-200 hover:border-smoke/60 aria-checked:border-accent aria-checked:bg-accent aria-checked:text-ink"
+                        >
+                          {f.label}
+                        </button>
+                      ))
+                    }
+                  </div>
+                  <p id="finish-note" class="pb-5 pt-2 text-[11px] leading-relaxed text-smoke/70">{FINISHES[0].note}</p>
+                </div>
+              </div>
             </div>
-            <p id="finish-note" class="mt-2 text-[11px] leading-relaxed text-smoke/70">{FINISHES[0].note}</p>
+          </div>
+        </div>
+
+        <!-- Preview column -->
+        <div class="min-w-0 lg:order-2 lg:sticky lg:top-24">
+          <div class="border border-line bg-coal p-4 sm:p-6">
+            <svg id="car-svg" viewBox="0 0 860 340" class="h-auto w-full" role="img" aria-label="Vehicle preview with selected film applied">
+              <defs>
+                <linearGradient id="body-gloss" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.28" />
+                  <stop offset="0.38" stop-color="#FFFFFF" stop-opacity="0.07" />
+                  <stop offset="0.62" stop-color="#FFFFFF" stop-opacity="0" />
+                  <stop offset="1" stop-color="#000000" stop-opacity="0.2" />
+                </linearGradient>
+              </defs>
+              <g id="car-root" set:html={initial.inner} />
+            </svg>
+
+            <!-- Live summary -->
+            <div class="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
+              <p id="build-summary" class="min-w-0 flex-1 text-xs font-semibold uppercase tracking-[0.08em] text-smoke"></p>
+              <span id="legal-badge" class="shrink-0 bg-accent/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-accent"></span>
+            </div>
           </div>
 
-          <!-- CTA -->
+          <!-- CTA under the preview, SunTek-style -->
           <a
             id="visualizer-cta"
             href={`https://wa.me/${WHATSAPP_NUMBER}`}
             target="_blank"
             rel="noopener noreferrer"
-            class="pressable sticker mt-5 block bg-accent px-8 py-4 text-center text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
+            class="pressable sticker mx-auto mt-6 block max-w-md bg-accent px-8 py-4 text-center text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
           >
             Contact Your Installer →
           </a>
           <p class="mt-2.5 text-center text-[11px] text-smoke/70">
             Opens WhatsApp with your build pre-filled — we reply with a free quote.
+          </p>
+
+          <p class="mx-auto mt-6 max-w-xl text-center text-[11px] leading-relaxed text-smoke/60">
+            Visual representations are shown for illustrative purposes only; actual appearances
+            treated with window film and paint protection film may vary.
           </p>
         </div>
       </div>
@@ -423,11 +501,25 @@ const PAINTS = [
       display: none;
     }
 
+    /* Accordions: +/− icon morph and body collapse. */
+    .acc[data-open='false'] .acc-body {
+      grid-template-rows: 0fr;
+    }
+    .acc .acc-icon .acc-vert {
+      transition: transform 300ms var(--ease-out), opacity 300ms var(--ease-out);
+      transform-origin: center;
+    }
+    .acc[data-open='true'] .acc-icon .acc-vert {
+      transform: scaleY(0);
+      opacity: 0;
+    }
+
     @media (prefers-reduced-motion: reduce) {
       #car-root,
       #car-svg :global(.gz),
       #car-svg :global(.pz),
-      #car-svg :global(.body-fill) {
+      #car-svg :global(.body-fill),
+      .acc-body {
         transition: none !important;
       }
     }
@@ -462,8 +554,8 @@ const PAINTS = [
       clear: { label: 'Clear', vlt: '95–100% VLT', frontLegal: true },
     };
     const ZONE_LABELS: Record<string, string> = {};
-    document.querySelectorAll<HTMLElement>('[data-tint-zone],[data-ppf-zone]').forEach((b) => {
-      ZONE_LABELS[b.dataset.tintZone || b.dataset.ppfZone!] = b.textContent!.trim();
+    document.querySelectorAll<HTMLElement>('[data-tint-zone],[data-ppf-zone],[data-priority]').forEach((b) => {
+      ZONE_LABELS[b.dataset.tintZone || b.dataset.ppfZone || b.dataset.priority!] = b.textContent!.trim();
     });
 
     const root = document.getElementById('visualizer')!;
@@ -476,9 +568,8 @@ const PAINTS = [
 
     // ══ Render ═══════════════════════════════════════════════════════
     function applyZones() {
-      const glassSel = state.tintZones;
       carRoot.querySelectorAll<SVGElement>('.gz').forEach((el) => {
-        el.classList.toggle('on', glassSel.has(el.dataset.z!));
+        el.classList.toggle('on', state.tintZones.has(el.dataset.z!));
       });
       const full = state.ppfZones.has('full');
       carRoot.querySelectorAll<SVGElement>('.pz').forEach((el) => {
@@ -563,6 +654,16 @@ const PAINTS = [
     // ══ Wiring ═══════════════════════════════════════════════════════
     const $$ = (sel: string) => Array.from(document.querySelectorAll<HTMLElement>(sel));
 
+    // Accordions
+    $$('.acc-toggle').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const acc = btn.closest<HTMLElement>('.acc')!;
+        const open = acc.dataset.open !== 'true';
+        acc.dataset.open = String(open);
+        btn.setAttribute('aria-expanded', String(open));
+      })
+    );
+
     $$('.veh-chip').forEach((chip) =>
       chip.addEventListener('click', () => {
         $$('.veh-chip').forEach((c) => {
@@ -627,7 +728,6 @@ const PAINTS = [
         const on = !state.priorities.has(p);
         state.priorities[on ? 'add' : 'delete'](p);
         chip.setAttribute('aria-pressed', String(on));
-        ZONE_LABELS[p] = chip.textContent!.trim();
         render();
       })
     );
