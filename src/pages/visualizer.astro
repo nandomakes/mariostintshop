@@ -5,7 +5,7 @@ import QuoteCTA from '../components/QuoteCTA.astro';
 import Footer from '../components/Footer.astro';
 import CallFab from '../components/CallFab.astro';
 import { SITE, IMAGES, WHATSAPP_NUMBER } from '../consts';
-import { VEHICLES, initial, zoneIcon } from '../lib/vehicles';
+import { PHOTO_VEHICLES as VEHICLES, initialPhoto as initial, zoneIconPhoto as zoneIcon } from '../lib/vehicles-photo';
 
 const title = `Tint & PPF Visualizer | ${SITE.brand}`;
 const description =
@@ -116,9 +116,14 @@ const PAINTS = [
                   i === 0 ? 'border-accent bg-mint' : 'border-sand hover:border-ash/60',
                 ]}
               >
-                <svg viewBox="0 0 860 340" class="h-9 w-full" aria-hidden="true">
-                  <g set:html={v.inner} />
-                </svg>
+                <img
+                  src={v.photo}
+                  alt=""
+                  width="120"
+                  height="47"
+                  loading="lazy"
+                  class="veh-thumb h-9 w-full object-contain transition-[filter,opacity] duration-200"
+                />
                 <span class="text-[10px] font-bold uppercase tracking-[0.14em] text-ink transition-colors group-aria-checked:text-accentDk">
                   {v.label}
                 </span>
@@ -168,6 +173,7 @@ const PAINTS = [
                   <button
                     type="button"
                     data-paint={p.hex}
+                    data-paint-id={p.id}
                     data-paint-label={p.label}
                     aria-label={`Paint: ${p.label}`}
                     aria-pressed={i === 0 ? 'true' : 'false'}
@@ -203,7 +209,7 @@ const PAINTS = [
                           aria-pressed={z.id === 'front-side' || z.id === 'rear-side' ? 'true' : 'false'}
                           class="zone-tile pressable group flex flex-col items-center gap-1 border border-sand bg-paper px-1.5 pb-2 pt-2.5 transition-colors duration-200 hover:border-ash/60 aria-pressed:border-accent aria-pressed:bg-mint"
                         >
-                          <svg viewBox="60 70 740 260" class="h-7 w-full" aria-hidden="true">
+                          <svg viewBox="20 80 820 240" class="h-7 w-full" aria-hidden="true">
                             <g set:html={zoneIcon(z.id)} />
                           </svg>
                           <span class="text-center text-[10px] font-bold leading-tight text-ink group-aria-pressed:text-accentDk">{z.label}</span>
@@ -311,7 +317,7 @@ const PAINTS = [
                           aria-pressed={['bumper-front', 'hood-full', 'fenders-partial', 'mirrors'].includes(z.id) ? 'true' : 'false'}
                           class="zone-tile pressable group flex flex-col items-center gap-1 border border-sand bg-paper px-1.5 pb-2 pt-2.5 transition-colors duration-200 hover:border-ash/60 aria-pressed:border-accent aria-pressed:bg-mint"
                         >
-                          <svg viewBox="60 70 740 260" class="h-7 w-full" aria-hidden="true">
+                          <svg viewBox="20 80 820 240" class="h-7 w-full" aria-hidden="true">
                             <g set:html={zoneIcon(z.id)} />
                           </svg>
                           <span class="text-center text-[10px] font-bold leading-tight text-ink group-aria-pressed:text-accentDk">{z.label}</span>
@@ -361,15 +367,10 @@ const PAINTS = [
         <div class="min-w-0 lg:order-2">
           <div class="border border-sand bg-whisper p-4 sm:p-6">
             <svg id="car-svg" viewBox="0 0 860 340" class="h-auto w-full" role="img" aria-label="Vehicle preview with selected film applied">
-              <defs>
-                <linearGradient id="body-gloss" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.28" />
-                  <stop offset="0.38" stop-color="#FFFFFF" stop-opacity="0.07" />
-                  <stop offset="0.62" stop-color="#FFFFFF" stop-opacity="0" />
-                  <stop offset="1" stop-color="#000000" stop-opacity="0.2" />
-                </linearGradient>
-              </defs>
-              <g id="car-root" set:html={initial.inner} />
+              <g id="car-root">
+                <image id="car-photo" href={initial.photo} x="0" y="0" width="860" height="340" preserveAspectRatio="xMidYMid meet" />
+                <g id="car-zones" set:html={initial.overlay} />
+              </g>
             </svg>
 
             <!-- Live summary -->
@@ -406,34 +407,26 @@ const PAINTS = [
   <Footer />
   <CallFab />
 
-  <!-- Per-vehicle geometry, consumed by the client script -->
-  <script type="application/json" id="vehicles-json" is:inline set:html={JSON.stringify(Object.fromEntries(VEHICLES.map((v) => [v.id, v.inner])))}></script>
+  <!-- Per-vehicle geometry + photo path, consumed by the client script -->
+  <script
+    type="application/json"
+    id="vehicles-json"
+    is:inline
+    set:html={JSON.stringify(
+      Object.fromEntries(
+        VEHICLES.map((v) => [v.id, { overlay: v.overlay, photo: v.photo }])
+      )
+    )}
+  ></script>
 
   <style>
-    /* Paint color transitions smoothly between swatches. */
-    @property --paint {
-      syntax: '<color>';
-      inherits: true;
-      initial-value: #1a1c20;
-    }
     #car-svg {
-      --paint: #1a1c20;
       --shade-op: 0.85;
     }
-    #car-svg :global(.body-fill) {
-      fill: var(--paint);
-      transition: fill 350ms var(--ease-out), --paint 350ms var(--ease-out);
-    }
-    #car-svg :global(.body-shine) {
-      transition: opacity 300ms var(--ease-out);
-    }
-    /* Stealth black restyles the paint; matte kills the gloss highlight. */
-    [data-finish='black'][data-mode='ppf'] #car-svg :global(.body-fill) {
-      fill: #16181c;
-    }
-    [data-finish='matte'][data-mode='ppf'] #car-svg :global(.body-shine),
-    [data-finish='black'][data-mode='ppf'] #car-svg :global(.body-shine) {
-      opacity: 0.22;
+    /* Paint recolor is applied as a CSS filter on the photo (JS-driven —
+       see PAINT_FILTERS below); the render is a neutral-silver base plate. */
+    #car-photo {
+      transition: filter 350ms var(--ease-out);
     }
 
     /* Glass: quiet by default, selected zones take the shade opacity. */
@@ -476,8 +469,8 @@ const PAINTS = [
       fill-opacity: 0.85;
     }
 
-    /* Ground shadow softened for the light stage. */
-    #car-svg :global(ellipse) {
+    /* Ground shadow softened for the light stage (photo mode). */
+    #car-zones :global(ellipse) {
       opacity: 0.12;
     }
 
@@ -491,19 +484,14 @@ const PAINTS = [
       transform: translateX(-10px);
     }
 
-    /* Mini silhouettes in the vehicle picker. */
-    .veh-chip svg :global(.body-fill) {
-      fill: #6b7280;
-      transition: fill 200ms var(--ease-out);
+    /* Photo thumbnails in the vehicle picker: dim until selected. */
+    .veh-chip .veh-thumb {
+      filter: grayscale(0.5) brightness(0.97);
+      opacity: 0.62;
     }
-    .veh-chip[aria-checked='true'] svg :global(.body-fill) {
-      fill: #00a8ff;
-    }
-    .veh-chip svg :global(.gz),
-    .veh-chip svg :global(.pz),
-    .veh-chip svg :global(.body-shine),
-    .veh-chip svg :global(ellipse) {
-      display: none;
+    .veh-chip[aria-checked='true'] .veh-thumb {
+      filter: none;
+      opacity: 1;
     }
 
     /* Accordions: +/− icon morph and body collapse. */
@@ -521,9 +509,9 @@ const PAINTS = [
 
     @media (prefers-reduced-motion: reduce) {
       #car-root,
+      #car-photo,
       #car-svg :global(.gz),
       #car-svg :global(.pz),
-      #car-svg :global(.body-fill),
       .acc-body {
         transition: none !important;
       }
@@ -532,15 +520,31 @@ const PAINTS = [
 
   <script>
     // ══ Visualizer state ═════════════════════════════════════════════
-    const vehicles: Record<string, string> = JSON.parse(
+    const vehicles: Record<string, { overlay: string; photo: string }> = JSON.parse(
       document.getElementById('vehicles-json')!.textContent!
     );
+
+    // Paint recolor is approximate: the renders are a neutral silver base
+    // plate, so each swatch is a CSS filter recipe rather than a per-pixel
+    // repaint. compact.png came back with a faint cool cast vs. the other
+    // five renders (measured ~146,155,157 vs ~133-163 neutral gray on the
+    // rest) — pre-correct it before layering the paint filter.
+    const COMPACT_CORRECTION = 'saturate(0.8) hue-rotate(-5deg) brightness(1.02)';
+    const PAINT_FILTERS: Record<string, string> = {
+      silver: 'none',
+      black: 'brightness(0.34) saturate(0.9) contrast(1.18)',
+      white: 'brightness(1.6) saturate(0.18) contrast(0.92)',
+      graphite: 'brightness(0.62) saturate(0.55) contrast(1.05)',
+      red: 'grayscale(1) sepia(1) saturate(4.5) hue-rotate(325deg) brightness(0.82) contrast(1.05)',
+      blue: 'grayscale(1) sepia(1) saturate(6) hue-rotate(178deg) brightness(0.85)',
+    };
 
     const state = {
       mode: 'tint' as 'tint' | 'ppf',
       vehicle: 'sedan',
       vehicleLabel: 'Sedan',
       paint: '#1A1C20',
+      paintId: 'black',
       paintLabel: 'Black',
       tintZones: new Set(['front-side', 'rear-side']),
       shade: 'dark',
@@ -566,6 +570,8 @@ const PAINTS = [
     const root = document.getElementById('visualizer')!;
     const carSvg = document.getElementById('car-svg')!;
     const carRoot = document.getElementById('car-root')!;
+    const carPhoto = document.getElementById('car-photo') as unknown as SVGImageElement;
+    const carZones = document.getElementById('car-zones')!;
     const summary = document.getElementById('build-summary')!;
     const badge = document.getElementById('legal-badge')!;
     const cta = document.getElementById('visualizer-cta') as HTMLAnchorElement;
@@ -573,22 +579,30 @@ const PAINTS = [
 
     // ══ Render ═══════════════════════════════════════════════════════
     function applyZones() {
-      carRoot.querySelectorAll<SVGElement>('.gz').forEach((el) => {
+      carZones.querySelectorAll<SVGElement>('.gz').forEach((el) => {
         el.classList.toggle('on', state.tintZones.has(el.dataset.z!));
       });
       const full = state.ppfZones.has('full');
-      carRoot.querySelectorAll<SVGElement>('.pz').forEach((el) => {
+      carZones.querySelectorAll<SVGElement>('.pz').forEach((el) => {
         const z = el.dataset.z!;
-        el.classList.toggle('on', full ? z === 'full' : state.ppfZones.has(z));
+        el.classList.toggle('on', full || state.ppfZones.has(z));
       });
+    }
+
+    function applyPaintFilter() {
+      let f = PAINT_FILTERS[state.paintId] ?? 'none';
+      if (state.mode === 'ppf' && state.finish === 'black') f = PAINT_FILTERS.black;
+      else if (state.mode === 'ppf' && state.finish === 'matte') f = `${f} saturate(0.82) contrast(0.94)`.trim();
+      if (state.vehicle === 'compact') f = f === 'none' ? COMPACT_CORRECTION : `${COMPACT_CORRECTION} ${f}`;
+      carPhoto.style.filter = f;
     }
 
     function render() {
       root.dataset.mode = state.mode;
       root.dataset.finish = state.finish;
-      carSvg.style.setProperty('--paint', state.paint);
       carSvg.style.setProperty('--shade-op', String(state.shadeOp));
       applyZones();
+      applyPaintFilter();
 
       // Summary line
       if (state.mode === 'tint') {
@@ -638,7 +652,8 @@ const PAINTS = [
       state.vehicle = id;
       state.vehicleLabel = label;
       const doSwap = () => {
-        carRoot.innerHTML = vehicles[id];
+        carPhoto.setAttribute('href', vehicles[id].photo);
+        carZones.innerHTML = vehicles[id].overlay;
         applyZones();
         render();
       };
@@ -701,6 +716,7 @@ const PAINTS = [
     $$('.paint-chip').forEach((chip) =>
       chip.addEventListener('click', () => {
         state.paint = chip.dataset.paint!;
+        state.paintId = chip.dataset.paintId!;
         state.paintLabel = chip.dataset.paintLabel!;
         $$('.paint-chip').forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
         render();
