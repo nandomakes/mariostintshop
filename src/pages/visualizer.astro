@@ -87,12 +87,12 @@ const PAINTS = [
     </section>
 
     <!-- Title + intro -->
-    <section class="border-b border-line bg-ink">
+    <section class="border-b border-sand bg-paper">
       <div class="mx-auto max-w-4xl px-5 py-12 text-center md:py-14">
-        <h1 class="reveal headline text-[clamp(1.4rem,2.8vw,2.1rem)] text-paper">
+        <h1 class="reveal headline text-[clamp(1.4rem,2.8vw,2.1rem)] text-ink">
           Window tint & paint protection film visualizer
         </h1>
-        <p class="reveal mx-auto mt-5 max-w-[64ch] text-[15px] leading-relaxed text-smoke">
+        <p class="reveal mx-auto mt-5 max-w-[64ch] text-[15px] leading-relaxed text-char">
           See 3M window tint and PPF (paint protection film) on your car. Select a car
           category, determine the coverage area, specify your product, and then preview the
           look of our films — before you buy.
@@ -101,7 +101,7 @@ const PAINTS = [
     </section>
 
     <!-- Vehicle type strip -->
-    <section class="border-b border-line bg-coal">
+    <section class="border-b border-sand bg-paper">
       <div class="mx-auto max-w-5xl px-5 py-6">
         <div class="grid grid-cols-3 gap-2 sm:grid-cols-6" role="radiogroup" aria-label="Vehicle type">
           {
@@ -113,13 +113,13 @@ const PAINTS = [
                 data-vehicle={v.id}
                 class:list={[
                   'veh-chip pressable group flex flex-col items-center gap-1.5 border px-2 pb-2.5 pt-3 transition-colors duration-200',
-                  i === 0 ? 'border-accent bg-accent/10' : 'border-line hover:border-smoke/50',
+                  i === 0 ? 'border-accent bg-mint' : 'border-sand hover:border-ash/60',
                 ]}
               >
                 <svg viewBox="0 0 860 340" class="h-9 w-full" aria-hidden="true">
                   <g set:html={v.inner} />
                 </svg>
-                <span class="text-[10px] font-bold uppercase tracking-[0.14em] text-paper transition-colors group-aria-checked:text-accent">
+                <span class="text-[10px] font-bold uppercase tracking-[0.14em] text-ink transition-colors group-aria-checked:text-accentDk">
                   {v.label}
                 </span>
               </button>
@@ -130,29 +130,29 @@ const PAINTS = [
     </section>
 
     <!-- Visualizer: controls left · preview right (SunTek layout) -->
-    <section id="visualizer" class="bg-ink" data-mode="tint" data-shade="dark" data-finish="gloss">
+    <section id="visualizer" class="bg-paper" data-mode="tint" data-shade="dark" data-finish="gloss">
       <div class="mx-auto grid max-w-6xl gap-8 px-5 py-10 md:py-14 lg:grid-cols-[5fr_7fr] lg:items-start">
         <!-- Controls column -->
         <div class="min-w-0 lg:order-1">
           <!-- Mode tabs + reset -->
-          <div class="flex items-center border-b border-line" role="tablist" aria-label="Film type">
+          <div class="flex items-center border-b border-sand" role="tablist" aria-label="Film type">
             <button
               type="button" role="tab" aria-selected="true" data-tab="tint"
-              class="mode-tab relative px-4 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-accent transition-colors duration-200"
+              class="mode-tab relative px-4 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-accentDk transition-colors duration-200"
             >
               Window Tint
               <span class="tab-line absolute inset-x-0 bottom-0 h-0.5 origin-left bg-accent transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"></span>
             </button>
             <button
               type="button" role="tab" aria-selected="false" data-tab="ppf"
-              class="mode-tab relative px-4 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-smoke transition-colors duration-200 hover:text-paper"
+              class="mode-tab relative px-4 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-ash transition-colors duration-200 hover:text-ink"
             >
               Paint Protection
               <span class="tab-line absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-accent transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"></span>
             </button>
             <button
               type="button" id="reset-btn"
-              class="pressable ml-auto flex items-center gap-1.5 px-2 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-smoke transition-colors hover:text-accent"
+              class="pressable ml-auto flex items-center gap-1.5 px-2 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-ash transition-colors hover:text-accentDk"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
               <span class="hidden sm:inline">Start over</span>
@@ -160,8 +160,8 @@ const PAINTS = [
           </div>
 
           <!-- Paint color -->
-          <div class="border-x border-b border-line bg-coal px-6 py-5">
-            <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-smoke">Paint color</p>
+          <div class="border-x border-b border-sand bg-whisper px-6 py-5">
+            <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-ash">Paint color</p>
             <div class="mt-3 flex flex-wrap gap-2.5">
               {
                 PAINTS.map((p, i) => (
@@ -171,7 +171,7 @@ const PAINTS = [
                     data-paint-label={p.label}
                     aria-label={`Paint: ${p.label}`}
                     aria-pressed={i === 0 ? 'true' : 'false'}
-                    class="paint-chip pressable h-9 w-9 border-2 border-line transition-[transform,border-color] duration-200 hover:scale-110 aria-pressed:border-accent"
+                    class="paint-chip pressable h-9 w-9 border-2 border-sand transition-[transform,border-color] duration-200 hover:scale-110 aria-pressed:border-accent"
                     style={`background:${p.hex}`}
                   />
                 ))
@@ -180,15 +180,15 @@ const PAINTS = [
           </div>
 
           <!-- TINT panel -->
-          <div id="tint-panel" class="border-x border-b border-line bg-coal">
+          <div id="tint-panel" class="border-x border-b border-sand bg-whisper">
             <!-- Accordion: coverage -->
-            <div class="acc border-b border-line px-6" data-open="true">
+            <div class="acc border-b border-sand px-6" data-open="true">
               <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
                 <span>
-                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-paper">Select the coverage</span>
-                  <span class="mt-0.5 block text-xs text-smoke/70">Select a coverage zone to get started.</span>
+                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the coverage</span>
+                  <span class="mt-0.5 block text-xs text-ash">Select a coverage zone to get started.</span>
                 </span>
-                <svg class="acc-icon shrink-0 text-accent transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+                <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
                   <path d="M5 12h14" /><path class="acc-vert" d="M12 5v14" />
                 </svg>
               </button>
@@ -201,12 +201,12 @@ const PAINTS = [
                           type="button"
                           data-tint-zone={z.id}
                           aria-pressed={z.id === 'front-side' || z.id === 'rear-side' ? 'true' : 'false'}
-                          class="zone-tile pressable group flex flex-col items-center gap-1 border border-line px-1.5 pb-2 pt-2.5 transition-colors duration-200 hover:border-smoke/60 aria-pressed:border-accent aria-pressed:bg-accent/10"
+                          class="zone-tile pressable group flex flex-col items-center gap-1 border border-sand bg-paper px-1.5 pb-2 pt-2.5 transition-colors duration-200 hover:border-ash/60 aria-pressed:border-accent aria-pressed:bg-mint"
                         >
                           <svg viewBox="60 70 740 260" class="h-7 w-full" aria-hidden="true">
                             <g set:html={zoneIcon(z.id)} />
                           </svg>
-                          <span class="text-center text-[10px] font-bold leading-tight text-paper group-aria-pressed:text-accent">{z.label}</span>
+                          <span class="text-center text-[10px] font-bold leading-tight text-ink group-aria-pressed:text-accentDk">{z.label}</span>
                         </button>
                       ))
                     }
@@ -216,13 +216,13 @@ const PAINTS = [
             </div>
 
             <!-- Accordion: tint shade -->
-            <div class="acc border-b border-line px-6" data-open="true">
+            <div class="acc border-b border-sand px-6" data-open="true">
               <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
                 <span>
-                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-paper">Select the tint</span>
-                  <span class="mt-0.5 block text-xs text-smoke/70">Preview the shade on the vehicle view.</span>
+                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the tint</span>
+                  <span class="mt-0.5 block text-xs text-ash">Preview the shade on the vehicle view.</span>
                 </span>
-                <svg class="acc-icon shrink-0 text-accent transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+                <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
                   <path d="M5 12h14" /><path class="acc-vert" d="M12 5v14" />
                 </svg>
               </button>
@@ -235,20 +235,20 @@ const PAINTS = [
                           type="button" role="radio"
                           aria-checked={s.id === 'dark' ? 'true' : 'false'}
                           data-shade={s.id} data-shade-label={s.label} data-op={s.op}
-                          class="shade-chip pressable border border-line p-2 text-center transition-colors duration-200 hover:border-smoke/60 aria-checked:border-accent"
+                          class="shade-chip pressable border border-sand bg-paper p-2 text-center transition-colors duration-200 hover:border-ash/60 aria-checked:border-accent"
                         >
                           <span
-                            class="block h-8 w-full border border-line/60"
+                            class="block h-8 w-full border border-sand"
                             style={`background: linear-gradient(rgba(11,21,36,${s.op}), rgba(11,21,36,${s.op})), linear-gradient(135deg, #E8F1F8 0%, #BFD3E2 60%, #DCE9F4 100%)`}
                             aria-hidden="true"
                           />
-                          <span class="mt-1.5 block text-xs font-bold text-paper">{s.label}</span>
-                          <span class="block text-[10px] text-smoke">{s.vlt}</span>
+                          <span class="mt-1.5 block text-xs font-bold text-ink">{s.label}</span>
+                          <span class="block text-[10px] text-ash">{s.vlt}</span>
                         </button>
                       ))
                     }
                   </div>
-                  <p class="pb-5 pt-2 text-[11px] leading-relaxed text-smoke/70">
+                  <p class="pb-5 pt-2 text-[11px] leading-relaxed text-ash">
                     Tennessee requires 35%+ VLT on front side windows.
                   </p>
                 </div>
@@ -259,10 +259,10 @@ const PAINTS = [
             <div class="acc px-6" data-open="true">
               <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
                 <span>
-                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-paper">What matters most?</span>
-                  <span class="mt-0.5 block text-xs text-smoke/70">Prioritize these benefits to help us find the right tint for you.</span>
+                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">What matters most?</span>
+                  <span class="mt-0.5 block text-xs text-ash">Prioritize these benefits to help us find the right tint for you.</span>
                 </span>
-                <svg class="acc-icon shrink-0 text-accent transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+                <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
                   <path d="M5 12h14" /><path class="acc-vert" d="M12 5v14" />
                 </svg>
               </button>
@@ -275,7 +275,7 @@ const PAINTS = [
                           type="button"
                           data-priority={p.id}
                           aria-pressed="false"
-                          class="prio-chip pressable border border-line px-3.5 py-2 text-xs font-bold text-paper transition-colors duration-200 hover:border-smoke/60 aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-ink"
+                          class="prio-chip pressable border border-sand bg-paper px-3.5 py-2 text-xs font-bold text-ink transition-colors duration-200 hover:border-ash/60 aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-ink"
                         >
                           {p.label}
                         </button>
@@ -288,15 +288,15 @@ const PAINTS = [
           </div>
 
           <!-- PPF panel -->
-          <div id="ppf-panel" class="hidden border-x border-b border-line bg-coal">
+          <div id="ppf-panel" class="hidden border-x border-b border-sand bg-whisper">
             <!-- Accordion: coverage -->
-            <div class="acc border-b border-line px-6" data-open="true">
+            <div class="acc border-b border-sand px-6" data-open="true">
               <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
                 <span>
-                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-paper">Select the coverage</span>
-                  <span class="mt-0.5 block text-xs text-smoke/70">Select individual zones or full coverage for the entire car.</span>
+                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the coverage</span>
+                  <span class="mt-0.5 block text-xs text-ash">Select individual zones or full coverage for the entire car.</span>
                 </span>
-                <svg class="acc-icon shrink-0 text-accent transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+                <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
                   <path d="M5 12h14" /><path class="acc-vert" d="M12 5v14" />
                 </svg>
               </button>
@@ -309,12 +309,12 @@ const PAINTS = [
                           type="button"
                           data-ppf-zone={z.id}
                           aria-pressed={['bumper-front', 'hood-full', 'fenders-partial', 'mirrors'].includes(z.id) ? 'true' : 'false'}
-                          class="zone-tile pressable group flex flex-col items-center gap-1 border border-line px-1.5 pb-2 pt-2.5 transition-colors duration-200 hover:border-smoke/60 aria-pressed:border-accent aria-pressed:bg-accent/10"
+                          class="zone-tile pressable group flex flex-col items-center gap-1 border border-sand bg-paper px-1.5 pb-2 pt-2.5 transition-colors duration-200 hover:border-ash/60 aria-pressed:border-accent aria-pressed:bg-mint"
                         >
                           <svg viewBox="60 70 740 260" class="h-7 w-full" aria-hidden="true">
                             <g set:html={zoneIcon(z.id)} />
                           </svg>
-                          <span class="text-center text-[10px] font-bold leading-tight text-paper group-aria-pressed:text-accent">{z.label}</span>
+                          <span class="text-center text-[10px] font-bold leading-tight text-ink group-aria-pressed:text-accentDk">{z.label}</span>
                         </button>
                       ))
                     }
@@ -327,10 +327,10 @@ const PAINTS = [
             <div class="acc px-6" data-open="true">
               <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
                 <span>
-                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-paper">Select the finish</span>
-                  <span class="mt-0.5 block text-xs text-smoke/70">Customize and combine to enhance the look of your vehicle.</span>
+                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the finish</span>
+                  <span class="mt-0.5 block text-xs text-ash">Customize and combine to enhance the look of your vehicle.</span>
                 </span>
-                <svg class="acc-icon shrink-0 text-accent transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+                <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
                   <path d="M5 12h14" /><path class="acc-vert" d="M12 5v14" />
                 </svg>
               </button>
@@ -343,14 +343,14 @@ const PAINTS = [
                           type="button" role="radio"
                           aria-checked={f.id === 'gloss' ? 'true' : 'false'}
                           data-finish={f.id} data-finish-label={f.label} data-note={f.note}
-                          class="finish-chip pressable border border-line px-2 py-2.5 text-center text-xs font-bold text-paper transition-colors duration-200 hover:border-smoke/60 aria-checked:border-accent aria-checked:bg-accent aria-checked:text-ink"
+                          class="finish-chip pressable border border-sand bg-paper px-2 py-2.5 text-center text-xs font-bold text-ink transition-colors duration-200 hover:border-ash/60 aria-checked:border-accent aria-checked:bg-accent aria-checked:text-ink"
                         >
                           {f.label}
                         </button>
                       ))
                     }
                   </div>
-                  <p id="finish-note" class="pb-5 pt-2 text-[11px] leading-relaxed text-smoke/70">{FINISHES[0].note}</p>
+                  <p id="finish-note" class="pb-5 pt-2 text-[11px] leading-relaxed text-ash">{FINISHES[0].note}</p>
                 </div>
               </div>
             </div>
@@ -358,8 +358,8 @@ const PAINTS = [
         </div>
 
         <!-- Preview column -->
-        <div class="min-w-0 lg:order-2 lg:sticky lg:top-24">
-          <div class="border border-line bg-coal p-4 sm:p-6">
+        <div class="min-w-0 lg:order-2">
+          <div class="border border-sand bg-whisper p-4 sm:p-6">
             <svg id="car-svg" viewBox="0 0 860 340" class="h-auto w-full" role="img" aria-label="Vehicle preview with selected film applied">
               <defs>
                 <linearGradient id="body-gloss" x1="0" y1="0" x2="0" y2="1">
@@ -373,9 +373,9 @@ const PAINTS = [
             </svg>
 
             <!-- Live summary -->
-            <div class="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
-              <p id="build-summary" class="min-w-0 flex-1 text-xs font-semibold uppercase tracking-[0.08em] text-smoke"></p>
-              <span id="legal-badge" class="shrink-0 bg-accent/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-accent"></span>
+            <div class="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-sand pt-4">
+              <p id="build-summary" class="min-w-0 flex-1 text-xs font-semibold uppercase tracking-[0.08em] text-char"></p>
+              <span id="legal-badge" class="shrink-0 bg-accent/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-accentDk"></span>
             </div>
           </div>
 
@@ -389,11 +389,11 @@ const PAINTS = [
           >
             Contact Your Installer →
           </a>
-          <p class="mt-2.5 text-center text-[11px] text-smoke/70">
+          <p class="mt-2.5 text-center text-[11px] text-ash">
             Opens WhatsApp with your build pre-filled — we reply with a free quote.
           </p>
 
-          <p class="mx-auto mt-6 max-w-xl text-center text-[11px] leading-relaxed text-smoke/60">
+          <p class="mx-auto mt-6 max-w-xl text-center text-[11px] leading-relaxed text-ash">
             Visual representations are shown for illustrative purposes only; actual appearances
             treated with window film and paint protection film may vary.
           </p>
@@ -474,6 +474,11 @@ const PAINTS = [
     }
     [data-finish='black'] #car-svg :global(.pz.on) {
       fill-opacity: 0.85;
+    }
+
+    /* Ground shadow softened for the light stage. */
+    #car-svg :global(ellipse) {
+      opacity: 0.12;
     }
 
     /* Vehicle swap: blur-crossfade (blur masks the geometry jump). */
@@ -602,8 +607,8 @@ const PAINTS = [
       badge.style.display = state.mode === 'tint' ? '' : 'none';
       badge.textContent = legal ? 'TN legal · selected zones' : 'TN: 35%+ required on front sides';
       badge.className = legal
-        ? 'shrink-0 bg-accent/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-accent'
-        : 'shrink-0 bg-[#3A2A00] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#FFB020]';
+        ? 'shrink-0 bg-accent/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-accentDk'
+        : 'shrink-0 bg-[#FFF1CC] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#8A5B00]';
 
       // WhatsApp CTA
       let msg: string;
@@ -683,8 +688,8 @@ const PAINTS = [
         $$('.mode-tab').forEach((t) => {
           const on = t === tab;
           t.setAttribute('aria-selected', String(on));
-          t.classList.toggle('text-accent', on);
-          t.classList.toggle('text-smoke', !on);
+          t.classList.toggle('text-accentDk', on);
+          t.classList.toggle('text-ash', !on);
           t.querySelector('.tab-line')?.classList.toggle('scale-x-0', !on);
         });
         document.getElementById('tint-panel')!.classList.toggle('hidden', state.mode !== 'tint');
