@@ -133,9 +133,9 @@ const PAINTS = [
     <section id="visualizer" class="bg-paper" data-mode="tint" data-shade="dark" data-finish="gloss">
       <div class="mx-auto grid max-w-6xl gap-8 px-5 py-10 md:py-14 lg:grid-cols-[5fr_7fr] lg:items-start">
         <!-- Controls column -->
-        <div class="min-w-0 lg:order-1">
+        <div class="min-w-0 border border-sand bg-whisper lg:order-1">
           <!-- Mode tabs + reset -->
-          <div class="flex items-center border-b border-sand" role="tablist" aria-label="Film type">
+          <div class="flex items-center border-b border-sand pr-3" role="tablist" aria-label="Film type">
             <button
               type="button" role="tab" aria-selected="true" data-tab="tint"
               class="mode-tab relative px-4 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-accentDk transition-colors duration-200"
@@ -160,7 +160,7 @@ const PAINTS = [
           </div>
 
           <!-- Paint color -->
-          <div class="border-x border-b border-sand bg-whisper px-6 py-5">
+          <div class="border-b border-sand px-6 py-5">
             <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-ash">Paint color</p>
             <div class="mt-3 flex flex-wrap gap-2.5">
               {
@@ -180,7 +180,7 @@ const PAINTS = [
           </div>
 
           <!-- TINT panel -->
-          <div id="tint-panel" class="border-x border-b border-sand bg-whisper">
+          <div id="tint-panel">
             <!-- Accordion: coverage -->
             <div class="acc border-b border-sand px-6" data-open="true">
               <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
@@ -288,7 +288,7 @@ const PAINTS = [
           </div>
 
           <!-- PPF panel -->
-          <div id="ppf-panel" class="hidden border-x border-b border-sand bg-whisper">
+          <div id="ppf-panel" class="hidden">
             <!-- Accordion: coverage -->
             <div class="acc border-b border-sand px-6" data-open="true">
               <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
