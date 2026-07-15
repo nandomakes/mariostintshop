@@ -19,7 +19,7 @@ const posts = await getInstagramFeed(8);
     <div class="relative mt-12">
       <div
         id="gallery-track"
-        class="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2"
+        class="no-scrollbar flex snap-x snap-proximity gap-4 overflow-x-auto pb-2"
       >
         {
           posts.map((img) => (
@@ -93,12 +93,11 @@ const posts = await getInstagramFeed(8);
     );
     const EPS = 4;
 
-    // Advance one card per click. The feed is short (a handful of cards), so a
-    // multi-card "page" would jump straight to the end in a single click and
-    // instantly disable the arrow — one card keeps the motion legible.
+    // Advance three cards per click, so each press reveals a fresh set of three
+    // images (plus the half-peek of the next, since ~3.5 fit in view).
     const step = () => {
       const card = track.querySelector<HTMLElement>('a');
-      return card ? card.offsetWidth + 16 : 300;
+      return (card ? card.offsetWidth + 16 : 300) * 3;
     };
     const maxScroll = () => track.scrollWidth - track.clientWidth;
 
