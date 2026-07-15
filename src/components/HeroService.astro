@@ -1,6 +1,4 @@
 ---
-import { CONTACT } from '../consts';
-
 interface Props {
   kicker: string;
   title: string;
@@ -31,18 +29,12 @@ const { kicker, title, subcopy, imageSrc } = Astro.props;
     </nav>
     <h1 class="reveal headline text-[clamp(2.25rem,5.5vw,4rem)] text-paper">{title}</h1>
     <p class="reveal mx-auto mt-6 max-w-[52ch] leading-relaxed text-smoke md:text-lg">{subcopy}</p>
-    <div class="reveal mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+    <div class="reveal mt-9 flex justify-center">
       <a
         href="/#contact"
         class="pressable sticker w-full bg-accent px-8 py-3.5 text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk sm:w-auto"
       >
         Get a Quote →
-      </a>
-      <a
-        href={`tel:${CONTACT.phoneTel}`}
-        class="pressable sticker w-full border border-paper/40 px-8 py-3.5 text-xs font-bold uppercase tracking-[0.12em] text-paper transition-colors duration-200 hover:border-accent hover:text-accent sm:w-auto"
-      >
-        Call {CONTACT.phoneDisplay}
       </a>
     </div>
   </div>

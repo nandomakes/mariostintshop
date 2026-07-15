@@ -56,7 +56,7 @@ const posts = await getInstagramFeed(8);
       <button
         type="button"
         data-dir="prev"
-        class="gallery-arrow pressable absolute -left-3 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center bg-accent text-ink shadow-lg shadow-accent/25 transition-[opacity,background-color] duration-200 hover:bg-accentDk disabled:pointer-events-none disabled:opacity-0 md:flex"
+        class="gallery-arrow pressable absolute -left-3 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center bg-accent text-ink shadow-lg shadow-accent/25 transition-[opacity,background-color] duration-200 hover:bg-accentDk disabled:pointer-events-none disabled:opacity-30 md:flex"
         aria-label="Previous photos"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
@@ -64,7 +64,7 @@ const posts = await getInstagramFeed(8);
       <button
         type="button"
         data-dir="next"
-        class="gallery-arrow pressable absolute -right-3 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center bg-accent text-ink shadow-lg shadow-accent/25 transition-[opacity,background-color] duration-200 hover:bg-accentDk disabled:pointer-events-none disabled:opacity-0 md:flex"
+        class="gallery-arrow pressable absolute -right-3 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center bg-accent text-ink shadow-lg shadow-accent/25 transition-[opacity,background-color] duration-200 hover:bg-accentDk disabled:pointer-events-none disabled:opacity-30 md:flex"
         aria-label="Next photos"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
@@ -93,11 +93,12 @@ const posts = await getInstagramFeed(8);
     );
     const EPS = 4;
 
-    // Scroll amount = as many whole cards as are visible (min one card).
+    // Advance one card per click. The feed is short (a handful of cards), so a
+    // multi-card "page" would jump straight to the end in a single click and
+    // instantly disable the arrow — one card keeps the motion legible.
     const step = () => {
       const card = track.querySelector<HTMLElement>('a');
-      const cardW = card ? card.offsetWidth + 16 : 300;
-      return Math.max(cardW, Math.floor(track.clientWidth / cardW) * cardW);
+      return card ? card.offsetWidth + 16 : 300;
     };
     const maxScroll = () => track.scrollWidth - track.clientWidth;
 

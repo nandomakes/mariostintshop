@@ -44,6 +44,20 @@ const ICONS: Record<string, string> = {
   'commercial-films':
     '<path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16"/><path d="M14 9h5a1 1 0 0 1 1 1v11"/><path d="M7.5 8h3M7.5 12h3M7.5 16h3M17 13h0M17 17h0"/>',
 };
+
+// Per-service framing for the faded card image so the subject lands in the
+// visible (right) zone of the strip. Defaults to a centered crop.
+const IMG_FX: Record<string, string> = {
+  ppf: 'object-center -scale-x-100', // red car sits on the left of the source → mirror it into view
+  'commercial-films': 'object-[60%_40%]', // bias toward the installers working the film
+};
+
+// Tesla "T" emblem, matched to the official proportions but drawn as our own
+// vector (no Tesla-supplied asset embedded). Shown as a faded, nominative mark
+// on the Tesla-services card to signal the brand we service.
+const TESLA_T =
+  '<path d="M12 2.6C7.7 2.6 4.5 3.7 4.5 3.7L5.5 5.4S8.3 4.4 12 4.4 18.5 5.4 18.5 5.4L19.5 3.7S16.3 2.6 12 2.6Z"/>' +
+  '<path d="M12 5.6C8.7 5.6 6.6 6.3 6.6 6.3 8 6.9 9.1 7.9 9.6 9.4L11 9.4 11 21 13 21 13 9.4 14.4 9.4C14.9 7.9 16 6.9 17.4 6.3 17.4 6.3 15.3 5.6 12 5.6Z"/>';
 ---
 
 <section id="services" class="relative bg-ink">
@@ -111,13 +125,27 @@ const ICONS: Record<string, string> = {
                 href={`/services/${service.slug}`}
                 class="lift group relative flex items-center gap-4 overflow-hidden bg-paper p-5 shadow-[0_2px_10px_rgba(0,0,0,0.05)] md:p-6"
               >
-                <img
-                  src={IMAGES[service.image].src}
-                  alt=""
-                  aria-hidden="true"
-                  loading="lazy"
-                  class="pointer-events-none absolute inset-y-0 right-0 h-full w-44 object-cover opacity-[0.24] transition-opacity duration-500 group-hover:opacity-40 [mask-image:linear-gradient(to_left,#000,transparent)]"
-                />
+                {
+                  service.id === 'tesla' ? (
+                    <svg
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      class="pointer-events-none absolute inset-y-0 right-6 my-auto h-[66%] w-auto fill-ink opacity-[0.2] transition-opacity duration-500 group-hover:opacity-[0.32]"
+                      set:html={TESLA_T}
+                    />
+                  ) : (
+                    <img
+                      src={IMAGES[service.image].src}
+                      alt=""
+                      aria-hidden="true"
+                      loading="lazy"
+                      class:list={[
+                        'pointer-events-none absolute inset-y-0 right-0 h-full w-48 object-cover opacity-[0.34] transition-opacity duration-500 group-hover:opacity-[0.55] [mask-image:linear-gradient(to_left,#000_22%,transparent)]',
+                        IMG_FX[service.id] ?? 'object-center',
+                      ]}
+                    />
+                  )
+                }
                 <span class="relative flex h-12 w-12 shrink-0 items-center justify-center bg-accent text-ink">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS[service.id]} />
                 </span>
