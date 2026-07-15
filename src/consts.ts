@@ -54,10 +54,54 @@ export const HERO = {
 // photography. Keep the same keys or update the paths here.
 export const IMAGES = {
   heroBg: {
-    src: '/images/hero.png',
+    src: '/images/hero-1.webp',
     alt: '',
-    width: 1584,
-    height: 672,
+    width: 1600,
+    height: 679,
+  },
+  // Satisfaction-badge image in the "Our services" section.
+  preview: {
+    src: '/images/preview.webp',
+    alt: 'Freshly tinted vehicle at Mario\'s Tint Shop',
+    width: 1000,
+    height: 1241,
+  },
+  // Per-service imagery (card preview + service page).
+  tinting: {
+    src: '/images/tinting-2.webp',
+    alt: 'Car window tinting installation',
+    width: 1400,
+    height: 781,
+  },
+  paint: {
+    src: '/images/paint-1.webp',
+    alt: 'Paint protection film application',
+    width: 1400,
+    height: 781,
+  },
+  coating: {
+    src: '/images/coating-1.webp',
+    alt: 'Ceramic coating finish on a vehicle',
+    width: 1400,
+    height: 781,
+  },
+  teslaSvc: {
+    src: '/images/tesla-1.webp',
+    alt: 'Tesla with premium tint and protection',
+    width: 1400,
+    height: 786,
+  },
+  office: {
+    src: '/images/office.webp',
+    alt: 'Office and commercial window film',
+    width: 1400,
+    height: 639,
+  },
+  office2: {
+    src: '/images/office-2.webp',
+    alt: 'Commercial building with window film installed',
+    width: 1400,
+    height: 1050,
   },
   hero: {
     src: 'https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=1200&h=1400&q=80',
@@ -187,7 +231,8 @@ export interface Service {
   features: Feature[];
   process: string[];
   faqs: { q: string; a: string }[];
-  image: keyof typeof IMAGES;
+  image: keyof typeof IMAGES; // card preview (and service page unless pageImage is set)
+  pageImage?: keyof typeof IMAGES; // overrides the service-page image when it differs from the card
 }
 
 export const SERVICES: Service[] = [
@@ -227,7 +272,7 @@ export const SERVICES: Service[] = [
       { q: 'How long does the tint take to cure?', a: 'Most tint fully cures within 3–5 days depending on weather. We ask you to keep windows rolled up during that time for the best result.' },
       { q: 'Will the tint turn purple over time?', a: 'No. Our premium ceramic and carbon films are dyed and constructed to never fade to purple, unlike low-cost dyed films.' },
     ],
-    image: 'detail',
+    image: 'tinting',
   },
   {
     id: 'ppf',
@@ -265,7 +310,7 @@ export const SERVICES: Service[] = [
       { q: 'How long does PPF last?', a: 'Quality PPF lasts 8–10 years and is backed by a manufacturer warranty against yellowing, cracking, and delamination.' },
       { q: 'Can PPF and ceramic coating be combined?', a: 'Yes — many clients add a ceramic coating over PPF for the easiest cleaning and maximum gloss. We can bundle both.' },
     ],
-    image: 'install',
+    image: 'paint',
   },
   {
     id: 'ceramic-coating',
@@ -303,7 +348,7 @@ export const SERVICES: Service[] = [
       { q: 'Does ceramic coating replace PPF?', a: 'No. Ceramic coating resists swirls, chemicals, and water spots but does not stop rock chips. For impact protection, pair it with PPF.' },
       { q: 'Do I still need to wash my car?', a: 'Yes, but far less often and much more easily. Dirt releases with a simple rinse and gentle wash — no waxing required.' },
     ],
-    image: 'garage',
+    image: 'coating',
   },
   {
     id: 'tesla',
@@ -341,7 +386,7 @@ export const SERVICES: Service[] = [
       { q: 'Can you tint the Tesla glass roof?', a: 'Yes. We offer ceramic film for the panoramic roof that significantly reduces heat and glare while keeping visibility clear.' },
       { q: 'What protects Tesla paint best?', a: 'A full-front or full-body PPF package handles rock chips, and a ceramic coating on top keeps it glossy and easy to clean. We commonly do both together on Teslas.' },
     ],
-    image: 'tesla',
+    image: 'teslaSvc',
   },
   {
     id: 'commercial-films',
@@ -379,7 +424,8 @@ export const SERVICES: Service[] = [
       { q: 'What kinds of commercial film do you offer?', a: 'Solar/heat-control, glare-reduction, decorative and privacy frost, reflective, and safety/security films for storefronts and office buildings.' },
       { q: 'Can film really lower our energy bills?', a: 'Yes. By rejecting solar heat gain, quality window film reduces cooling load and can deliver a meaningful return on energy costs.' },
     ],
-    image: 'fleet',
+    image: 'office',
+    pageImage: 'office2',
   },
 ];
 
@@ -389,61 +435,61 @@ export const getService = (slug: string) =>
 
 // ── Testimonials ────────────────────────────────────────────────────
 // Real 5-star Google reviews from the shop's Google Business profile
-// (5.0 rating · 128+ reviews). ⚠️ Photos are placeholders — swap for
-// real photos of each customer's finished vehicle when available.
+// (5.0 rating · 390+ reviews). Photos are the customers' own review photos,
+// pulled from Google Maps and self-hosted under /public/images/reviews.
 export const TESTIMONIALS = [
   {
     quote:
-      "Mario and his team are the best. They got my new Honda Passport Trailsport looking super clean. Thank you guys for always giving us the best tint money can buy and top notch professionalism. I'm a customer for life.",
+      "Mario and his team are the best. They got my new Honda Passport Trailsport looking super clean. Thank you guys for always giving us the best tint money can buy and top-notch professionalism. I'm a customer for life.",
     author: 'Christopher Moers',
     photo: {
-      src: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=800&h=500&q=80',
-      alt: "Customer's SUV with fresh window tint",
+      src: '/images/reviews/review-1.webp',
+      alt: "Christopher's black Honda Passport with fresh window tint",
     },
   },
   {
     quote:
-      "Just had both of my Teslas tinted and protected with PPF by Mario's Tint, and I couldn't be happier! Mario's workmanship is absolutely impeccable — every detail was handled with care.",
-    author: 'Cameron Stacey',
-    photo: {
-      src: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&w=800&h=500&q=80',
-      alt: "Customer's Tesla with tint and paint protection film",
-    },
-  },
-  {
-    quote:
-      'Place is awesome. Super cheap prices and got my 4 windows on my F250 done in 30 minutes. They take care of you and anything else wrong with the tint in the future. Lifetime warranty available.',
+      'Place is awesome. Super cheap prices and got all 4 windows on my F250 done in 30 minutes. They take care of you and anything else wrong with the tint in the future — lifetime warranty available.',
     author: 'Ethan Stoquert',
     photo: {
-      src: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&h=500&q=80',
-      alt: "Customer's truck after window tinting",
+      src: '/images/reviews/review-2.webp',
+      alt: "Ethan's truck after window tinting",
     },
   },
   {
     quote:
-      "Mario has done 4 vehicles for me, from peeling off old tint and applying new on my old truck, to a complete ceramic tint on my 2 brand new SUV's fresh off the lot. As a local it's shops like this that always make things smooth.",
+      "Mario has done 4 vehicles for me, from peeling off old tint on my truck to a complete ceramic tint on my 2 brand-new SUVs fresh off the lot. Shops like this always make things smooth.",
     author: 'Nathan Fair',
     photo: {
-      src: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&h=500&q=80',
-      alt: "Customer's SUV with ceramic tint",
+      src: '/images/reviews/review-3.webp',
+      alt: "Nathan's SUV with ceramic window tint",
     },
   },
   {
     quote:
-      "Everyone I dealt with was friendly and professional, and the whole process was smooth and straightforward. The products they used were high quality and backed by a warranty, which gave me a lot of confidence in the work.",
-    author: 'Brandon Gurule',
+      "Highly recommended. The work performed at Mario's Tint Shop is outstanding. The staff is very knowledgeable and friendly, they use high-quality materials, and they keep your car clean during the install.",
+    author: 'Chase Ramos',
     photo: {
-      src: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&h=500&q=80',
-      alt: "Customer's vehicle after professional tint installation",
+      src: '/images/reviews/review-4.webp',
+      alt: "Chase's silver Honda Civic with tinted windows",
     },
   },
   {
     quote:
-      "Took my third vehicle here yesterday to get tinted and once again they knock it out of the park. Incredibly knowledgeable staff and impeccable work at a fair price. I'll never go anywhere else for a tint.",
-    author: 'Jamie Pearman',
+      'Has tinted two of my vehicles — a 4Runner and a Tacoma. Customer service is amazing, super nice guys who explain all the options and do an amazing job. The 4Runner tint is over 2 years old and still looks incredible.',
+    author: 'Tyler Johnston',
     photo: {
-      src: 'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=800&h=500&q=80',
-      alt: "Customer's car during film installation",
+      src: '/images/reviews/review-5.webp',
+      alt: "Tyler's Toyota after professional tint installation",
+    },
+  },
+  {
+    quote:
+      "Mario's tint is the best in Tennessee — great service, great people, and great business. Very professional and knowledgeable. They've done my headlights and tail lights, which isn't easy, but they got me right.",
+    author: 'Damone Pledger Jr',
+    photo: {
+      src: '/images/reviews/review-6.webp',
+      alt: "Damone's white sedan tinted in Mario's Tint Shop",
     },
   },
 ];

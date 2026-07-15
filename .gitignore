@@ -19,6 +19,10 @@ pnpm-debug.log*
 .env.production
 .env.*.local
 
+# source/original imagery (optimized copies live in public/images) — keep out
+# of the repo and the deploy; these raw files are hundreds of MB
+public/images/archive/
+
 # macOS / editor
 .DS_Store
 Thumbs.db
