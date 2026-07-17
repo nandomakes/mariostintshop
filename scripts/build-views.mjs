@@ -19,7 +19,66 @@ import sharp from 'sharp';
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')), '..');
 const VIEWS_DIR = path.join(ROOT, 'src', 'assets', 'vehicle-views');
 const MASKS_DIR = path.join(ROOT, 'src', 'lib', 'view-masks');
+const TPL_DIR = path.join(VIEWS_DIR, 'masks');
 const OUT_TS = path.join(ROOT, 'src', 'lib', 'vehicles-views.ts');
+
+// Canonical window ids the visualizer maps to tint zones.
+const WINDOW_IDS = [
+  'front-windshield', 'driver-front-window', 'driver-rear-window',
+  'quarter-window', 'rear-windshield', 'glass-roof',
+];
+const MASK_COLORS = {
+  'front-windshield': '#ff2d78', 'driver-front-window': '#00b3ff',
+  'driver-rear-window': '#e6c800', 'quarter-window': '#18c964',
+  'rear-windshield': '#ff7a00', 'glass-roof': '#b36bff',
+};
+
+// Parse hand-editable mask SVG: any <path> whose id (or inkscape:label)
+// matches a window id overrides the auto-traced mask for that window.
+function readHandMasks(slug) {
+  const file = path.join(TPL_DIR, `${slug}.svg`);
+  if (!fs.existsSync(file)) return null;
+  const svg = fs.readFileSync(file, 'utf8');
+  const out = {};
+  for (const tag of svg.matchAll(/<path\b[^>]*>/g)) {
+    const t = tag[0];
+    const id = t.match(/\bid="([^"]+)"/)?.[1];
+    const label = t.match(/\binkscape:label="([^"]+)"/)?.[1];
+    const name = [id, label].find((n) => n && WINDOW_IDS.includes(n));
+    if (!name) continue;
+    const d = t.match(/\bd="([^"]+)"/)?.[1];
+    if (!d) continue;
+    if (/\btransform="/.test(t)) {
+      console.warn(`! ${slug}.svg: path "${name}" has a transform attribute — flatten transforms before saving (path ignored)`);
+      continue;
+    }
+    out[name] = d;
+  }
+  return Object.keys(out).length ? out : null;
+}
+
+// Write an editable tracing template: the render embedded at native scale
+// plus the current masks as semi-transparent starting shapes.
+async function writeTemplate(slug, buf, w, h, windows) {
+  const file = path.join(TPL_DIR, `${slug}.svg`);
+  if (fs.existsSync(file)) return;
+  fs.mkdirSync(TPL_DIR, { recursive: true });
+  const png = await sharp(buf).resize({ width: 1720 }).png({ compressionLevel: 9 }).toBuffer();
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">\n`;
+  svg += `  <!-- Plantilla de trazado: edita los nodos de cada path (NO los renombres,\n`;
+  svg += `       NO muevas/escales la imagen, NO apliques transforms). Ids validos:\n`;
+  svg += `       ${WINDOW_IDS.join(', ')}.\n`;
+  svg += `       Al guardar, corre: node scripts/build-views.mjs -->\n`;
+  svg += `  <image id="render" x="0" y="0" width="${w}" height="${h}" xlink:href="data:image/png;base64,${png.toString('base64')}"/>\n`;
+  svg += `  <g id="window-masks">\n`;
+  for (const [id, d] of Object.entries(windows)) {
+    const c = MASK_COLORS[id] ?? '#ff2d78';
+    svg += `    <path id="${id}" d="${d}" fill="${c}" fill-opacity="0.35" stroke="${c}" stroke-width="3"/>\n`;
+  }
+  svg += `  </g>\n</svg>\n`;
+  fs.writeFileSync(file, svg);
+  console.log(`+ tracing template ${path.relative(ROOT, file)}`);
+}
 
 // Filename → visualizer vehicle id. Keys are the tokens used in the VIEWS
 // folder; values are the vehicle ids used by the visualizer's picker.
@@ -32,6 +91,24 @@ function parseName(file) {
   const vehicle = tokens.map((t) => CATEGORY_TOKENS[t]).find(Boolean);
   const view = tokens.map((t) => VIEW_TOKENS[t]).find(Boolean);
   return vehicle && view ? { vehicle, view } : null;
+}
+
+// Drop zone: any raw SVG left in public/images/VIEWS is ingested here first
+// (moved to src/assets so the 4-5 MB sources never ship with the deploy).
+const DROP_DIR = path.join(ROOT, 'public', 'images', 'views');
+if (fs.existsSync(DROP_DIR)) {
+  for (const f of fs.readdirSync(DROP_DIR).filter((f) => f.toLowerCase().endsWith('.svg'))) {
+    fs.mkdirSync(VIEWS_DIR, { recursive: true });
+    fs.copyFileSync(path.join(DROP_DIR, f), path.join(VIEWS_DIR, f));
+    fs.rmSync(path.join(DROP_DIR, f));
+    console.log(`→ ingested ${f} from public/images/VIEWS`);
+    // A fresh source render invalidates the derived webp so it regenerates.
+    const parsed = parseName(f);
+    if (parsed) {
+      const webp = path.join(DROP_DIR, `${parsed.vehicle}-${parsed.view}.webp`);
+      if (fs.existsSync(webp)) fs.rmSync(webp);
+    }
+  }
 }
 
 const entries = {};
@@ -135,8 +212,17 @@ for (const file of files) {
   const vb = [bx0, by0, cw, ch];
 
   const maskFile = path.join(MASKS_DIR, `${slug}.json`);
-  const windows = fs.existsSync(maskFile) ? JSON.parse(fs.readFileSync(maskFile, 'utf8')) : {};
+  let windows = fs.existsSync(maskFile) ? JSON.parse(fs.readFileSync(maskFile, 'utf8')) : {};
+  // Hand-drawn masks (src/assets/vehicle-views/masks/<slug>.svg) win over
+  // the auto-traced ones, window by window.
+  const hand = readHandMasks(slug);
+  let source = 'auto';
+  if (hand) {
+    windows = { ...windows, ...hand };
+    source = `hand(${Object.keys(hand).join(',')})`;
+  }
   if (!Object.keys(windows).length) console.warn(`! ${file}: no window masks found at ${maskFile}`);
+  await writeTemplate(slug, buf, w, h, windows);
   (entries[parsed.vehicle] ??= {})[parsed.view] = {
     src: webpRel,
     width: meta.width,
@@ -144,7 +230,7 @@ for (const file of files) {
     vb,
     windows,
   };
-  console.log(`✓ ${file} → ${parsed.vehicle}/${parsed.view} (${meta.width}x${meta.height}, vb ${vb.join(' ')}, ${Object.keys(windows).length} windows)`);
+  console.log(`✓ ${file} → ${parsed.vehicle}/${parsed.view} (${meta.width}x${meta.height}, vb ${vb.join(' ')}, ${Object.keys(windows).length} windows, masks: ${source})`);
 }
 
 const banner = `// AUTO-GENERATED by scripts/build-views.mjs — do not edit by hand.

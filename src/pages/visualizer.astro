@@ -1023,8 +1023,8 @@ const PAINTS = [
           const on = c === chip;
           c.setAttribute('aria-checked', String(on));
           c.classList.toggle('border-accent', on);
-          c.classList.toggle('bg-accent/10', on);
-          c.classList.toggle('border-line', !on);
+          c.classList.toggle('bg-mint', on);
+          c.classList.toggle('border-sand', !on);
         });
         swapVehicle(chip.dataset.vehicle!, chip.querySelector('span')!.textContent!.trim());
       })
