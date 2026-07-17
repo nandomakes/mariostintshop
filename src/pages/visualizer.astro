@@ -404,7 +404,7 @@ const PAINTS = [
             <!-- Photo views (front/rear renders + traced window masks) — tint mode -->
             <svg
               id="views-svg"
-              viewBox={`0 0 ${initialView?.width ?? 3474} ${initialView?.height ?? 2331}`}
+              viewBox={initialView ? initialView.vb.join(' ') : '0 0 3474 2331'}
               class="h-auto w-full"
               role="img"
               aria-label="Vehicle photo with selected tint applied to each window"
@@ -676,7 +676,7 @@ const PAINTS = [
     const carZones = document.getElementById('car-zones')!;
 
     // ══ Front/rear photo views with traced window masks ═══════════════
-    type ViewDef = { src: string; width: number; height: number; windows: Record<string, string> };
+    type ViewDef = { src: string; width: number; height: number; vb: [number, number, number, number]; windows: Record<string, string> };
     const VIEWS: Record<string, { front?: ViewDef; rear?: ViewDef }> = JSON.parse(
       document.getElementById('views-json')!.textContent!
     );
@@ -704,7 +704,7 @@ const PAINTS = [
     function buildView() {
       const def = currentViewDef();
       if (!def) return;
-      viewsSvg.setAttribute('viewBox', `0 0 ${def.width} ${def.height}`);
+      viewsSvg.setAttribute('viewBox', def.vb.join(' '));
       viewsPhoto.setAttribute('href', def.src);
       viewsPhoto.setAttribute('width', String(def.width));
       viewsPhoto.setAttribute('height', String(def.height));
