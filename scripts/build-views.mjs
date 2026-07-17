@@ -95,9 +95,10 @@ function parseName(file) {
 
 // Drop zone: any raw SVG left in public/images/VIEWS is ingested here first
 // (moved to src/assets so the 4-5 MB sources never ship with the deploy).
+const SOURCE_EXTS = /\.(svg|png|jpe?g|webp)$/i;
 const DROP_DIR = path.join(ROOT, 'public', 'images', 'views');
 if (fs.existsSync(DROP_DIR)) {
-  for (const f of fs.readdirSync(DROP_DIR).filter((f) => f.toLowerCase().endsWith('.svg'))) {
+  for (const f of fs.readdirSync(DROP_DIR).filter((f) => SOURCE_EXTS.test(f) && !/^[a-z]+-(front|rear)\.webp$/.test(f))) {
     fs.mkdirSync(VIEWS_DIR, { recursive: true });
     fs.copyFileSync(path.join(DROP_DIR, f), path.join(VIEWS_DIR, f));
     fs.rmSync(path.join(DROP_DIR, f));
@@ -112,26 +113,42 @@ if (fs.existsSync(DROP_DIR)) {
 }
 
 const entries = {};
-const files = fs.readdirSync(VIEWS_DIR).filter((f) => f.toLowerCase().endsWith('.svg'));
-
-for (const file of files) {
-  const parsed = parseName(file);
+// Sources may be SVG wrappers (render embedded as base64) or plain raster
+// images (png/jpg/webp) named with the same <CATEGORY> <VIEW> convention.
+// When both exist for one view, the largest usable file wins.
+const bySlug = {};
+for (const f of fs.readdirSync(VIEWS_DIR).filter((f) => SOURCE_EXTS.test(f))) {
+  const parsed = parseName(f.replace(SOURCE_EXTS, ''));
   if (!parsed) {
-    console.warn(`! ${file}: filename does not match <CATEGORY> <VIEW>.svg — skipped`);
+    console.warn(`! ${f}: filename does not match <CATEGORY> <VIEW>.<ext> — skipped`);
     continue;
   }
-  const svg = fs.readFileSync(path.join(VIEWS_DIR, file), 'utf8');
-  const images = [...svg.matchAll(/data:image\/(png|jpeg);base64,([A-Za-z0-9+/=]+)/g)];
-  if (images.length === 0) {
-    console.warn(`! ${file}: empty placeholder (no embedded render) — skipped`);
-    continue;
-  }
-  // The largest embedded raster is the vehicle render.
-  const big = images.reduce((a, b) => (b[2].length > a[2].length ? b : a));
   const slug = `${parsed.vehicle}-${parsed.view}`;
+  (bySlug[slug] ??= { parsed, files: [] }).files.push(f);
+}
+
+for (const [slug, { parsed, files: candidates }] of Object.entries(bySlug)) {
+  let buf = null, chosen = null;
+  for (const f of candidates.sort((a, b) => fs.statSync(path.join(VIEWS_DIR, b)).size - fs.statSync(path.join(VIEWS_DIR, a)).size)) {
+    if (/\.svg$/i.test(f)) {
+      const svg = fs.readFileSync(path.join(VIEWS_DIR, f), 'utf8');
+      const images = [...svg.matchAll(/data:image\/(png|jpeg|webp);base64,([A-Za-z0-9+/=]+)/g)];
+      if (images.length === 0) {
+        console.warn(`! ${f}: empty placeholder (no embedded render) — skipped`);
+        continue;
+      }
+      const big = images.reduce((a, b) => (b[2].length > a[2].length ? b : a));
+      buf = Buffer.from(big[2], 'base64');
+    } else {
+      buf = fs.readFileSync(path.join(VIEWS_DIR, f));
+    }
+    chosen = f;
+    break;
+  }
+  if (!buf) continue;
+  const file = chosen;
   const webpRel = `/images/views/${slug}.webp`;
   const webpAbs = path.join(ROOT, 'public', webpRel);
-  const buf = Buffer.from(big[2], 'base64');
   const meta = await sharp(buf).metadata();
   const { data, info } = await sharp(buf).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
   const { width: w, height: h } = info;
