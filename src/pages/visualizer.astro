@@ -6,6 +6,9 @@ import Footer from '../components/Footer.astro';
 import CallFab from '../components/CallFab.astro';
 import { SITE, IMAGES, WHATSAPP_NUMBER } from '../consts';
 import { PHOTO_VEHICLES as VEHICLES, initialPhoto as initial, zoneIconPhoto as zoneIcon } from '../lib/vehicles-photo';
+import { VEHICLE_VIEWS } from '../lib/vehicles-views';
+
+const initialView = VEHICLE_VIEWS['sedan']?.front;
 
 const title = `Tint & PPF Visualizer | ${SITE.brand}`;
 const description =
@@ -366,12 +369,89 @@ const PAINTS = [
         <!-- Preview column -->
         <div class="min-w-0 lg:order-2">
           <div class="border border-sand bg-whisper p-4 sm:p-6">
-            <svg id="car-svg" viewBox="0 0 860 340" class="h-auto w-full" role="img" aria-label="Vehicle preview with selected film applied">
+            <!-- Preview toolbar: Front/Rear (photo views) + 3D toggle (SUV) -->
+            <div class="mb-3 flex items-center justify-between gap-2">
+              <div id="fr-toggle" class="flex items-center gap-1" role="tablist" aria-label="Vehicle angle">
+                <button
+                  type="button" data-fr="front" aria-pressed="true"
+                  class="fr-btn pressable border border-sand bg-paper px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-200 aria-pressed:border-accent aria-pressed:bg-accent"
+                >
+                  Front view
+                </button>
+                <button
+                  type="button" data-fr="rear" aria-pressed="false"
+                  class="fr-btn pressable border border-sand bg-paper px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-200 aria-pressed:border-accent aria-pressed:bg-accent"
+                >
+                  Rear view
+                </button>
+              </div>
+              <div id="view-toggle" class="hidden items-center justify-end gap-1" role="tablist" aria-label="Preview mode">
+                <button
+                  type="button" data-view="2d" aria-pressed="true"
+                  class="view-btn pressable border border-sand bg-paper px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-200 aria-pressed:border-accent aria-pressed:bg-accent"
+                >
+                  Film view
+                </button>
+                <button
+                  type="button" data-view="3d" aria-pressed="false"
+                  class="view-btn pressable border border-sand bg-paper px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-200 aria-pressed:border-accent aria-pressed:bg-accent"
+                >
+                  3D interactive
+                </button>
+              </div>
+            </div>
+
+            <!-- Photo views (front/rear renders + traced window masks) — tint mode -->
+            <svg
+              id="views-svg"
+              viewBox={`0 0 ${initialView?.width ?? 3474} ${initialView?.height ?? 2331}`}
+              class="h-auto w-full"
+              role="img"
+              aria-label="Vehicle photo with selected tint applied to each window"
+            >
+              <g id="views-root">
+                <image
+                  id="views-photo"
+                  href={initialView?.src}
+                  x="0" y="0"
+                  width={initialView?.width ?? 3474}
+                  height={initialView?.height ?? 2331}
+                  preserveAspectRatio="xMidYMid meet"
+                />
+                <g id="views-windows"></g>
+              </g>
+            </svg>
+
+            <!-- Legacy side view — PPF mode + vehicles without photo views -->
+            <svg id="car-svg" viewBox="0 0 860 340" class="hidden h-auto w-full" role="img" aria-label="Vehicle preview with selected film applied">
               <g id="car-root">
                 <image id="car-photo" href={initial.photo} x="0" y="0" width="860" height="340" preserveAspectRatio="xMidYMid meet" />
                 <g id="car-zones" set:html={initial.overlay} />
               </g>
             </svg>
+
+            <!-- 3D model (Sketchfab) — lazy-loaded the first time it is opened -->
+            <div id="car-3d" class="hidden">
+              <div class="relative w-full overflow-hidden border border-sand bg-ink" style="aspect-ratio: 860 / 480;">
+                <iframe
+                  id="car-3d-frame"
+                  title="Tesla Model Y White with interior — 3D model"
+                  class="absolute inset-0 h-full w-full"
+                  frameborder="0"
+                  allowfullscreen
+                  allow="autoplay; fullscreen; xr-spatial-tracking"
+                  data-src="https://sketchfab.com/models/b083d9e8def44d878db35299160f2556/embed?autostart=1&camera=0&ui_hint=0"
+                ></iframe>
+              </div>
+              <p class="mt-2 text-[10px] leading-relaxed text-ash">
+                Drag to rotate · scroll to zoom · pick a tint shade to see it on the glass ·
+                <a href="https://sketchfab.com/3d-models/tesla-model-y-white-with-interior-b083d9e8def44d878db35299160f2556" target="_blank" rel="nofollow noopener noreferrer" class="font-bold text-accentDk hover:underline">Tesla Model Y White with interior</a>
+                by
+                <a href="https://sketchfab.com/dragosburian" target="_blank" rel="nofollow noopener noreferrer" class="font-bold text-accentDk hover:underline">dragosburian</a>
+                on
+                <a href="https://sketchfab.com" target="_blank" rel="nofollow noopener noreferrer" class="font-bold text-accentDk hover:underline">Sketchfab</a>
+              </p>
+            </div>
 
             <!-- Live summary -->
             <div class="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-sand pt-4">
@@ -419,6 +499,9 @@ const PAINTS = [
     )}
   ></script>
 
+  <!-- Front/rear photo views + traced window masks (generated from VIEWS folder) -->
+  <script type="application/json" id="views-json" is:inline set:html={JSON.stringify(VEHICLE_VIEWS)}></script>
+
   <style>
     #car-svg {
       --shade-op: 0.85;
@@ -427,6 +510,25 @@ const PAINTS = [
        see PAINT_FILTERS below); the render is a neutral-silver base plate. */
     #car-photo {
       transition: filter 350ms var(--ease-out);
+    }
+
+    /* Photo-view window masks: invisible until their zone is selected. */
+    #views-svg :global(.vw) {
+      fill: #0b1524;
+      opacity: 0;
+      transition: opacity 300ms var(--ease-out);
+      pointer-events: none;
+    }
+    #views-svg :global(.vw.on) {
+      opacity: var(--shade-op, 0.85);
+    }
+    #views-root {
+      transition: opacity 160ms var(--ease-out), filter 160ms var(--ease-out), transform 160ms var(--ease-out);
+    }
+    #views-root.swapping {
+      opacity: 0;
+      filter: blur(6px);
+      transform: translateX(-10px);
     }
 
     /* Glass: quiet by default, selected zones take the shade opacity. */
@@ -572,10 +674,234 @@ const PAINTS = [
     const carRoot = document.getElementById('car-root')!;
     const carPhoto = document.getElementById('car-photo') as unknown as SVGImageElement;
     const carZones = document.getElementById('car-zones')!;
+
+    // ══ Front/rear photo views with traced window masks ═══════════════
+    type ViewDef = { src: string; width: number; height: number; windows: Record<string, string> };
+    const VIEWS: Record<string, { front?: ViewDef; rear?: ViewDef }> = JSON.parse(
+      document.getElementById('views-json')!.textContent!
+    );
+    const viewsSvg = document.getElementById('views-svg')!;
+    const viewsRoot = document.getElementById('views-root')!;
+    const viewsPhoto = document.getElementById('views-photo') as unknown as SVGImageElement;
+    const viewsWindows = document.getElementById('views-windows')!;
+    const frToggle = document.getElementById('fr-toggle')!;
+    let frView: 'front' | 'rear' = 'front';
+
+    // Tint zone → which traced windows it darkens.
+    const ZONE_WINDOWS: Record<string, string[]> = {
+      'front-side': ['driver-front-window'],
+      'rear-side': ['driver-rear-window', 'quarter-window'],
+      rear: ['rear-windshield'],
+      sunroof: ['glass-roof'],
+    };
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+
+    function currentViewDef(): ViewDef | null {
+      return VIEWS[state.vehicle]?.[frView] ?? null;
+    }
+
+    // Build the photo + mask DOM for the active vehicle/angle.
+    function buildView() {
+      const def = currentViewDef();
+      if (!def) return;
+      viewsSvg.setAttribute('viewBox', `0 0 ${def.width} ${def.height}`);
+      viewsPhoto.setAttribute('href', def.src);
+      viewsPhoto.setAttribute('width', String(def.width));
+      viewsPhoto.setAttribute('height', String(def.height));
+      viewsWindows.innerHTML = '';
+      for (const [id, d] of Object.entries(def.windows)) {
+        const p = document.createElementNS(SVG_NS, 'path');
+        p.setAttribute('d', d);
+        p.setAttribute('class', 'vw');
+        p.dataset.w = id;
+        viewsWindows.appendChild(p);
+      }
+      // Visor strip = top 26% of the windshield, via clipPath.
+      const ws = viewsWindows.querySelector<SVGPathElement>('[data-w="front-windshield"]');
+      if (ws) {
+        const bb = ws.getBBox();
+        const clip = document.createElementNS(SVG_NS, 'clipPath');
+        clip.id = 'visor-clip';
+        const rect = document.createElementNS(SVG_NS, 'rect');
+        rect.setAttribute('x', String(bb.x));
+        rect.setAttribute('y', String(bb.y));
+        rect.setAttribute('width', String(bb.width));
+        rect.setAttribute('height', String(bb.height * 0.26));
+        clip.appendChild(rect);
+        viewsWindows.appendChild(clip);
+        const visor = ws.cloneNode() as SVGPathElement;
+        visor.dataset.w = 'visor-strip';
+        visor.setAttribute('clip-path', 'url(#visor-clip)');
+        viewsWindows.appendChild(visor);
+      }
+      applyViewZones();
+    }
+
+    // Darken the windows belonging to the selected tint zones.
+    function applyViewZones() {
+      const active = new Set<string>();
+      for (const z of state.tintZones) for (const w of ZONE_WINDOWS[z] ?? []) active.add(w);
+      viewsWindows.querySelectorAll<SVGElement>('.vw').forEach((el) => {
+        const w = el.dataset.w!;
+        const on = w === 'visor-strip' ? state.tintZones.has('visor') : active.has(w);
+        el.classList.toggle('on', on);
+      });
+    }
+
+    function hasViews(): boolean {
+      return Boolean(VIEWS[state.vehicle]);
+    }
+
+    // Show the right preview: photo views for tint (when available),
+    // legacy side view for PPF mode and vehicles without renders.
+    function syncPreview() {
+      const photoMode = state.mode === 'tint' && hasViews();
+      viewsSvg.classList.toggle('hidden', !photoMode);
+      carSvg.classList.toggle('hidden', photoMode);
+      const v = VIEWS[state.vehicle];
+      frToggle.classList.toggle('hidden', !photoMode);
+      if (photoMode && v) {
+        if (!v[frView]) frView = v.front ? 'front' : 'rear';
+        frToggle.querySelectorAll<HTMLElement>('.fr-btn').forEach((b) => {
+          const which = b.dataset.fr as 'front' | 'rear';
+          b.style.display = v[which] ? '' : 'none';
+          b.setAttribute('aria-pressed', String(which === frView));
+        });
+        buildView();
+      }
+    }
+
+    let frSwapping = false;
+    frToggle.querySelectorAll<HTMLElement>('.fr-btn').forEach((b) =>
+      b.addEventListener('click', () => {
+        const next = b.dataset.fr as 'front' | 'rear';
+        if (frSwapping || next === frView || !VIEWS[state.vehicle]?.[next]) return;
+        frView = next;
+        frToggle.querySelectorAll<HTMLElement>('.fr-btn').forEach((c) =>
+          c.setAttribute('aria-pressed', String(c === b))
+        );
+        if (reduceMotion) return buildView();
+        frSwapping = true;
+        viewsRoot.classList.add('swapping');
+        setTimeout(() => {
+          buildView();
+          requestAnimationFrame(() =>
+            requestAnimationFrame(() => {
+              viewsRoot.classList.remove('swapping');
+              frSwapping = false;
+            })
+          );
+        }, 170);
+      })
+    );
     const summary = document.getElementById('build-summary')!;
     const badge = document.getElementById('legal-badge')!;
     const cta = document.getElementById('visualizer-cta') as HTMLAnchorElement;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // ══ 3D model view (Sketchfab) — available for vehicles listed here ═
+    const MODELS_3D = new Set(['suv']);
+    const MODEL_3D_UID = 'b083d9e8def44d878db35299160f2556';
+    const viewToggle = document.getElementById('view-toggle')!;
+    const car3d = document.getElementById('car-3d')!;
+    const car3dFrame = document.getElementById('car-3d-frame') as HTMLIFrameElement;
+    let view: '2d' | '3d' = '2d';
+
+    // Sketchfab Viewer API: lets us recolor the model's glass materials live
+    // so the selected tint shade shows on the 3D car too.
+    let sfApi: any = null;
+    let sfGlassMats: any[] = [];
+    let sf3dStarted = false;
+
+    function loadSketchfabApi(): Promise<any> {
+      return new Promise((resolve, reject) => {
+        const w = window as any;
+        if (w.Sketchfab) return resolve(w.Sketchfab);
+        const s = document.createElement('script');
+        s.src = 'https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js';
+        s.onload = () => resolve(w.Sketchfab);
+        s.onerror = () => reject(new Error('Sketchfab API failed to load'));
+        document.head.appendChild(s);
+      });
+    }
+
+    function applyTint3D() {
+      if (!sfApi || !sfGlassMats.length) return;
+      // Map the 2D shade opacity (0.14 clear … 0.85 dark) onto the glass:
+      // darker shade → near-black albedo + higher opacity.
+      const op = state.shadeOp;
+      const albedo = 0.02 + 0.2 * (1 - op);
+      const opacity = Math.min(0.92, 0.22 + 0.78 * op);
+      sfGlassMats.forEach((m) => {
+        m.channels.AlbedoPBR = m.channels.AlbedoPBR || {};
+        m.channels.AlbedoPBR.enable = true;
+        m.channels.AlbedoPBR.color = [albedo, albedo, albedo];
+        m.channels.AlbedoPBR.factor = 1;
+        m.channels.Opacity = m.channels.Opacity || { type: 'alphaBlend' };
+        m.channels.Opacity.enable = true;
+        m.channels.Opacity.factor = opacity;
+        sfApi.setMaterial(m, () => {});
+      });
+    }
+
+    function init3D() {
+      if (sf3dStarted) return;
+      sf3dStarted = true;
+      const fallback = () => {
+        // Viewer API unavailable → plain embed (no live tint, still interactive)
+        if (!car3dFrame.src) car3dFrame.src = car3dFrame.dataset.src!;
+      };
+      loadSketchfabApi()
+        .then((Sketchfab) => {
+          const client = new Sketchfab(car3dFrame);
+          client.init(MODEL_3D_UID, {
+            autostart: 1,
+            camera: 0,
+            ui_hint: 0,
+            success(api: any) {
+              api.addEventListener('viewerready', () => {
+                sfApi = api;
+                api.getMaterialList((err: any, materials: any[]) => {
+                  if (err || !materials) return;
+                  sfGlassMats = materials.filter((m) =>
+                    /glass|window|windshield|wind_?screen/i.test(m.name || '')
+                  );
+                  applyTint3D();
+                });
+              });
+            },
+            error: fallback,
+          });
+        })
+        .catch(fallback);
+    }
+
+    function setView(next: '2d' | '3d') {
+      view = next;
+      if (view === '3d') init3D(); // lazy-load on first open
+      if (view === '3d') {
+        carSvg.classList.add('hidden');
+        viewsSvg.classList.add('hidden');
+        frToggle.classList.add('hidden');
+      } else {
+        syncPreview();
+      }
+      car3d.classList.toggle('hidden', view !== '3d');
+      viewToggle.querySelectorAll<HTMLElement>('.view-btn').forEach((b) =>
+        b.setAttribute('aria-pressed', String(b.dataset.view === view))
+      );
+    }
+
+    function syncViewToggle() {
+      const has3d = MODELS_3D.has(state.vehicle);
+      viewToggle.classList.toggle('hidden', !has3d);
+      viewToggle.classList.toggle('flex', has3d);
+      if (!has3d && view === '3d') setView('2d');
+    }
+
+    viewToggle.querySelectorAll<HTMLElement>('.view-btn').forEach((b) =>
+      b.addEventListener('click', () => setView(b.dataset.view as '2d' | '3d'))
+    );
 
     // ══ Render ═══════════════════════════════════════════════════════
     function applyZones() {
@@ -601,8 +927,11 @@ const PAINTS = [
       root.dataset.mode = state.mode;
       root.dataset.finish = state.finish;
       carSvg.style.setProperty('--shade-op', String(state.shadeOp));
+      viewsSvg.style.setProperty('--shade-op', String(state.shadeOp));
       applyZones();
+      applyViewZones();
       applyPaintFilter();
+      applyTint3D();
 
       // Summary line
       if (state.mode === 'tint') {
@@ -651,20 +980,24 @@ const PAINTS = [
       if (swapping || state.vehicle === id) return;
       state.vehicle = id;
       state.vehicleLabel = label;
+      syncViewToggle();
       const doSwap = () => {
         carPhoto.setAttribute('href', vehicles[id].photo);
         carZones.innerHTML = vehicles[id].overlay;
         applyZones();
+        syncPreview();
         render();
       };
       if (reduceMotion) return doSwap();
       swapping = true;
       carRoot.classList.add('swapping');
+      viewsRoot.classList.add('swapping');
       setTimeout(() => {
         doSwap();
         requestAnimationFrame(() =>
           requestAnimationFrame(() => {
             carRoot.classList.remove('swapping');
+            viewsRoot.classList.remove('swapping');
             swapping = false;
           })
         );
@@ -709,6 +1042,7 @@ const PAINTS = [
         });
         document.getElementById('tint-panel')!.classList.toggle('hidden', state.mode !== 'tint');
         document.getElementById('ppf-panel')!.classList.toggle('hidden', state.mode !== 'ppf');
+        syncPreview();
         render();
       })
     );
@@ -810,6 +1144,8 @@ const PAINTS = [
       render();
     });
 
+    syncViewToggle();
+    syncPreview();
     render();
   </script>
 </Layout>
