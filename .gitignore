@@ -28,3 +28,6 @@ public/images/archive/
 Thumbs.db
 .vscode/
 .idea/
+
+# Raw 3D model sources (optimized copies live in public/models3d)
+assets-src/

@@ -5,14 +5,15 @@ import QuoteCTA from '../components/QuoteCTA.astro';
 import Footer from '../components/Footer.astro';
 import CallFab from '../components/CallFab.astro';
 import { SITE, IMAGES, WHATSAPP_NUMBER } from '../consts';
-import { PHOTO_VEHICLES as VEHICLES, initialPhoto as initial, zoneIconPhoto as zoneIcon } from '../lib/vehicles-photo';
-import { VEHICLE_VIEWS } from '../lib/vehicles-views';
+import { PHOTO_VEHICLES, zoneIconPhoto as zoneIcon } from '../lib/vehicles-photo';
 
-const initialView = VEHICLE_VIEWS['sedan']?.front;
+// 3D-only visualizer: one optimized GLB per category (public/models3d/*.glb).
+const VEHICLE_IDS = ['sedan', 'suv', 'sport', 'truck'];
+const VEHICLES = PHOTO_VEHICLES.filter((v) => VEHICLE_IDS.includes(v.id));
 
-const title = `Tint & PPF Visualizer | ${SITE.brand}`;
+const title = `Window Tint Visualizer | ${SITE.brand}`;
 const description =
-  "See 3M window tint and paint protection film on your car. Select a car category, determine the coverage area, specify your product, and preview the look — then send your build to Mario's Tint Shop in Murfreesboro, TN for a free quote.";
+  "See 3M window tint on a 3D car. Pick a vehicle type, choose the coverage and shade, and rotate the model to preview the look — then send your build to Mario's Tint Shop in Murfreesboro, TN for a free quote.";
 
 // ── Control data ─────────────────────────────────────────────────────
 const TINT_ZONES = [
@@ -28,47 +29,18 @@ const SHADES = [
   { id: 'light', label: 'Light', vlt: 'VLT 65–95', op: 0.32 },
   { id: 'clear', label: 'Clear', vlt: 'VLT 95–100', op: 0.14 },
 ];
-const PPF_ZONES = [
-  { id: 'bumper-front', label: 'Front bumper' },
-  { id: 'hood-full', label: 'Full hood' },
-  { id: 'hood-partial', label: 'Partial hood' },
-  { id: 'fenders-full', label: 'Full fenders' },
-  { id: 'fenders-partial', label: 'Partial fenders' },
-  { id: 'mirrors', label: 'Side mirrors' },
-  { id: 'doors', label: 'Door panels' },
-  { id: 'handles', label: 'Door handles' },
-  { id: 'door-edges', label: 'Door edges' },
-  { id: 'rocker', label: 'Rocker panels' },
-  { id: 'roof', label: 'Roof' },
-  { id: 'trunk', label: 'Trunk / tailgate' },
-  { id: 'bumper-rear', label: 'Rear bumper' },
-  { id: 'full', label: 'Full coverage' },
-];
-const FINISHES = [
-  { id: 'gloss', label: 'Gloss', note: 'High-gloss self-healing top coat. Gloss PPF is clear — shown in blue for illustration.' },
-  { id: 'matte', label: 'Matte', note: 'Satin finish that turns gloss paint into a smooth matte look.' },
-  { id: 'black', label: 'Stealth Black', note: 'Satin-black film that restyles any paint color.' },
-];
 const PRIORITIES = [
   { id: 'price', label: 'Price' },
   { id: 'heat', label: 'Heat rejection' },
   { id: 'signal', label: 'Signal clarity' },
   { id: 'appearance', label: 'Appearance' },
 ];
-const PAINTS = [
-  { id: 'black', label: 'Black', hex: '#1A1C20' },
-  { id: 'white', label: 'White', hex: '#E9EAEC' },
-  { id: 'silver', label: 'Silver', hex: '#AEB4BC' },
-  { id: 'graphite', label: 'Graphite', hex: '#4E545C' },
-  { id: 'red', label: 'Red', hex: '#A6182F' },
-  { id: 'blue', label: 'Blue', hex: '#1E4FBF' },
-];
 ---
 
 <Layout title={title} description={description}>
   <Header />
   <main id="content">
-    <!-- Hero image band (SunTek-style banner, our own imagery) -->
+    <!-- Hero image band -->
     <section class="relative overflow-hidden border-b border-line bg-ink">
       <div class="absolute inset-0" aria-hidden="true">
         <img
@@ -84,7 +56,7 @@ const PAINTS = [
         <nav class="reveal text-[11px] font-bold uppercase tracking-[0.16em] text-smoke" aria-label="Breadcrumb">
           <a href="/" class="transition-colors hover:text-paper">Home</a>
           <span class="mx-2 text-line">/</span>
-          <span class="text-accent">Film visualizer</span>
+          <span class="text-accent">Tint visualizer</span>
         </nav>
       </div>
     </section>
@@ -93,20 +65,19 @@ const PAINTS = [
     <section class="border-b border-sand bg-paper">
       <div class="mx-auto max-w-4xl px-5 py-12 text-center md:py-14">
         <h1 class="reveal headline text-[clamp(1.4rem,2.8vw,2.1rem)] text-ink">
-          Window tint & paint protection film visualizer
+          Window tint visualizer
         </h1>
         <p class="reveal mx-auto mt-5 max-w-[64ch] text-[15px] leading-relaxed text-char">
-          See 3M window tint and PPF (paint protection film) on your car. Select a car
-          category, determine the coverage area, specify your product, and then preview the
-          look of our films — before you buy.
+          See 3M window tint on your car. Select a car category, determine the coverage
+          area, pick a shade, and rotate the 3D model to preview the look — before you buy.
         </p>
       </div>
     </section>
 
     <!-- Vehicle type strip -->
     <section class="border-b border-sand bg-paper">
-      <div class="mx-auto max-w-5xl px-5 py-6">
-        <div class="grid grid-cols-3 gap-2 sm:grid-cols-6" role="radiogroup" aria-label="Vehicle type">
+      <div class="mx-auto max-w-4xl px-5 py-6">
+        <div class="grid grid-cols-2 gap-2 sm:grid-cols-4" role="radiogroup" aria-label="Vehicle type">
           {
             VEHICLES.map((v, i) => (
               <button
@@ -114,6 +85,7 @@ const PAINTS = [
                 role="radio"
                 aria-checked={i === 0 ? 'true' : 'false'}
                 data-vehicle={v.id}
+                data-vehicle-label={v.label}
                 class:list={[
                   'veh-chip pressable group flex flex-col items-center gap-1.5 border px-2 pb-2.5 pt-3 transition-colors duration-200',
                   i === 0 ? 'border-accent bg-mint' : 'border-sand hover:border-ash/60',
@@ -137,27 +109,17 @@ const PAINTS = [
       </div>
     </section>
 
-    <!-- Visualizer: controls left · preview right (SunTek layout) -->
-    <section id="visualizer" class="bg-paper" data-mode="tint" data-shade="dark" data-finish="gloss">
+    <!-- Visualizer: controls left · 3D preview right -->
+    <section id="visualizer" class="bg-paper">
       <div class="mx-auto grid max-w-6xl gap-8 px-5 py-10 md:py-14 lg:grid-cols-[5fr_7fr] lg:items-start">
         <!-- Controls column -->
         <div class="min-w-0 border border-sand bg-whisper lg:order-1">
-          <!-- Mode tabs + reset -->
-          <div class="flex items-center border-b border-sand pr-3" role="tablist" aria-label="Film type">
-            <button
-              type="button" role="tab" aria-selected="true" data-tab="tint"
-              class="mode-tab relative px-4 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-accentDk transition-colors duration-200"
-            >
+          <!-- Header + reset -->
+          <div class="flex items-center border-b border-sand pr-3">
+            <span class="relative px-4 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-accentDk">
               Window Tint
-              <span class="tab-line absolute inset-x-0 bottom-0 h-0.5 origin-left bg-accent transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"></span>
-            </button>
-            <button
-              type="button" role="tab" aria-selected="false" data-tab="ppf"
-              class="mode-tab relative px-4 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-ash transition-colors duration-200 hover:text-ink"
-            >
-              Paint Protection
-              <span class="tab-line absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-accent transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"></span>
-            </button>
+              <span class="absolute inset-x-0 bottom-0 h-0.5 bg-accent"></span>
+            </span>
             <button
               type="button" id="reset-btn"
               class="pressable ml-auto flex items-center gap-1.5 px-2 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-ash transition-colors hover:text-accentDk"
@@ -167,291 +129,148 @@ const PAINTS = [
             </button>
           </div>
 
-          <!-- Paint color -->
-          <div class="border-b border-sand px-6 py-5">
-            <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-ash">Paint color</p>
-            <div class="mt-3 flex flex-wrap gap-2.5">
-              {
-                PAINTS.map((p, i) => (
-                  <button
-                    type="button"
-                    data-paint={p.hex}
-                    data-paint-id={p.id}
-                    data-paint-label={p.label}
-                    aria-label={`Paint: ${p.label}`}
-                    aria-pressed={i === 0 ? 'true' : 'false'}
-                    class="paint-chip pressable h-9 w-9 border-2 border-sand transition-[transform,border-color] duration-200 hover:scale-110 aria-pressed:border-accent"
-                    style={`background:${p.hex}`}
-                  />
-                ))
-              }
-            </div>
-          </div>
-
-          <!-- TINT panel -->
-          <div id="tint-panel">
-            <!-- Accordion: coverage -->
-            <div class="acc border-b border-sand px-6" data-open="true">
-              <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
-                <span>
-                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the coverage</span>
-                  <span class="mt-0.5 block text-xs text-ash">Select a coverage zone to get started.</span>
-                </span>
-                <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
-                  <path d="M5 12h14" /><path class="acc-vert" d="M12 5v14" />
-                </svg>
-              </button>
-              <div class="acc-body grid grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]">
-                <div class="min-h-0 overflow-hidden">
-                  <div class="grid grid-cols-3 gap-2 pb-5 sm:grid-cols-3">
-                    {
-                      TINT_ZONES.map((z) => (
-                        <button
-                          type="button"
-                          data-tint-zone={z.id}
-                          aria-pressed={z.id === 'front-side' || z.id === 'rear-side' ? 'true' : 'false'}
-                          class="zone-tile pressable group flex flex-col items-center gap-1 border border-sand bg-paper px-1.5 pb-2 pt-2.5 transition-colors duration-200 hover:border-ash/60 aria-pressed:border-accent aria-pressed:bg-mint"
-                        >
-                          <svg viewBox="20 80 820 240" class="h-7 w-full" aria-hidden="true">
-                            <g set:html={zoneIcon(z.id)} />
-                          </svg>
-                          <span class="text-center text-[10px] font-bold leading-tight text-ink group-aria-pressed:text-accentDk">{z.label}</span>
-                        </button>
-                      ))
-                    }
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Accordion: tint shade -->
-            <div class="acc border-b border-sand px-6" data-open="true">
-              <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
-                <span>
-                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the tint</span>
-                  <span class="mt-0.5 block text-xs text-ash">Preview the shade on the vehicle view.</span>
-                </span>
-                <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
-                  <path d="M5 12h14" /><path class="acc-vert" d="M12 5v14" />
-                </svg>
-              </button>
-              <div class="acc-body grid grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]">
-                <div class="min-h-0 overflow-hidden">
-                  <div class="grid grid-cols-4 gap-2" role="radiogroup" aria-label="Tint shade">
-                    {
-                      SHADES.map((s) => (
-                        <button
-                          type="button" role="radio"
-                          aria-checked={s.id === 'dark' ? 'true' : 'false'}
-                          data-shade={s.id} data-shade-label={s.label} data-op={s.op}
-                          class="shade-chip pressable border border-sand bg-paper p-2 text-center transition-colors duration-200 hover:border-ash/60 aria-checked:border-accent"
-                        >
-                          <span
-                            class="block h-8 w-full border border-sand"
-                            style={`background: linear-gradient(rgba(11,21,36,${s.op}), rgba(11,21,36,${s.op})), linear-gradient(135deg, #E8F1F8 0%, #BFD3E2 60%, #DCE9F4 100%)`}
-                            aria-hidden="true"
-                          />
-                          <span class="mt-1.5 block text-xs font-bold text-ink">{s.label}</span>
-                          <span class="block text-[10px] text-ash">{s.vlt}</span>
-                        </button>
-                      ))
-                    }
-                  </div>
-                  <p class="pb-5 pt-2 text-[11px] leading-relaxed text-ash">
-                    Tennessee requires 35%+ VLT on front side windows.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Accordion: priorities -->
-            <div class="acc px-6" data-open="true">
-              <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
-                <span>
-                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">What matters most?</span>
-                  <span class="mt-0.5 block text-xs text-ash">Prioritize these benefits to help us find the right tint for you.</span>
-                </span>
-                <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
-                  <path d="M5 12h14" /><path class="acc-vert" d="M12 5v14" />
-                </svg>
-              </button>
-              <div class="acc-body grid grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]">
-                <div class="min-h-0 overflow-hidden">
-                  <div class="flex flex-wrap gap-2 pb-5">
-                    {
-                      PRIORITIES.map((p) => (
-                        <button
-                          type="button"
-                          data-priority={p.id}
-                          aria-pressed="false"
-                          class="prio-chip pressable border border-sand bg-paper px-3.5 py-2 text-xs font-bold text-ink transition-colors duration-200 hover:border-ash/60 aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-ink"
-                        >
-                          {p.label}
-                        </button>
-                      ))
-                    }
-                  </div>
+          <!-- Accordion: coverage -->
+          <div class="acc border-b border-sand px-6" data-open="true">
+            <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
+              <span>
+                <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the coverage</span>
+                <span class="mt-0.5 block text-xs text-ash">Select a coverage zone to get started.</span>
+              </span>
+              <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+                <path d="M5 12h14" /><path class="acc-vert" d="M12 5v14" />
+              </svg>
+            </button>
+            <div class="acc-body grid grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]">
+              <div class="min-h-0 overflow-hidden">
+                <div class="grid grid-cols-3 gap-2 pb-5 sm:grid-cols-3">
+                  {
+                    TINT_ZONES.map((z) => (
+                      <button
+                        type="button"
+                        data-tint-zone={z.id}
+                        aria-pressed={z.id === 'front-side' || z.id === 'rear-side' ? 'true' : 'false'}
+                        class="zone-tile pressable group flex flex-col items-center gap-1 border border-sand bg-paper px-1.5 pb-2 pt-2.5 transition-colors duration-200 hover:border-ash/60 aria-pressed:border-accent aria-pressed:bg-mint"
+                      >
+                        <svg viewBox="20 80 820 240" class="h-7 w-full" aria-hidden="true">
+                          <g set:html={zoneIcon(z.id)} />
+                        </svg>
+                        <span class="text-center text-[10px] font-bold leading-tight text-ink group-aria-pressed:text-accentDk">{z.label}</span>
+                      </button>
+                    ))
+                  }
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- PPF panel -->
-          <div id="ppf-panel" class="hidden">
-            <!-- Accordion: coverage -->
-            <div class="acc border-b border-sand px-6" data-open="true">
-              <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
-                <span>
-                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the coverage</span>
-                  <span class="mt-0.5 block text-xs text-ash">Select individual zones or full coverage for the entire car.</span>
-                </span>
-                <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
-                  <path d="M5 12h14" /><path class="acc-vert" d="M12 5v14" />
-                </svg>
-              </button>
-              <div class="acc-body grid grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]">
-                <div class="min-h-0 overflow-hidden">
-                  <div class="grid grid-cols-3 gap-2 pb-5">
-                    {
-                      PPF_ZONES.map((z) => (
-                        <button
-                          type="button"
-                          data-ppf-zone={z.id}
-                          aria-pressed={['bumper-front', 'hood-full', 'fenders-partial', 'mirrors'].includes(z.id) ? 'true' : 'false'}
-                          class="zone-tile pressable group flex flex-col items-center gap-1 border border-sand bg-paper px-1.5 pb-2 pt-2.5 transition-colors duration-200 hover:border-ash/60 aria-pressed:border-accent aria-pressed:bg-mint"
-                        >
-                          <svg viewBox="20 80 820 240" class="h-7 w-full" aria-hidden="true">
-                            <g set:html={zoneIcon(z.id)} />
-                          </svg>
-                          <span class="text-center text-[10px] font-bold leading-tight text-ink group-aria-pressed:text-accentDk">{z.label}</span>
-                        </button>
-                      ))
-                    }
-                  </div>
+          <!-- Accordion: tint shade -->
+          <div class="acc border-b border-sand px-6" data-open="true">
+            <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
+              <span>
+                <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the tint</span>
+                <span class="mt-0.5 block text-xs text-ash">The shade applies live to the 3D model's glass.</span>
+              </span>
+              <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+                <path d="M5 12h14" /><path class="acc-vert" d="M12 5v14" />
+              </svg>
+            </button>
+            <div class="acc-body grid grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]">
+              <div class="min-h-0 overflow-hidden">
+                <div class="grid grid-cols-4 gap-2" role="radiogroup" aria-label="Tint shade">
+                  {
+                    SHADES.map((s) => (
+                      <button
+                        type="button" role="radio"
+                        aria-checked={s.id === 'dark' ? 'true' : 'false'}
+                        data-shade={s.id} data-shade-label={s.label} data-op={s.op}
+                        class="shade-chip pressable border border-sand bg-paper p-2 text-center transition-colors duration-200 hover:border-ash/60 aria-checked:border-accent"
+                      >
+                        <span
+                          class="block h-8 w-full border border-sand"
+                          style={`background: linear-gradient(rgba(11,21,36,${s.op}), rgba(11,21,36,${s.op})), linear-gradient(135deg, #E8F1F8 0%, #BFD3E2 60%, #DCE9F4 100%)`}
+                          aria-hidden="true"
+                        />
+                        <span class="mt-1.5 block text-xs font-bold text-ink">{s.label}</span>
+                        <span class="block text-[10px] text-ash">{s.vlt}</span>
+                      </button>
+                    ))
+                  }
                 </div>
+                <p class="pb-5 pt-2 text-[11px] leading-relaxed text-ash">
+                  Tennessee requires 35%+ VLT on front side windows.
+                </p>
               </div>
             </div>
+          </div>
 
-            <!-- Accordion: finish -->
-            <div class="acc px-6" data-open="true">
-              <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
-                <span>
-                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the finish</span>
-                  <span class="mt-0.5 block text-xs text-ash">Customize and combine to enhance the look of your vehicle.</span>
-                </span>
-                <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
-                  <path d="M5 12h14" /><path class="acc-vert" d="M12 5v14" />
-                </svg>
-              </button>
-              <div class="acc-body grid grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]">
-                <div class="min-h-0 overflow-hidden">
-                  <div class="grid grid-cols-3 gap-2" role="radiogroup" aria-label="PPF finish">
-                    {
-                      FINISHES.map((f) => (
-                        <button
-                          type="button" role="radio"
-                          aria-checked={f.id === 'gloss' ? 'true' : 'false'}
-                          data-finish={f.id} data-finish-label={f.label} data-note={f.note}
-                          class="finish-chip pressable border border-sand bg-paper px-2 py-2.5 text-center text-xs font-bold text-ink transition-colors duration-200 hover:border-ash/60 aria-checked:border-accent aria-checked:bg-accent aria-checked:text-ink"
-                        >
-                          {f.label}
-                        </button>
-                      ))
-                    }
-                  </div>
-                  <p id="finish-note" class="pb-5 pt-2 text-[11px] leading-relaxed text-ash">{FINISHES[0].note}</p>
+          <!-- Accordion: priorities -->
+          <div class="acc px-6" data-open="true">
+            <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
+              <span>
+                <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">What matters most?</span>
+                <span class="mt-0.5 block text-xs text-ash">Prioritize these benefits to help us find the right tint for you.</span>
+              </span>
+              <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+                <path d="M5 12h14" /><path class="acc-vert" d="M12 5v14" />
+              </svg>
+            </button>
+            <div class="acc-body grid grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]">
+              <div class="min-h-0 overflow-hidden">
+                <div class="flex flex-wrap gap-2 pb-5">
+                  {
+                    PRIORITIES.map((p) => (
+                      <button
+                        type="button"
+                        data-priority={p.id}
+                        aria-pressed="false"
+                        class="prio-chip pressable border border-sand bg-paper px-3.5 py-2 text-xs font-bold text-ink transition-colors duration-200 hover:border-ash/60 aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-ink"
+                      >
+                        {p.label}
+                      </button>
+                    ))
+                  }
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Preview column -->
+        <!-- Preview column: 3D model on a white stage -->
         <div class="min-w-0 lg:order-2">
           <div class="border border-sand bg-whisper p-4 sm:p-6">
-            <!-- Preview toolbar: Front/Rear (photo views) + 3D toggle (SUV) -->
-            <div class="mb-3 flex items-center justify-between gap-2">
-              <div id="fr-toggle" class="flex items-center gap-1" role="tablist" aria-label="Vehicle angle">
-                <button
-                  type="button" data-fr="front" aria-pressed="true"
-                  class="fr-btn pressable border border-sand bg-paper px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-200 aria-pressed:border-accent aria-pressed:bg-accent"
-                >
-                  Front view
-                </button>
-                <button
-                  type="button" data-fr="rear" aria-pressed="false"
-                  class="fr-btn pressable border border-sand bg-paper px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-200 aria-pressed:border-accent aria-pressed:bg-accent"
-                >
-                  Rear view
-                </button>
-              </div>
-              <div id="view-toggle" class="hidden items-center justify-end gap-1" role="tablist" aria-label="Preview mode">
-                <button
-                  type="button" data-view="2d" aria-pressed="true"
-                  class="view-btn pressable border border-sand bg-paper px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-200 aria-pressed:border-accent aria-pressed:bg-accent"
-                >
-                  Film view
-                </button>
-                <button
-                  type="button" data-view="3d" aria-pressed="false"
-                  class="view-btn pressable border border-sand bg-paper px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-200 aria-pressed:border-accent aria-pressed:bg-accent"
-                >
-                  3D interactive
-                </button>
-              </div>
+            <div class="relative w-full overflow-hidden border border-sand bg-white" style="aspect-ratio: 860 / 520;">
+              <model-viewer
+                id="car-3d-viewer"
+                class="absolute inset-0 h-full w-full"
+                style="background-color: #ffffff;"
+                src="/models3d/sedan.glb"
+                shadow-intensity="0.9"
+                shadow-softness="0.8"
+                exposure="1.05"
+                camera-orbit="-35deg 78deg 80%"
+                disable-zoom
+                disable-tap
+                interaction-prompt="none"
+                aria-label="3D vehicle with the selected tint applied to the glass"
+              ></model-viewer>
+
+              <!-- Step rotation arrows -->
+              <button
+                type="button" id="rot-left" aria-label="Rotate left"
+                class="pressable absolute left-2 top-1/2 -translate-y-1/2 border border-sand bg-paper/90 px-3 py-2.5 text-ink transition-colors hover:border-accent hover:text-accentDk"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <button
+                type="button" id="rot-right" aria-label="Rotate right"
+                class="pressable absolute right-2 top-1/2 -translate-y-1/2 border border-sand bg-paper/90 px-3 py-2.5 text-ink transition-colors hover:border-accent hover:text-accentDk"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+              </button>
             </div>
-
-            <!-- Photo views (front/rear renders + traced window masks) — tint mode -->
-            <svg
-              id="views-svg"
-              viewBox={initialView ? initialView.vb.join(' ') : '0 0 3474 2331'}
-              class="h-auto w-full"
-              role="img"
-              aria-label="Vehicle photo with selected tint applied to each window"
-            >
-              <g id="views-root">
-                <image
-                  id="views-photo"
-                  href={initialView?.src}
-                  x="0" y="0"
-                  width={initialView?.width ?? 3474}
-                  height={initialView?.height ?? 2331}
-                  preserveAspectRatio="xMidYMid meet"
-                />
-                <g id="views-windows"></g>
-              </g>
-            </svg>
-
-            <!-- Legacy side view — PPF mode + vehicles without photo views -->
-            <svg id="car-svg" viewBox="0 0 860 340" class="hidden h-auto w-full" role="img" aria-label="Vehicle preview with selected film applied">
-              <g id="car-root">
-                <image id="car-photo" href={initial.photo} x="0" y="0" width="860" height="340" preserveAspectRatio="xMidYMid meet" />
-                <g id="car-zones" set:html={initial.overlay} />
-              </g>
-            </svg>
-
-            <!-- 3D model (Sketchfab) — lazy-loaded the first time it is opened -->
-            <div id="car-3d" class="hidden">
-              <div class="relative w-full overflow-hidden border border-sand bg-ink" style="aspect-ratio: 860 / 480;">
-                <iframe
-                  id="car-3d-frame"
-                  title="Tesla Model Y White with interior — 3D model"
-                  class="absolute inset-0 h-full w-full"
-                  frameborder="0"
-                  allowfullscreen
-                  allow="autoplay; fullscreen; xr-spatial-tracking"
-                  data-src="https://sketchfab.com/models/b083d9e8def44d878db35299160f2556/embed?autostart=1&camera=0&ui_hint=0"
-                ></iframe>
-              </div>
-              <p class="mt-2 text-[10px] leading-relaxed text-ash">
-                Drag to rotate · scroll to zoom · pick a tint shade to see it on the glass ·
-                <a href="https://sketchfab.com/3d-models/tesla-model-y-white-with-interior-b083d9e8def44d878db35299160f2556" target="_blank" rel="nofollow noopener noreferrer" class="font-bold text-accentDk hover:underline">Tesla Model Y White with interior</a>
-                by
-                <a href="https://sketchfab.com/dragosburian" target="_blank" rel="nofollow noopener noreferrer" class="font-bold text-accentDk hover:underline">dragosburian</a>
-                on
-                <a href="https://sketchfab.com" target="_blank" rel="nofollow noopener noreferrer" class="font-bold text-accentDk hover:underline">Sketchfab</a>
-              </p>
-            </div>
+            <p class="mt-2 text-[10px] leading-relaxed text-ash">
+              Use the arrows to rotate the car · pick a tint shade to see it on the glass
+            </p>
 
             <!-- Live summary -->
             <div class="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-sand pt-4">
@@ -460,7 +279,7 @@ const PAINTS = [
             </div>
           </div>
 
-          <!-- CTA under the preview, SunTek-style -->
+          <!-- CTA under the preview -->
           <a
             id="visualizer-cta"
             href={`https://wa.me/${WHATSAPP_NUMBER}`}
@@ -475,8 +294,8 @@ const PAINTS = [
           </p>
 
           <p class="mx-auto mt-6 max-w-xl text-center text-[11px] leading-relaxed text-ash">
-            Visual representations are shown for illustrative purposes only; actual appearances
-            treated with window film and paint protection film may vary.
+            Visual representations are shown for illustrative purposes only; vehicles are
+            generic 3D models and actual appearances treated with window film may vary.
           </p>
         </div>
       </div>
@@ -487,105 +306,7 @@ const PAINTS = [
   <Footer />
   <CallFab />
 
-  <!-- Per-vehicle geometry + photo path, consumed by the client script -->
-  <script
-    type="application/json"
-    id="vehicles-json"
-    is:inline
-    set:html={JSON.stringify(
-      Object.fromEntries(
-        VEHICLES.map((v) => [v.id, { overlay: v.overlay, photo: v.photo }])
-      )
-    )}
-  ></script>
-
-  <!-- Front/rear photo views + traced window masks (generated from VIEWS folder) -->
-  <script type="application/json" id="views-json" is:inline set:html={JSON.stringify(VEHICLE_VIEWS)}></script>
-
   <style>
-    #car-svg {
-      --shade-op: 0.85;
-    }
-    /* Paint recolor is applied as a CSS filter on the photo (JS-driven —
-       see PAINT_FILTERS below); the render is a neutral-silver base plate. */
-    #car-photo {
-      transition: filter 350ms var(--ease-out);
-    }
-
-    /* Photo-view window masks: invisible until their zone is selected. */
-    #views-svg :global(.vw) {
-      fill: #0b1524;
-      opacity: 0;
-      transition: opacity 300ms var(--ease-out);
-      pointer-events: none;
-    }
-    #views-svg :global(.vw.on) {
-      opacity: var(--shade-op, 0.85);
-    }
-    #views-root {
-      transition: opacity 160ms var(--ease-out), filter 160ms var(--ease-out), transform 160ms var(--ease-out);
-    }
-    #views-root.swapping {
-      opacity: 0;
-      filter: blur(6px);
-      transform: translateX(-10px);
-    }
-
-    /* Glass: quiet by default, selected zones take the shade opacity. */
-    #car-svg :global(.gz) {
-      fill: #0b1524;
-      opacity: 0.16;
-      transition: opacity 300ms var(--ease-out);
-    }
-    #car-svg :global(.gz.on) {
-      opacity: var(--shade-op);
-    }
-    [data-mode='ppf'] #car-svg :global(.gz) {
-      opacity: 0.3;
-    }
-
-    /* PPF overlays: draw in with a dash sweep + fade. */
-    #car-svg :global(.pz) {
-      fill: #00a8ff;
-      fill-opacity: 0;
-      stroke: #00a8ff;
-      stroke-width: 2;
-      stroke-dasharray: 6 5;
-      opacity: 0;
-      transition: opacity 250ms var(--ease-out), fill-opacity 250ms var(--ease-out);
-      pointer-events: none;
-    }
-    [data-mode='ppf'] #car-svg :global(.pz.on) {
-      opacity: 1;
-      fill-opacity: 0.32;
-    }
-    [data-finish='matte'] #car-svg :global(.pz) {
-      fill: #9fb6c4;
-      stroke: #9fb6c4;
-    }
-    [data-finish='black'] #car-svg :global(.pz) {
-      fill: #101216;
-      stroke: #3a3f46;
-    }
-    [data-finish='black'] #car-svg :global(.pz.on) {
-      fill-opacity: 0.85;
-    }
-
-    /* Ground shadow softened for the light stage (photo mode). */
-    #car-zones :global(ellipse) {
-      opacity: 0.12;
-    }
-
-    /* Vehicle swap: blur-crossfade (blur masks the geometry jump). */
-    #car-root {
-      transition: opacity 160ms var(--ease-out), filter 160ms var(--ease-out), transform 160ms var(--ease-out);
-    }
-    #car-root.swapping {
-      opacity: 0;
-      filter: blur(6px);
-      transform: translateX(-10px);
-    }
-
     /* Photo thumbnails in the vehicle picker: dim until selected. */
     .veh-chip .veh-thumb {
       filter: grayscale(0.5) brightness(0.97);
@@ -610,10 +331,6 @@ const PAINTS = [
     }
 
     @media (prefers-reduced-motion: reduce) {
-      #car-root,
-      #car-photo,
-      #car-svg :global(.gz),
-      #car-svg :global(.pz),
       .acc-body {
         transition: none !important;
       }
@@ -621,404 +338,141 @@ const PAINTS = [
   </style>
 
   <script>
+    // model-viewer registers <model-viewer> as a custom element on import.
+    // Dynamic chunk: it loads after the page shell renders.
+    import('@google/model-viewer');
+
+    const $$ = <T extends HTMLElement = HTMLElement>(sel: string) =>
+      Array.from(document.querySelectorAll<T>(sel));
+
     // ══ Visualizer state ═════════════════════════════════════════════
-    const vehicles: Record<string, { overlay: string; photo: string }> = JSON.parse(
-      document.getElementById('vehicles-json')!.textContent!
-    );
-
-    // Paint recolor is approximate: the renders are a neutral silver base
-    // plate, so each swatch is a CSS filter recipe rather than a per-pixel
-    // repaint. compact.png came back with a faint cool cast vs. the other
-    // five renders (measured ~146,155,157 vs ~133-163 neutral gray on the
-    // rest) — pre-correct it before layering the paint filter.
-    const COMPACT_CORRECTION = 'saturate(0.8) hue-rotate(-5deg) brightness(1.02)';
-    const PAINT_FILTERS: Record<string, string> = {
-      silver: 'none',
-      black: 'brightness(0.34) saturate(0.9) contrast(1.18)',
-      white: 'brightness(1.6) saturate(0.18) contrast(0.92)',
-      graphite: 'brightness(0.62) saturate(0.55) contrast(1.05)',
-      red: 'grayscale(1) sepia(1) saturate(4.5) hue-rotate(325deg) brightness(0.82) contrast(1.05)',
-      blue: 'grayscale(1) sepia(1) saturate(6) hue-rotate(178deg) brightness(0.85)',
-    };
-
     const state = {
-      mode: 'tint' as 'tint' | 'ppf',
       vehicle: 'sedan',
       vehicleLabel: 'Sedan',
-      paint: '#1A1C20',
-      paintId: 'black',
-      paintLabel: 'Black',
       tintZones: new Set(['front-side', 'rear-side']),
       shade: 'dark',
       shadeLabel: 'Dark',
       shadeOp: 0.85,
       priorities: new Set<string>(),
-      ppfZones: new Set(['bumper-front', 'hood-full', 'fenders-partial', 'mirrors']),
-      finish: 'gloss',
-      finishLabel: 'Gloss',
     };
 
-    const SHADE_META: Record<string, { label: string; vlt: string; frontLegal: boolean }> = {
-      dark: { label: 'Dark', vlt: '5–35% VLT', frontLegal: false },
-      medium: { label: 'Medium', vlt: '35–65% VLT', frontLegal: true },
-      light: { label: 'Light', vlt: '65–95% VLT', frontLegal: true },
-      clear: { label: 'Clear', vlt: '95–100% VLT', frontLegal: true },
+    const ZONE_LABELS: Record<string, string> = {
+      'rear-side': 'Rear side windows',
+      'front-side': 'Front side windows',
+      rear: 'Rear window',
+      visor: 'Visor strip',
+      sunroof: 'Sunroof',
+      price: 'Price',
+      heat: 'Heat rejection',
+      signal: 'Signal clarity',
+      appearance: 'Appearance',
     };
-    const ZONE_LABELS: Record<string, string> = {};
-    document.querySelectorAll<HTMLElement>('[data-tint-zone],[data-ppf-zone],[data-priority]').forEach((b) => {
-      ZONE_LABELS[b.dataset.tintZone || b.dataset.ppfZone || b.dataset.priority!] = b.textContent!.trim();
-    });
-
-    const root = document.getElementById('visualizer')!;
-    const carSvg = document.getElementById('car-svg')!;
-    const carRoot = document.getElementById('car-root')!;
-    const carPhoto = document.getElementById('car-photo') as unknown as SVGImageElement;
-    const carZones = document.getElementById('car-zones')!;
-
-    // ══ Front/rear photo views with traced window masks ═══════════════
-    type ViewDef = { src: string; width: number; height: number; vb: [number, number, number, number]; windows: Record<string, string> };
-    const VIEWS: Record<string, { front?: ViewDef; rear?: ViewDef }> = JSON.parse(
-      document.getElementById('views-json')!.textContent!
-    );
-    const viewsSvg = document.getElementById('views-svg')!;
-    const viewsRoot = document.getElementById('views-root')!;
-    const viewsPhoto = document.getElementById('views-photo') as unknown as SVGImageElement;
-    const viewsWindows = document.getElementById('views-windows')!;
-    const frToggle = document.getElementById('fr-toggle')!;
-    let frView: 'front' | 'rear' = 'front';
-
-    // Tint zone → which traced windows it darkens.
-    const ZONE_WINDOWS: Record<string, string[]> = {
-      'front-side': ['driver-front-window'],
-      'rear-side': ['driver-rear-window', 'quarter-window'],
-      rear: ['rear-windshield'],
-      sunroof: ['glass-roof'],
+    const SHADE_META: Record<string, { vlt: string; frontLegal: boolean }> = {
+      dark: { vlt: 'VLT 5–35', frontLegal: false },
+      medium: { vlt: 'VLT 35–65', frontLegal: true },
+      light: { vlt: 'VLT 65–95', frontLegal: true },
+      clear: { vlt: 'VLT 95–100', frontLegal: true },
     };
-    const SVG_NS = 'http://www.w3.org/2000/svg';
 
-    function currentViewDef(): ViewDef | null {
-      return VIEWS[state.vehicle]?.[frView] ?? null;
-    }
-
-    // Build the photo + mask DOM for the active vehicle/angle.
-    function buildView() {
-      const def = currentViewDef();
-      if (!def) return;
-      viewsSvg.setAttribute('viewBox', def.vb.join(' '));
-      viewsPhoto.setAttribute('href', def.src);
-      viewsPhoto.setAttribute('width', String(def.width));
-      viewsPhoto.setAttribute('height', String(def.height));
-      viewsWindows.innerHTML = '';
-      for (const [id, d] of Object.entries(def.windows)) {
-        const p = document.createElementNS(SVG_NS, 'path');
-        p.setAttribute('d', d);
-        p.setAttribute('class', 'vw');
-        p.dataset.w = id;
-        viewsWindows.appendChild(p);
-      }
-      // Visor strip = top 26% of the windshield, via clipPath.
-      const ws = viewsWindows.querySelector<SVGPathElement>('[data-w="front-windshield"]');
-      if (ws) {
-        const bb = ws.getBBox();
-        const clip = document.createElementNS(SVG_NS, 'clipPath');
-        clip.id = 'visor-clip';
-        const rect = document.createElementNS(SVG_NS, 'rect');
-        rect.setAttribute('x', String(bb.x));
-        rect.setAttribute('y', String(bb.y));
-        rect.setAttribute('width', String(bb.width));
-        rect.setAttribute('height', String(bb.height * 0.26));
-        clip.appendChild(rect);
-        viewsWindows.appendChild(clip);
-        const visor = ws.cloneNode() as SVGPathElement;
-        visor.dataset.w = 'visor-strip';
-        visor.setAttribute('clip-path', 'url(#visor-clip)');
-        viewsWindows.appendChild(visor);
-      }
-      applyViewZones();
-    }
-
-    // Darken the windows belonging to the selected tint zones.
-    function applyViewZones() {
-      const active = new Set<string>();
-      for (const z of state.tintZones) for (const w of ZONE_WINDOWS[z] ?? []) active.add(w);
-      viewsWindows.querySelectorAll<SVGElement>('.vw').forEach((el) => {
-        const w = el.dataset.w!;
-        const on = w === 'visor-strip' ? state.tintZones.has('visor') : active.has(w);
-        el.classList.toggle('on', on);
-      });
-    }
-
-    function hasViews(): boolean {
-      return Boolean(VIEWS[state.vehicle]);
-    }
-
-    // Show the right preview: photo views for tint (when available),
-    // legacy side view for PPF mode and vehicles without renders.
-    function syncPreview() {
-      const photoMode = state.mode === 'tint' && hasViews();
-      viewsSvg.classList.toggle('hidden', !photoMode);
-      carSvg.classList.toggle('hidden', photoMode);
-      const v = VIEWS[state.vehicle];
-      frToggle.classList.toggle('hidden', !photoMode);
-      if (photoMode && v) {
-        if (!v[frView]) frView = v.front ? 'front' : 'rear';
-        frToggle.querySelectorAll<HTMLElement>('.fr-btn').forEach((b) => {
-          const which = b.dataset.fr as 'front' | 'rear';
-          b.style.display = v[which] ? '' : 'none';
-          b.setAttribute('aria-pressed', String(which === frView));
-        });
-        buildView();
-      }
-    }
-
-    let frSwapping = false;
-    frToggle.querySelectorAll<HTMLElement>('.fr-btn').forEach((b) =>
-      b.addEventListener('click', () => {
-        const next = b.dataset.fr as 'front' | 'rear';
-        if (frSwapping || next === frView || !VIEWS[state.vehicle]?.[next]) return;
-        frView = next;
-        frToggle.querySelectorAll<HTMLElement>('.fr-btn').forEach((c) =>
-          c.setAttribute('aria-pressed', String(c === b))
-        );
-        if (reduceMotion) return buildView();
-        frSwapping = true;
-        viewsRoot.classList.add('swapping');
-        setTimeout(() => {
-          buildView();
-          requestAnimationFrame(() =>
-            requestAnimationFrame(() => {
-              viewsRoot.classList.remove('swapping');
-              frSwapping = false;
-            })
-          );
-        }, 170);
-      })
-    );
     const summary = document.getElementById('build-summary')!;
     const badge = document.getElementById('legal-badge')!;
     const cta = document.getElementById('visualizer-cta') as HTMLAnchorElement;
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // ══ 3D model view (Sketchfab) — available for vehicles listed here ═
-    const MODELS_3D = new Set(['suv']);
-    const MODEL_3D_UID = 'b083d9e8def44d878db35299160f2556';
-    const viewToggle = document.getElementById('view-toggle')!;
-    const car3d = document.getElementById('car-3d')!;
-    const car3dFrame = document.getElementById('car-3d-frame') as HTMLIFrameElement;
-    let view: '2d' | '3d' = '2d';
+    // ══ 3D viewer ═════════════════════════════════════════════════════
+    type GlbMaterial = {
+      name: string;
+      pbrMetallicRoughness: { setBaseColorFactor(rgba: number[]): void };
+    };
+    const viewer = document.getElementById('car-3d-viewer') as HTMLElement & {
+      src: string;
+      cameraOrbit: string;
+      jumpCameraToGoal(): void;
+      model?: { materials: GlbMaterial[] };
+    };
 
-    // Sketchfab Viewer API: lets us recolor the model's glass materials live
-    // so the selected tint shade shows on the 3D car too.
-    let sfApi: any = null;
-    let sfGlassMats: any[] = [];
-    let sf3dStarted = false;
+    // Window glass only — never headlights/taillights (RED_GLASS, orange_GLASS,
+    // LightGlass…). Matches the material names baked by scripts/build-models.mjs.
+    const isTintableGlass = (n: string) =>
+      /window_material|^glass/i.test(n) && !/red|orange|light/i.test(n);
 
-    function loadSketchfabApi(): Promise<any> {
-      return new Promise((resolve, reject) => {
-        const w = window as any;
-        if (w.Sketchfab) return resolve(w.Sketchfab);
-        const s = document.createElement('script');
-        s.src = 'https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js';
-        s.onload = () => resolve(w.Sketchfab);
-        s.onerror = () => reject(new Error('Sketchfab API failed to load'));
-        document.head.appendChild(s);
-      });
-    }
+    let glassMaterials: GlbMaterial[] = [];
+    let currentSrc = '';
 
+    // Darken the glass to match the selected shade: interpolate from the
+    // clear-glass baseline baked into the models toward near-black film.
     function applyTint3D() {
-      if (!sfApi || !sfGlassMats.length) return;
-      // Map the 2D shade opacity (0.14 clear … 0.85 dark) onto the glass:
-      // darker shade → near-black albedo + higher opacity.
-      const op = state.shadeOp;
-      const albedo = 0.02 + 0.2 * (1 - op);
-      const opacity = Math.min(0.92, 0.22 + 0.78 * op);
-      sfGlassMats.forEach((m) => {
-        m.channels.AlbedoPBR = m.channels.AlbedoPBR || {};
-        m.channels.AlbedoPBR.enable = true;
-        m.channels.AlbedoPBR.color = [albedo, albedo, albedo];
-        m.channels.AlbedoPBR.factor = 1;
-        m.channels.Opacity = m.channels.Opacity || { type: 'alphaBlend' };
-        m.channels.Opacity.enable = true;
-        m.channels.Opacity.factor = opacity;
-        sfApi.setMaterial(m, () => {});
-      });
+      if (!glassMaterials.length) return;
+      const t = Math.max(0, Math.min(1, (state.shadeOp - 0.14) / 0.71));
+      const lerp = (a: number, b: number) => a + (b - a) * t;
+      const rgba = [lerp(0.62, 0.02), lerp(0.68, 0.02), lerp(0.74, 0.02), lerp(0.25, 0.9)];
+      for (const mat of glassMaterials) mat.pbrMetallicRoughness.setBaseColorFactor(rgba);
     }
 
-    function init3D() {
-      if (sf3dStarted) return;
-      sf3dStarted = true;
-      const fallback = () => {
-        // Viewer API unavailable → plain embed (no live tint, still interactive)
-        if (!car3dFrame.src) car3dFrame.src = car3dFrame.dataset.src!;
+    // model-viewer gates loading on visibility, and its load event is not
+    // reliable when src is swapped — poll model.materials until ready.
+    function loadModel(vehicleId: string) {
+      const src = `/models3d/${vehicleId}.glb`;
+      if (currentSrc === src) return;
+      currentSrc = src;
+      glassMaterials = [];
+      viewer.src = src;
+      let tries = 0;
+      const poll = () => {
+        if (currentSrc !== src) return; // superseded
+        const materials = viewer.model?.materials ?? [];
+        // materials belong to the *new* model only once src has swapped in;
+        // model-viewer clears .model while loading, so any list is current.
+        if (materials.length) {
+          glassMaterials = materials.filter((m) => isTintableGlass(m.name || ''));
+          applyTint3D();
+        } else if (tries++ < 150) {
+          setTimeout(poll, 100);
+        }
       };
-      loadSketchfabApi()
-        .then((Sketchfab) => {
-          const client = new Sketchfab(car3dFrame);
-          client.init(MODEL_3D_UID, {
-            autostart: 1,
-            camera: 0,
-            ui_hint: 0,
-            success(api: any) {
-              api.addEventListener('viewerready', () => {
-                sfApi = api;
-                api.getMaterialList((err: any, materials: any[]) => {
-                  if (err || !materials) return;
-                  sfGlassMats = materials.filter((m) =>
-                    /glass|window|windshield|wind_?screen/i.test(m.name || '')
-                  );
-                  applyTint3D();
-                });
-              });
-            },
-            error: fallback,
-          });
-        })
-        .catch(fallback);
+      setTimeout(poll, 100);
     }
 
-    function setView(next: '2d' | '3d') {
-      view = next;
-      if (view === '3d') init3D(); // lazy-load on first open
-      if (view === '3d') {
-        carSvg.classList.add('hidden');
-        viewsSvg.classList.add('hidden');
-        frToggle.classList.add('hidden');
-      } else {
-        syncPreview();
-      }
-      car3d.classList.toggle('hidden', view !== '3d');
-      viewToggle.querySelectorAll<HTMLElement>('.view-btn').forEach((b) =>
-        b.setAttribute('aria-pressed', String(b.dataset.view === view))
-      );
+    // Step rotation: 30° per arrow press, snapped instantly (no easing).
+    let theta = -35;
+    function rotate(step: number) {
+      theta = (theta + step) % 360;
+      viewer.cameraOrbit = `${theta}deg 78deg 80%`;
+      viewer.jumpCameraToGoal?.();
     }
+    document.getElementById('rot-left')!.addEventListener('click', () => rotate(-30));
+    document.getElementById('rot-right')!.addEventListener('click', () => rotate(30));
 
-    function syncViewToggle() {
-      const has3d = MODELS_3D.has(state.vehicle);
-      viewToggle.classList.toggle('hidden', !has3d);
-      viewToggle.classList.toggle('flex', has3d);
-      if (!has3d && view === '3d') setView('2d');
-    }
-
-    viewToggle.querySelectorAll<HTMLElement>('.view-btn').forEach((b) =>
-      b.addEventListener('click', () => setView(b.dataset.view as '2d' | '3d'))
-    );
-
-    // ══ Render ═══════════════════════════════════════════════════════
-    function applyZones() {
-      carZones.querySelectorAll<SVGElement>('.gz').forEach((el) => {
-        el.classList.toggle('on', state.tintZones.has(el.dataset.z!));
-      });
-      const full = state.ppfZones.has('full');
-      carZones.querySelectorAll<SVGElement>('.pz').forEach((el) => {
-        const z = el.dataset.z!;
-        el.classList.toggle('on', full || state.ppfZones.has(z));
-      });
-    }
-
-    function applyPaintFilter() {
-      let f = PAINT_FILTERS[state.paintId] ?? 'none';
-      if (state.mode === 'ppf' && state.finish === 'black') f = PAINT_FILTERS.black;
-      else if (state.mode === 'ppf' && state.finish === 'matte') f = `${f} saturate(0.82) contrast(0.94)`.trim();
-      if (state.vehicle === 'compact') f = f === 'none' ? COMPACT_CORRECTION : `${COMPACT_CORRECTION} ${f}`;
-      carPhoto.style.filter = f;
-    }
-
+    // ══ Render cycle ═══════════════════════════════════════════════════
     function render() {
-      root.dataset.mode = state.mode;
-      root.dataset.finish = state.finish;
-      carSvg.style.setProperty('--shade-op', String(state.shadeOp));
-      viewsSvg.style.setProperty('--shade-op', String(state.shadeOp));
-      applyZones();
-      applyViewZones();
-      applyPaintFilter();
       applyTint3D();
 
-      // Summary line
-      if (state.mode === 'tint') {
-        const zones = [...state.tintZones].map((z) => ZONE_LABELS[z]).join(', ') || 'no zones yet';
-        summary.textContent = `${state.vehicleLabel} · ${state.shadeLabel} (${SHADE_META[state.shade].vlt}) · ${zones}`;
-      } else {
-        const zones = state.ppfZones.has('full')
-          ? 'Full coverage'
-          : [...state.ppfZones].map((z) => ZONE_LABELS[z]).join(', ') || 'no zones yet';
-        summary.textContent = `${state.vehicleLabel} · ${state.finishLabel} PPF · ${zones}`;
-      }
+      const zones = [...state.tintZones].map((z) => ZONE_LABELS[z]).join(', ') || 'no zones yet';
+      summary.textContent = `${state.vehicleLabel} · ${state.shadeLabel} (${SHADE_META[state.shade].vlt}) · ${zones}`;
 
-      // Legal badge (tint mode only)
       const frontTinted = state.tintZones.has('front-side');
       const legal = !frontTinted || SHADE_META[state.shade].frontLegal;
-      badge.style.display = state.mode === 'tint' ? '' : 'none';
       badge.textContent = legal ? 'TN legal · selected zones' : 'TN: 35%+ required on front sides';
       badge.className = legal
         ? 'shrink-0 bg-accent/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-accentDk'
         : 'shrink-0 bg-[#FFF1CC] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#8A5B00]';
 
-      // WhatsApp CTA
-      let msg: string;
-      if (state.mode === 'tint') {
-        const zones = [...state.tintZones].map((z) => ZONE_LABELS[z]).join(', ') || 'to be decided';
-        const prio = [...state.priorities].map((p) => ZONE_LABELS[p] ?? p).join(', ');
-        msg =
-          `Hi! I built this in your film visualizer — Window tint on a ${state.vehicleLabel.toLowerCase()}` +
-          ` (${state.paintLabel.toLowerCase()}). Zones: ${zones}. Shade: ${state.shadeLabel} (${SHADE_META[state.shade].vlt}).` +
-          (prio ? ` Priorities: ${prio}.` : '') +
-          ` Can I get a quote?`;
-      } else {
-        const zones = state.ppfZones.has('full')
-          ? 'full coverage'
-          : [...state.ppfZones].map((z) => ZONE_LABELS[z]).join(', ') || 'to be decided';
-        msg =
-          `Hi! I built this in your film visualizer — Paint protection film on a ${state.vehicleLabel.toLowerCase()}` +
-          ` (${state.paintLabel.toLowerCase()}). Coverage: ${zones}. Finish: ${state.finishLabel}. Can I get a quote?`;
-      }
+      const zonesMsg = [...state.tintZones].map((z) => ZONE_LABELS[z]).join(', ') || 'to be decided';
+      const prio = [...state.priorities].map((p) => ZONE_LABELS[p] ?? p).join(', ');
+      const msg =
+        `Hi! I built this in your tint visualizer — Window tint on a ${state.vehicleLabel.toLowerCase()}.` +
+        ` Zones: ${zonesMsg}. Shade: ${state.shadeLabel} (${SHADE_META[state.shade].vlt}).` +
+        (prio ? ` Priorities: ${prio}.` : '') +
+        ` Can I get a quote?`;
       cta.href = `${cta.href.split('?')[0]}?text=${encodeURIComponent(msg)}`;
     }
 
-    // ══ Vehicle switching (blur-crossfade) ═══════════════════════════
-    let swapping = false;
-    function swapVehicle(id: string, label: string) {
-      if (swapping || state.vehicle === id) return;
-      state.vehicle = id;
-      state.vehicleLabel = label;
-      syncViewToggle();
-      const doSwap = () => {
-        carPhoto.setAttribute('href', vehicles[id].photo);
-        carZones.innerHTML = vehicles[id].overlay;
-        applyZones();
-        syncPreview();
-        render();
-      };
-      if (reduceMotion) return doSwap();
-      swapping = true;
-      carRoot.classList.add('swapping');
-      viewsRoot.classList.add('swapping');
-      setTimeout(() => {
-        doSwap();
-        requestAnimationFrame(() =>
-          requestAnimationFrame(() => {
-            carRoot.classList.remove('swapping');
-            viewsRoot.classList.remove('swapping');
-            swapping = false;
-          })
-        );
-      }, 170);
-    }
-
-    // ══ Wiring ═══════════════════════════════════════════════════════
-    const $$ = (sel: string) => Array.from(document.querySelectorAll<HTMLElement>(sel));
-
-    // Accordions
-    $$('.acc-toggle').forEach((btn) =>
-      btn.addEventListener('click', () => {
-        const acc = btn.closest<HTMLElement>('.acc')!;
-        const open = acc.dataset.open !== 'true';
-        acc.dataset.open = String(open);
-        btn.setAttribute('aria-expanded', String(open));
-      })
-    );
-
+    // ══ Controls ═══════════════════════════════════════════════════════
     $$('.veh-chip').forEach((chip) =>
       chip.addEventListener('click', () => {
+        const id = chip.dataset.vehicle!;
+        if (state.vehicle === id) return;
+        state.vehicle = id;
+        state.vehicleLabel = chip.dataset.vehicleLabel!;
         $$('.veh-chip').forEach((c) => {
           const on = c === chip;
           c.setAttribute('aria-checked', String(on));
@@ -1026,43 +480,17 @@ const PAINTS = [
           c.classList.toggle('bg-mint', on);
           c.classList.toggle('border-sand', !on);
         });
-        swapVehicle(chip.dataset.vehicle!, chip.querySelector('span')!.textContent!.trim());
-      })
-    );
-
-    $$('.mode-tab').forEach((tab) =>
-      tab.addEventListener('click', () => {
-        state.mode = tab.dataset.tab as 'tint' | 'ppf';
-        $$('.mode-tab').forEach((t) => {
-          const on = t === tab;
-          t.setAttribute('aria-selected', String(on));
-          t.classList.toggle('text-accentDk', on);
-          t.classList.toggle('text-ash', !on);
-          t.querySelector('.tab-line')?.classList.toggle('scale-x-0', !on);
-        });
-        document.getElementById('tint-panel')!.classList.toggle('hidden', state.mode !== 'tint');
-        document.getElementById('ppf-panel')!.classList.toggle('hidden', state.mode !== 'ppf');
-        syncPreview();
+        loadModel(id);
         render();
       })
     );
 
-    $$('.paint-chip').forEach((chip) =>
-      chip.addEventListener('click', () => {
-        state.paint = chip.dataset.paint!;
-        state.paintId = chip.dataset.paintId!;
-        state.paintLabel = chip.dataset.paintLabel!;
-        $$('.paint-chip').forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
-        render();
-      })
-    );
-
-    $$('[data-tint-zone]').forEach((chip) =>
-      chip.addEventListener('click', () => {
-        const z = chip.dataset.tintZone!;
-        const on = !state.tintZones.has(z);
-        state.tintZones[on ? 'add' : 'delete'](z);
-        chip.setAttribute('aria-pressed', String(on));
+    $$('.zone-tile[data-tint-zone]').forEach((tile) =>
+      tile.addEventListener('click', () => {
+        const z = tile.dataset.tintZone!;
+        if (state.tintZones.has(z)) state.tintZones.delete(z);
+        else state.tintZones.add(z);
+        tile.setAttribute('aria-pressed', String(state.tintZones.has(z)));
         render();
       })
     );
@@ -1080,72 +508,56 @@ const PAINTS = [
     $$('.prio-chip').forEach((chip) =>
       chip.addEventListener('click', () => {
         const p = chip.dataset.priority!;
-        const on = !state.priorities.has(p);
-        state.priorities[on ? 'add' : 'delete'](p);
-        chip.setAttribute('aria-pressed', String(on));
+        if (state.priorities.has(p)) state.priorities.delete(p);
+        else state.priorities.add(p);
+        chip.setAttribute('aria-pressed', String(state.priorities.has(p)));
         render();
       })
     );
 
-    // PPF zones: "full" is exclusive; hood/fender variants are mutually exclusive.
-    const EXCLUSIVE: Record<string, string> = {
-      'hood-full': 'hood-partial',
-      'hood-partial': 'hood-full',
-      'fenders-full': 'fenders-partial',
-      'fenders-partial': 'fenders-full',
-    };
-    $$('[data-ppf-zone]').forEach((chip) =>
-      chip.addEventListener('click', () => {
-        const z = chip.dataset.ppfZone!;
-        const on = !state.ppfZones.has(z);
-        if (z === 'full') {
-          state.ppfZones.clear();
-          if (on) state.ppfZones.add('full');
-        } else {
-          state.ppfZones.delete('full');
-          if (on && EXCLUSIVE[z]) state.ppfZones.delete(EXCLUSIVE[z]);
-          state.ppfZones[on ? 'add' : 'delete'](z);
-        }
-        $$('[data-ppf-zone]').forEach((c) =>
-          c.setAttribute('aria-pressed', String(state.ppfZones.has(c.dataset.ppfZone!)))
-        );
-        render();
+    // Accordions
+    $$('.acc-toggle').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const acc = btn.closest('.acc') as HTMLElement;
+        const open = acc.dataset.open === 'true';
+        acc.dataset.open = String(!open);
+        btn.setAttribute('aria-expanded', String(!open));
       })
     );
 
-    $$('.finish-chip').forEach((chip) =>
-      chip.addEventListener('click', () => {
-        state.finish = chip.dataset.finish!;
-        state.finishLabel = chip.dataset.finishLabel!;
-        document.getElementById('finish-note')!.textContent = chip.dataset.note!;
-        $$('.finish-chip').forEach((c) => c.setAttribute('aria-checked', String(c === chip)));
-        render();
-      })
-    );
-
+    // Start over
     document.getElementById('reset-btn')!.addEventListener('click', () => {
       state.tintZones = new Set(['front-side', 'rear-side']);
-      state.priorities = new Set();
-      state.ppfZones = new Set(['bumper-front', 'hood-full', 'fenders-partial', 'mirrors']);
       state.shade = 'dark';
       state.shadeLabel = 'Dark';
       state.shadeOp = 0.85;
-      state.finish = 'gloss';
-      state.finishLabel = 'Gloss';
-      $$('[data-tint-zone]').forEach((c) =>
-        c.setAttribute('aria-pressed', String(state.tintZones.has(c.dataset.tintZone!)))
+      state.priorities = new Set();
+      $$('.zone-tile[data-tint-zone]').forEach((t) =>
+        t.setAttribute('aria-pressed', String(state.tintZones.has(t.dataset.tintZone!)))
       );
-      $$('[data-ppf-zone]').forEach((c) =>
-        c.setAttribute('aria-pressed', String(state.ppfZones.has(c.dataset.ppfZone!)))
-      );
-      $$('.prio-chip').forEach((c) => c.setAttribute('aria-pressed', 'false'));
       $$('.shade-chip').forEach((c) => c.setAttribute('aria-checked', String(c.dataset.shade === 'dark')));
-      $$('.finish-chip').forEach((c) => c.setAttribute('aria-checked', String(c.dataset.finish === 'gloss')));
+      $$('.prio-chip').forEach((c) => c.setAttribute('aria-pressed', 'false'));
+      theta = -35;
+      viewer.cameraOrbit = `${theta}deg 78deg 80%`;
+      viewer.jumpCameraToGoal?.();
       render();
     });
 
-    syncViewToggle();
-    syncPreview();
+    // ══ Boot ═══════════════════════════════════════════════════════════
+    currentSrc = '/models3d/sedan.glb'; // matches the src baked into the markup
+    (function pollInitial() {
+      let tries = 0;
+      const poll = () => {
+        const materials = viewer.model?.materials ?? [];
+        if (materials.length) {
+          glassMaterials = materials.filter((m) => isTintableGlass(m.name || ''));
+          applyTint3D();
+        } else if (tries++ < 150) {
+          setTimeout(poll, 100);
+        }
+      };
+      poll();
+    })();
     render();
   </script>
 </Layout>
