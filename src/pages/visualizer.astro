@@ -238,6 +238,22 @@ const PRIORITIES = [
         <!-- Preview column: 3D model on a white stage -->
         <div class="min-w-0 lg:order-2">
           <div class="border border-sand bg-whisper p-4 sm:p-6">
+            <!-- Angle toggle: two fixed ¾ views -->
+            <div class="mb-3 flex items-center gap-1" role="tablist" aria-label="Vehicle angle">
+              <button
+                type="button" data-angle="front" aria-pressed="true"
+                class="angle-btn pressable border border-sand bg-paper px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-200 aria-pressed:border-accent aria-pressed:bg-accent"
+              >
+                Front view
+              </button>
+              <button
+                type="button" data-angle="rear" aria-pressed="false"
+                class="angle-btn pressable border border-sand bg-paper px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-200 aria-pressed:border-accent aria-pressed:bg-accent"
+              >
+                Rear view
+              </button>
+            </div>
+
             <div class="relative w-full overflow-hidden border border-sand bg-white" style="aspect-ratio: 860 / 520;">
               <model-viewer
                 id="car-3d-viewer"
@@ -246,30 +262,17 @@ const PRIORITIES = [
                 src="/models3d/sedan.glb"
                 shadow-intensity="0.9"
                 shadow-softness="0.8"
-                exposure="1.05"
+                exposure="1.1"
+                environment-image="neutral"
                 camera-orbit="-35deg 78deg 80%"
                 disable-zoom
                 disable-tap
                 interaction-prompt="none"
                 aria-label="3D vehicle with the selected tint applied to the glass"
               ></model-viewer>
-
-              <!-- Step rotation arrows -->
-              <button
-                type="button" id="rot-left" aria-label="Rotate left"
-                class="pressable absolute left-2 top-1/2 -translate-y-1/2 border border-sand bg-paper/90 px-3 py-2.5 text-ink transition-colors hover:border-accent hover:text-accentDk"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
-              </button>
-              <button
-                type="button" id="rot-right" aria-label="Rotate right"
-                class="pressable absolute right-2 top-1/2 -translate-y-1/2 border border-sand bg-paper/90 px-3 py-2.5 text-ink transition-colors hover:border-accent hover:text-accentDk"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
-              </button>
             </div>
             <p class="mt-2 text-[10px] leading-relaxed text-ash">
-              Use the arrows to rotate the car · pick a tint shade to see it on the glass
+              Switch between front and rear view · pick a tint shade to see it on the glass
             </p>
 
             <!-- Live summary -->
@@ -279,7 +282,7 @@ const PRIORITIES = [
             </div>
           </div>
 
-          <!-- CTA under the preview -->
+          <!-- CTAs under the preview -->
           <a
             id="visualizer-cta"
             href={`https://wa.me/${WHATSAPP_NUMBER}`}
@@ -292,6 +295,15 @@ const PRIORITIES = [
           <p class="mt-2.5 text-center text-[11px] text-ash">
             Opens WhatsApp with your build pre-filled — we reply with a free quote.
           </p>
+          <button
+            type="button"
+            id="pdf-btn"
+            class="pressable mx-auto mt-3 flex max-w-md items-center justify-center gap-2 border border-sand bg-paper px-8 py-3 text-center text-[11px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-200 hover:border-accent hover:text-accentDk"
+            style="width: 100%; max-width: 28rem;"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            Download your configuration (PDF)
+          </button>
 
           <p class="mx-auto mt-6 max-w-xl text-center text-[11px] leading-relaxed text-ash">
             Visual representations are shown for illustrative purposes only; vehicles are
@@ -387,26 +399,46 @@ const PRIORITIES = [
       src: string;
       cameraOrbit: string;
       jumpCameraToGoal(): void;
+      toDataURL(type?: string): string;
       model?: { materials: GlbMaterial[] };
     };
 
     // Window glass only — never headlights/taillights (RED_GLASS, orange_GLASS,
-    // LightGlass…). Matches the material names baked by scripts/build-models.mjs.
+    // LightGlass, lamps…). Matches the names baked by scripts/build-models.mjs.
     const isTintableGlass = (n: string) =>
-      /window_material|^glass/i.test(n) && !/red|orange|light/i.test(n);
+      /window_material|^glass/i.test(n) && !/red|orange|light|lamp|lens|luces/i.test(n);
 
     let glassMaterials: GlbMaterial[] = [];
     let currentSrc = '';
 
-    // Darken the glass to match the selected shade: interpolate from the
-    // clear-glass baseline baked into the models toward near-black film.
+    // Darken the glass to match the selected shade. Alpha is capped at 0.85
+    // and the base keeps a cool blue-gray cast so reflections still read on
+    // the mirror-smooth glass instead of going flat opaque black.
     function applyTint3D() {
       if (!glassMaterials.length) return;
       const t = Math.max(0, Math.min(1, (state.shadeOp - 0.14) / 0.71));
       const lerp = (a: number, b: number) => a + (b - a) * t;
-      const rgba = [lerp(0.62, 0.02), lerp(0.68, 0.02), lerp(0.74, 0.02), lerp(0.25, 0.9)];
+      const rgba = [lerp(0.35, 0.012), lerp(0.4, 0.016), lerp(0.45, 0.022), lerp(0.3, 0.85)];
       for (const mat of glassMaterials) mat.pbrMetallicRoughness.setBaseColorFactor(rgba);
     }
+
+    // Fixed ¾ camera angles. The Raptor rip faces the opposite way from the
+    // other three models, so its front theta is offset 180°.
+    const FRONT_THETA: Record<string, number> = { sedan: -35, suv: -35, sport: -35, truck: 145 };
+    let angle: 'front' | 'rear' = 'front';
+    function applyAngle() {
+      const front = FRONT_THETA[state.vehicle] ?? -35;
+      const theta = angle === 'front' ? front : front + 180;
+      viewer.cameraOrbit = `${theta}deg 78deg 80%`;
+      viewer.jumpCameraToGoal?.();
+    }
+    $$('.angle-btn').forEach((b) =>
+      b.addEventListener('click', () => {
+        angle = b.dataset.angle as 'front' | 'rear';
+        $$('.angle-btn').forEach((c) => c.setAttribute('aria-pressed', String(c === b)));
+        applyAngle();
+      })
+    );
 
     // model-viewer gates loading on visibility, and its load event is not
     // reliable when src is swapped — poll model.materials until ready.
@@ -416,6 +448,7 @@ const PRIORITIES = [
       currentSrc = src;
       glassMaterials = [];
       viewer.src = src;
+      applyAngle();
       let tries = 0;
       const poll = () => {
         if (currentSrc !== src) return; // superseded
@@ -432,15 +465,13 @@ const PRIORITIES = [
       setTimeout(poll, 100);
     }
 
-    // Step rotation: 30° per arrow press, snapped instantly (no easing).
-    let theta = -35;
-    function rotate(step: number) {
-      theta = (theta + step) % 360;
-      viewer.cameraOrbit = `${theta}deg 78deg 80%`;
-      viewer.jumpCameraToGoal?.();
+    // Warm the HTTP cache for the other models so switching vehicles is
+    // nearly instant (the GLBs are 2-3.7MB each; decode is the only cost left).
+    function prefetchOthers() {
+      for (const id of ['suv', 'sport', 'truck']) {
+        fetch(`/models3d/${id}.glb`, { priority: 'low' } as RequestInit).catch(() => {});
+      }
     }
-    document.getElementById('rot-left')!.addEventListener('click', () => rotate(-30));
-    document.getElementById('rot-right')!.addEventListener('click', () => rotate(30));
 
     // ══ Render cycle ═══════════════════════════════════════════════════
     function render() {
@@ -537,9 +568,9 @@ const PRIORITIES = [
       );
       $$('.shade-chip').forEach((c) => c.setAttribute('aria-checked', String(c.dataset.shade === 'dark')));
       $$('.prio-chip').forEach((c) => c.setAttribute('aria-pressed', 'false'));
-      theta = -35;
-      viewer.cameraOrbit = `${theta}deg 78deg 80%`;
-      viewer.jumpCameraToGoal?.();
+      angle = 'front';
+      $$('.angle-btn').forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.angle === 'front')));
+      applyAngle();
       render();
     });
 
@@ -552,6 +583,7 @@ const PRIORITIES = [
         if (materials.length) {
           glassMaterials = materials.filter((m) => isTintableGlass(m.name || ''));
           applyTint3D();
+          prefetchOthers();
         } else if (tries++ < 150) {
           setTimeout(poll, 100);
         }
@@ -559,5 +591,97 @@ const PRIORITIES = [
       poll();
     })();
     render();
+
+    // ══ PDF configuration download (SunTek-style summary sheet) ═════════
+    document.getElementById('pdf-btn')!.addEventListener('click', async () => {
+      const btn = document.getElementById('pdf-btn') as HTMLButtonElement;
+      btn.disabled = true;
+      const prev = btn.textContent;
+      btn.textContent = 'Generating…';
+      try {
+        const { jsPDF } = await import('jspdf');
+        const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+        const W = 210;
+        const zones = [...state.tintZones].map((z) => ZONE_LABELS[z]).join(', ') || 'To be decided';
+        const prio = [...state.priorities].map((p) => ZONE_LABELS[p] ?? p).join(', ') || '—';
+        const frontTinted = state.tintZones.has('front-side');
+        const legal = !frontTinted || SHADE_META[state.shade].frontLegal;
+
+        // Header band
+        doc.setFillColor(11, 21, 36);
+        doc.rect(0, 0, W, 30, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(16);
+        doc.text("MARIO'S TINT SHOP", 14, 13);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Window Tint Configuration · Murfreesboro, TN', 14, 20);
+        doc.setFontSize(8);
+        doc.text(new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }), W - 14, 13, { align: 'right' });
+
+        // Vehicle snapshot from the 3D viewer
+        try {
+          const shot = viewer.toDataURL('image/png');
+          doc.setFillColor(255, 255, 255);
+          doc.setDrawColor(224, 219, 209);
+          doc.rect(14, 38, W - 28, 92, 'S');
+          doc.addImage(shot, 'PNG', 16, 40, W - 32, 88, undefined, 'FAST');
+        } catch {
+          /* snapshot unavailable — PDF still carries the config table */
+        }
+
+        // Configuration table
+        let y = 142;
+        doc.setTextColor(26, 28, 32);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(12);
+        doc.text('Your build', 14, y);
+        y += 8;
+        const row = (label: string, value: string) => {
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(9);
+          doc.setTextColor(120, 116, 108);
+          doc.text(label.toUpperCase(), 14, y);
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(10);
+          doc.setTextColor(26, 28, 32);
+          const lines = doc.splitTextToSize(value, W - 78);
+          doc.text(lines, 64, y);
+          y += 7 * lines.length;
+          doc.setDrawColor(235, 231, 223);
+          doc.line(14, y - 4.5, W - 14, y - 4.5);
+        };
+        row('Vehicle type', state.vehicleLabel);
+        row('Film type', 'Window Tint (3M)');
+        row('Coverage zones', zones);
+        row('Tint shade', `${state.shadeLabel} (${SHADE_META[state.shade].vlt})`);
+        row('Priorities', prio);
+        row('TN legality', legal ? 'Legal for the selected zones' : 'Tennessee requires 35%+ VLT on front side windows');
+
+        // Footer
+        y = 272;
+        doc.setFillColor(245, 242, 236);
+        doc.rect(0, y - 8, W, 40, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.setTextColor(26, 28, 32);
+        doc.text('Ready for a free quote?', 14, y);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(90, 86, 80);
+        doc.text('Send this configuration via WhatsApp or bring it to the shop — we reply fast.', 14, y + 6);
+        doc.setTextColor(26, 28, 32);
+        doc.text("Mario's Tint Shop · Murfreesboro, Tennessee", 14, y + 14);
+        doc.setFontSize(7.5);
+        doc.setTextColor(140, 136, 128);
+        doc.text('Visual representations are illustrative only; vehicles are generic 3D models and actual film appearance may vary.', 14, y + 21);
+
+        doc.save('marios-tint-shop-configuration.pdf');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = prev;
+      }
+    });
   </script>
 </Layout>

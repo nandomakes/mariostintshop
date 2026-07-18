@@ -54,7 +54,7 @@ const MODELS = {
 };
 
 // Clear glass baseline; the visualizer darkens this live per shade.
-const GLASS_RGBA = [0.62, 0.68, 0.74, 0.25];
+const GLASS_RGBA = [0.35, 0.4, 0.45, 0.3];
 
 const io = new NodeIO()
   .registerExtensions(KHRONOS_EXTENSIONS)
@@ -74,25 +74,38 @@ for (const [vehicle, cfg] of Object.entries(MODELS)) {
 
   // 1. Cars keep their original look: base-color textures stay. Detail maps
   //    (normal / metallic-roughness / occlusion / emissive) are dropped —
-  //    that is where most of the texture weight lives. Window glass is
-  //    normalized to clear so the visualizer can tint it live.
+  //    that is where most of the texture weight lives. Because dropping an
+  //    MR texture leaves glTF's defaults (metallic 1 + roughness 1 = dull,
+  //    washed-out "pastel" shading), every material gets explicit factors.
   for (const mat of root.listMaterials()) {
     const name = mat.getName() || '';
+    const hadMR = !!mat.getMetallicRoughnessTexture();
     mat.setMetallicRoughnessTexture(null);
     mat.setNormalTexture(null);
     mat.setOcclusionTexture(null);
     mat.setEmissiveTexture(null);
 
     if (cfg.glass.test(name)) {
+      // Real-glass look: dark-neutral base at low alpha, mirror-smooth so the
+      // environment reflects off it. The visualizer drives darkness live.
       mat.setBaseColorTexture(null);
       mat.setBaseColorFactor(GLASS_RGBA);
       mat.setAlphaMode('BLEND');
-      mat.setMetallicFactor(0);
-      mat.setRoughnessFactor(0.05);
+      mat.setMetallicFactor(0.9);
+      mat.setRoughnessFactor(0.04);
       mat.setDoubleSided(true);
-      // Remove transmission/volume/etc — plain alpha glass tints predictably
-      // and renders cheaper than refractive transmission.
       for (const ext of mat.listExtensions()) ext.dispose();
+    } else if (/paint|coloured/i.test(name)) {
+      // Glossy car paint.
+      mat.setMetallicFactor(0.4);
+      mat.setRoughnessFactor(0.22);
+    } else if (/chrome|crome/i.test(name)) {
+      mat.setMetallicFactor(1);
+      mat.setRoughnessFactor(0.12);
+    } else if (hadMR || mat.getMetallicFactor() === 1) {
+      // Generic trim/plastic/rubber: matte dielectric, keeps color saturated.
+      mat.setMetallicFactor(0.1);
+      mat.setRoughnessFactor(0.55);
     }
   }
 
