@@ -5,7 +5,7 @@ import QuoteCTA from '../components/QuoteCTA.astro';
 import Footer from '../components/Footer.astro';
 import CallFab from '../components/CallFab.astro';
 import { SITE, IMAGES, WHATSAPP_NUMBER } from '../consts';
-import { PHOTO_VEHICLES } from '../lib/vehicles-photo';
+import { PHOTO_VEHICLES, sedanZonePath } from '../lib/vehicles-photo';
 
 // 3D-only visualizer: one optimized GLB per category (public/models3d/*.glb).
 const VEHICLE_IDS = ['sedan', 'suv', 'sport', 'truck'];
@@ -23,31 +23,9 @@ const TINT_ZONES = [
   { id: 'rear', label: 'Rear window' },
 ];
 
-// Coverage tile icons: a vector sedan profile (nose to the right) with the
-// covered glass highlighted in accent blue. Same silhouette for all zones.
-function sedanZoneIcon(zone: string): string {
-  const on = '#00A8E8';
-  const glass = '#EDF2F6';
-  const body = '#5B6470';
-  const pane = (d: string, id: string) =>
-    `<path d="${d}" fill="${zone === id ? on : glass}"/>`;
-  return (
-    // body silhouette + wheels
-    `<path d="M10 62 L10 56 Q10 51 18 49 L46 44 Q56 27 82 21 L100 17 Q126 13 152 17 L170 21 Q188 25 198 40 L220 46 Q232 50 232 58 L232 63 Q232 67 226 67 L16 67 Q10 67 10 62 Z" fill="${body}"/>` +
-    `<circle cx="58" cy="66" r="11" fill="#2E333B"/><circle cx="188" cy="66" r="11" fill="#2E333B"/>` +
-    `<circle cx="58" cy="66" r="5" fill="#9AA3AE"/><circle cx="188" cy="66" r="5" fill="#9AA3AE"/>` +
-    // rear glass (sloped, left)
-    pane('M62 31 L80 24 L86 41 L68 43 Z', 'rear') +
-    // rear door window
-    pane('M90 23 L120 20 L120 41 L94 41 Z', 'rear-side') +
-    // front door window
-    pane('M126 20 L154 22 L158 41 L126 41 Z', 'front-side') +
-    // windshield (front, right)
-    `<path d="M162 24 L186 39 L164 41 L160 25 Z" fill="${glass}"/>` +
-    // visor strip: top band of the windshield
-    (zone === 'visor' ? `<path d="M161 24 L172 30 L163 31 L160 25 Z" fill="${on}"/>` : '')
-  );
-}
+// Coverage tiles use the sedan side-view photo (the same imagery as the
+// vehicle picker) with the covered glass vectorized on top in accent blue.
+const zoneTiles = TINT_ZONES.map((z) => ({ ...z, path: sedanZonePath(z.id) }));
 const SHADES = [
   { id: 'dark', label: 'Dark', vlt: 'VLT 5–35', op: 0.85 },
   { id: 'medium', label: 'Medium', vlt: 'VLT 35–65', op: 0.58 },
@@ -169,15 +147,16 @@ const PRIORITIES = [
               <div class="min-h-0 overflow-hidden">
                 <div class="grid grid-cols-2 gap-2 pb-5 sm:grid-cols-4">
                   {
-                    TINT_ZONES.map((z) => (
+                    zoneTiles.map((z) => (
                       <button
                         type="button"
                         data-tint-zone={z.id}
                         aria-pressed={z.id === 'front-side' || z.id === 'rear-side' ? 'true' : 'false'}
                         class="zone-tile pressable group flex flex-col items-center gap-1 border border-sand bg-paper px-1.5 pb-2 pt-2.5 transition-colors duration-200 hover:border-ash/60 aria-pressed:border-accent aria-pressed:bg-mint"
                       >
-                        <svg viewBox="0 0 242 82" class="h-9 w-full" aria-hidden="true">
-                          <g set:html={sedanZoneIcon(z.id)} />
+                        <svg viewBox="30 70 800 265" class="h-10 w-full" aria-hidden="true">
+                          <image href="/images/vehicles/sedan.png" x="0" y="0" width="860" height="340" />
+                          <path d={z.path} fill="#00A8E8" fill-opacity="0.9" stroke="#0077B6" stroke-width="1.5" />
                         </svg>
                         <span class="text-center text-[10px] font-bold leading-tight text-ink group-aria-pressed:text-accentDk">{z.label}</span>
                       </button>
@@ -263,19 +242,30 @@ const PRIORITIES = [
         <!-- Preview column: 3D model on a white stage -->
         <div class="min-w-0 lg:order-2">
           <div class="border border-sand bg-whisper p-4 sm:p-6">
-            <!-- Angle toggle: two fixed ¾ views -->
-            <div class="mb-3 flex items-center gap-1" role="tablist" aria-label="Vehicle angle">
+            <!-- Toolbar: angle toggle left · PDF download top-right -->
+            <div class="mb-3 flex items-center justify-between gap-2">
+              <div class="flex items-center gap-1" role="tablist" aria-label="Vehicle angle">
+                <button
+                  type="button" data-angle="front" aria-pressed="true"
+                  class="angle-btn pressable border border-sand bg-paper px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-200 aria-pressed:border-accent aria-pressed:bg-accent"
+                >
+                  Front view
+                </button>
+                <button
+                  type="button" data-angle="rear" aria-pressed="false"
+                  class="angle-btn pressable border border-sand bg-paper px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-200 aria-pressed:border-accent aria-pressed:bg-accent"
+                >
+                  Rear view
+                </button>
+              </div>
               <button
-                type="button" data-angle="front" aria-pressed="true"
-                class="angle-btn pressable border border-sand bg-paper px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-200 aria-pressed:border-accent aria-pressed:bg-accent"
+                type="button"
+                id="pdf-btn"
+                class="pressable flex items-center gap-1.5 border border-sand bg-paper px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-200 hover:border-accent hover:text-accentDk"
               >
-                Front view
-              </button>
-              <button
-                type="button" data-angle="rear" aria-pressed="false"
-                class="angle-btn pressable border border-sand bg-paper px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-200 aria-pressed:border-accent aria-pressed:bg-accent"
-              >
-                Rear view
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+                <span class="hidden sm:inline">Download PDF</span>
+                <span class="sm:hidden">PDF</span>
               </button>
             </div>
 
@@ -323,15 +313,6 @@ const PRIORITIES = [
           <p class="mt-2.5 text-center text-[11px] text-ash">
             Opens WhatsApp with your build pre-filled — we reply with a free quote.
           </p>
-          <button
-            type="button"
-            id="pdf-btn"
-            class="pressable mx-auto mt-3 flex max-w-md items-center justify-center gap-2 border border-sand bg-paper px-8 py-3 text-center text-[11px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-200 hover:border-accent hover:text-accentDk"
-            style="width: 100%; max-width: 28rem;"
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
-            Download your configuration (PDF)
-          </button>
 
           <p class="mx-auto mt-6 max-w-xl text-center text-[11px] leading-relaxed text-ash">
             Visual representations are shown for illustrative purposes only; vehicles are
@@ -418,25 +399,59 @@ const PRIORITIES = [
     const cta = document.getElementById('visualizer-cta') as HTMLAnchorElement;
 
     // ══ 3D viewer ═════════════════════════════════════════════════════
+    type GlbMaterial = {
+      name: string;
+      pbrMetallicRoughness: { setBaseColorFactor(rgba: number[]): void; baseColorFactor: number[] };
+    };
     const viewer = document.getElementById('car-3d-viewer') as HTMLElement & {
       src: string;
       cameraOrbit: string;
       cameraTarget: string;
-      variantName: string | null;
       jumpCameraToGoal(): void;
       toDataURL(type?: string): string;
-      model?: { materials: Array<{ name: string }> };
+      model?: { materials: GlbMaterial[] };
     };
 
     let currentSrc = '';
 
-    // The four shades are baked into every GLB as KHR_materials_variants on
-    // the window-glass primitives only (headlights/taillights excluded at
-    // build time). Switching is declarative and handled by model-viewer
-    // itself — no live material mutation, no race with texture loading.
+    // Glass looks per shade — must match GLASS_LOOK in scripts/build-models.mjs.
+    const GLASS_LOOK: Record<string, number[]> = {
+      clear: [0.8, 0.84, 0.88, 0.18],
+      light: [0.5, 0.54, 0.58, 0.42],
+      medium: [0.17, 0.19, 0.21, 0.66],
+      dark: [0.02, 0.024, 0.03, 0.88],
+    };
+    // Each coverage zone owns a glass material, split at build time.
+    // glass_windshield and glass_lamps are never tinted.
+    const ZONE_MATERIAL: Record<string, string> = {
+      'front-side': 'glass_front',
+      'rear-side': 'glass_rearside',
+      rear: 'glass_rearwin',
+      visor: 'glass_visor',
+    };
+
+    // Apply the selected shade to the selected zones' glass materials and
+    // reset unselected zones to clear. three.js re-syncs materials
+    // asynchronously while textures wire up and can overwrite live edits,
+    // so a permanent watchdog re-asserts the state every 700ms — any revert
+    // is corrected within a frame or two of it happening.
     function applyTint3D() {
-      viewer.variantName = state.shade;
+      const materials = viewer.model?.materials;
+      if (!materials?.length) return;
+      const shadeLook = GLASS_LOOK[state.shade] ?? GLASS_LOOK.dark;
+      const wanted: Record<string, number[]> = {
+        glass_windshield: GLASS_LOOK.clear,
+        glass_lamps: GLASS_LOOK.clear,
+      };
+      for (const [zone, matName] of Object.entries(ZONE_MATERIAL)) {
+        wanted[matName] = state.tintZones.has(zone) ? shadeLook : GLASS_LOOK.clear;
+      }
+      for (const mat of materials) {
+        const target = wanted[mat.name];
+        if (target) mat.pbrMetallicRoughness.setBaseColorFactor(target);
+      }
     }
+    setInterval(applyTint3D, 700);
 
     // Fixed ¾ camera angles. The Raptor rip faces the opposite way from the
     // other three models, so its front theta is offset 180°.
@@ -468,11 +483,6 @@ const PRIORITIES = [
 
     let prefetched = false;
     viewer.addEventListener('load', () => {
-      // Force the variant onto the freshly loaded model: if variantName
-      // already equals the target (e.g. 'dark' carried over from the previous
-      // vehicle), assigning the same value is a no-op and the new model would
-      // stay on its clear default — reset to null first.
-      viewer.variantName = null;
       applyTint3D();
       // Capture the auto-framed center of THIS model, then re-frame with
       // the nose-shift applied.
@@ -621,8 +631,7 @@ const PRIORITIES = [
     document.getElementById('pdf-btn')!.addEventListener('click', async () => {
       const btn = document.getElementById('pdf-btn') as HTMLButtonElement;
       btn.disabled = true;
-      const prev = btn.textContent;
-      btn.textContent = 'Generating…';
+      btn.style.opacity = '0.5';
       try {
         const { jsPDF } = await import('jspdf');
         const doc = new jsPDF({ unit: 'mm', format: 'a4' });
@@ -705,7 +714,7 @@ const PRIORITIES = [
         doc.save('marios-tint-shop-configuration.pdf');
       } finally {
         btn.disabled = false;
-        btn.textContent = prev;
+        btn.style.opacity = '';
       }
     });
   </script>

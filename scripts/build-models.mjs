@@ -1,20 +1,28 @@
 // Optimizes the raw 3D car models (assets-src/models3d-src) into lean,
 // tint-ready GLBs at public/models3d/<vehicle>.glb.
 //
-// Per model (cars keep their ORIGINAL factory colors):
-//  - keep base-color textures, recompressed to WebP at 1024px
-//  - drop normal / metallic-roughness / occlusion / emissive textures
-//    (detail maps that cost megabytes and add little on a small stage)
-//  - normalize window glass to clear (alphaMode BLEND, light color, no
-//    baked tint, no transmission — the visualizer drives darkness at runtime)
-//  - weld + simplify heavy meshes, then Draco-compress
+// Cars keep their ORIGINAL factory colors (base-color textures stay,
+// recompressed to WebP 1024px; detail maps dropped with explicit PBR
+// factors so nothing goes pastel). Window glass becomes real-looking
+// mirror glass, split into TINT ZONES so the visualizer can darken each
+// coverage zone independently:
+//
+//   glass_windshield  — never tinted (legal)
+//   glass_visor       — top band of the windshield
+//   glass_front       — front door windows
+//   glass_rearside    — rear door windows + quarters
+//   glass_rearwin     — rear window
+//   glass_lamps       — head/tail-light lenses, never tinted
+//
+// Debug: COLOR_ZONES=1 node scripts/build-models.mjs paints each zone a
+// loud color so the split can be verified visually.
 //
 // Run: node scripts/build-models.mjs
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { NodeIO } from '@gltf-transform/core';
-import { KHRONOS_EXTENSIONS, KHRMaterialsVariants } from '@gltf-transform/extensions';
+import { KHRONOS_EXTENSIONS } from '@gltf-transform/extensions';
 import { dedup, prune, weld, simplify, draco, textureCompress } from '@gltf-transform/functions';
 import { MeshoptSimplifier } from 'meshoptimizer';
 import draco3d from 'draco3dgltf';
@@ -23,59 +31,73 @@ import sharp from 'sharp';
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')), '..');
 const SRC = path.join(ROOT, 'assets-src', 'models3d-src');
 const OUT = path.join(ROOT, 'public', 'models3d');
+const COLOR_ZONES = !!process.env.COLOR_ZONES;
 
-// Which source file becomes which vehicle, and how to recognize its
-// paint (→ light silver) and window glass (→ clear, runtime-tintable).
-// "lights" materials must never be touched (tail lights stay red, etc.).
+// Per model: source, how to recognize window glass, mesh simplification,
+// and the zone split along the cabin-glass long axis. `noseSign` says which
+// end of the long axis the nose points to (+1 = positive coordinates).
+// Fractions are measured nose → tail across the cabin glass span.
 const MODELS = {
   sedan: {
     src: '2022_bmw_m5_cs.glb',
     glass: /Window_Material$/i,
-    carveLamps: true,
     simplifyRatio: 0.6,
+    noseSign: +1,
+    upSign: +1,
+    zoneCuts: { ws: 0.44, front: 0.7, rearside: 0.85 },
+    lampFrontFrac: 0.16, lampRearFrac: 0.08,
   },
   suv: {
     src: '2023-lamborghini-urus-performante/source/2023_lamborghini_urus_performante.glb',
     glass: /Window_Material$/i,
-    carveLamps: true,
     simplifyRatio: 0.6,
+    noseSign: +1,
+    upSign: +1,
+    zoneCuts: { ws: 0.44, front: 0.64, rearside: 0.85 },
+    lampFrontFrac: 0.16, lampRearFrac: 0.08,
   },
   sport: {
     src: '2020-porsche-718-cayman-gt4/source/2020_porsche_718_cayman_gt4.glb',
     glass: /Window_Material$/i,
-    carveLamps: true,
     simplifyRatio: 0.75,
+    noseSign: +1,
+    upSign: +1,
+    // two-door: no rear side band worth splitting finely
+    zoneCuts: { ws: 0.4, front: 0.75, rearside: 0.88 },
+    lampFrontFrac: 0.18, lampRearFrac: 0.13,
   },
   truck: {
     src: 'ford-f150-raptor/source/Ford Raptor.glb',
     glass: /^glass/i,
     simplifyRatio: 0.5,
-    // This rip carries broken purple vertex colors on every primitive
-    // (interior, brake discs render magenta). Strip COLOR_0 entirely.
     stripVertexColors: true,
-    // glass.006 also covers the headlight lenses (mesh Object_104,
-    // identified by color-coding every glass primitive). They get their
-    // own "glass_lamps" material so runtime tinting skips them.
     lampMeshes: ['Object_104'],
+    noseSign: -1,
+    upSign: -1,
+    zoneCuts: { ws: 0.34, front: 0.6, rearside: 0.88 },
   },
 };
 
-// Window-glass looks per tint shade, baked as KHR_materials_variants.
-// Runtime shade switching is then just `viewer.variantName = shade` —
-// model-viewer applies variants natively, immune to the async material-sync
-// races that made live setBaseColorFactor() mutations silently revert.
-// The cars' interiors are near-black, so translucent-dark glass over them
-// reads the same as opaque-dark glass. Clear glass therefore carries its own
-// milky-light body (like film-simulator renders) so every shade step is
-// visibly distinct regardless of what sits behind the pane.
-const GLASS_LOOK = {
-  clear: [0.62, 0.67, 0.72, 0.45],
-  light: [0.4, 0.44, 0.48, 0.58],
-  medium: [0.16, 0.18, 0.2, 0.74],
-  dark: [0.015, 0.02, 0.026, 0.92],
+// Real-glass look per shade: mirror-smooth metallic surface (strong
+// environment reflections) whose body darkens with the film's VLT.
+// The visualizer holds the same table for runtime zone toggling.
+export const GLASS_LOOK = {
+  clear: [0.8, 0.84, 0.88, 0.18],
+  light: [0.5, 0.54, 0.58, 0.42],
+  medium: [0.17, 0.19, 0.21, 0.66],
+  dark: [0.02, 0.024, 0.03, 0.88],
 };
-const SHADE_T = { clear: 0, light: 1, medium: 2, dark: 3 }; // kept for iteration order
-const glassRGBA = (shadeOrT) => GLASS_LOOK[typeof shadeOrT === 'string' ? shadeOrT : Object.keys(SHADE_T)[shadeOrT]] ?? GLASS_LOOK.clear;
+const GLASS_METALLIC = 1;
+const GLASS_ROUGHNESS = 0.04;
+
+const ZONE_DEBUG_COLORS = {
+  glass_windshield: [1, 0, 0, 1],
+  glass_visor: [1, 1, 0, 1],
+  glass_front: [0, 1, 0, 1],
+  glass_rearside: [0, 0, 1, 1],
+  glass_rearwin: [1, 0, 1, 1],
+  glass_lamps: [0, 1, 1, 1],
+};
 
 const io = new NodeIO()
   .registerExtensions(KHRONOS_EXTENSIONS)
@@ -93,11 +115,7 @@ for (const [vehicle, cfg] of Object.entries(MODELS)) {
   const doc = await io.read(srcAbs);
   const root = doc.getRoot();
 
-  // 1. Cars keep their original look: base-color textures stay. Detail maps
-  //    (normal / metallic-roughness / occlusion / emissive) are dropped —
-  //    that is where most of the texture weight lives. Because dropping an
-  //    MR texture leaves glTF's defaults (metallic 1 + roughness 1 = dull,
-  //    washed-out "pastel" shading), every material gets explicit factors.
+  // ── Materials: keep original colors, fix PBR factors, prep glass ──
   for (const mat of root.listMaterials()) {
     const name = mat.getName() || '';
     const hadMR = !!mat.getMetallicRoughnessTexture();
@@ -107,68 +125,63 @@ for (const [vehicle, cfg] of Object.entries(MODELS)) {
     mat.setEmissiveTexture(null);
 
     if (cfg.glass.test(name)) {
-      // Real-glass look: mirror-smooth so the environment reflects off it.
-      // Default state = clear; shade variants are attached further below.
       mat.setBaseColorTexture(null);
-      mat.setBaseColorFactor(glassRGBA('clear'));
+      mat.setBaseColorFactor(GLASS_LOOK.clear);
       mat.setAlphaMode('BLEND');
-      mat.setMetallicFactor(0.35);
-      mat.setRoughnessFactor(0.05);
+      mat.setMetallicFactor(GLASS_METALLIC);
+      mat.setRoughnessFactor(GLASS_ROUGHNESS);
       mat.setDoubleSided(true);
       for (const ext of mat.listExtensions()) ext.dispose();
     } else if (/paint|coloured/i.test(name)) {
-      // Glossy car paint.
       mat.setMetallicFactor(0.4);
       mat.setRoughnessFactor(0.22);
     } else if (/chrome|crome/i.test(name)) {
       mat.setMetallicFactor(1);
       mat.setRoughnessFactor(0.12);
     } else if (hadMR || mat.getMetallicFactor() === 1) {
-      // Generic trim/plastic/rubber: matte dielectric, keeps color saturated.
       mat.setMetallicFactor(0.1);
       mat.setRoughnessFactor(0.55);
     }
   }
 
-  // Glass meshes in these rips carry VEC4 vertex colors whose alpha
-  // multiplies the material's — with near-zero values the BLEND glass
-  // renders fully invisible. Strip COLOR_0 from every glass primitive.
+  // ── Glass vertex colors: near-zero alpha makes BLEND glass invisible ──
   for (const mesh of root.listMeshes()) {
     for (const prim of mesh.listPrimitives()) {
       const n = prim.getMaterial()?.getName() || '';
       if (!cfg.glass.test(n)) continue;
       const c = prim.getAttribute('COLOR_0');
-      if (c) {
-        prim.setAttribute('COLOR_0', null);
-        console.log(`  stripped glass vertex colors (${(mesh.getName() || '').slice(0, 40)})`);
-      }
+      if (c) prim.setAttribute('COLOR_0', null);
     }
   }
 
+  // ── Named lamp meshes (truck): whole meshes that are light lenses ──
+  const isGlassName = (n) => cfg.glass.test(n || '');
+  const mkGlassMat = (base, name) => base.clone().setName(name);
+  let lampMat = null;
   if (cfg.lampMeshes?.length) {
-    let lampMat = null;
     for (const mesh of root.listMeshes()) {
       if (!cfg.lampMeshes.includes(mesh.getName())) continue;
       for (const prim of mesh.listPrimitives()) {
         const mat = prim.getMaterial();
-        if (!mat || !cfg.glass.test(mat.getName() || '')) continue;
-        if (!lampMat) {
-          // Roughness differs slightly from the window glass so dedup()
-          // cannot merge the two materials back together.
-          lampMat = mat.clone().setName('glass_lamps').setRoughnessFactor(0.06);
-        }
+        if (!mat || !isGlassName(mat.getName())) continue;
+        lampMat ??= mkGlassMat(mat, 'glass_lamps');
         prim.setMaterial(lampMat);
-        console.log(`  split headlight lenses off "${mat.getName()}" → glass_lamps (${mesh.getName()})`);
       }
     }
   }
 
-  if (cfg.carveLamps) {
-    // Some rips fold head/tail-light lenses into the window-glass material.
-    // Discriminate by HEIGHT: lamp lenses sit below the beltline while cabin
-    // glass lives above it. Vertical = the model's smallest bbox axis (cars
-    // are longer and wider than they are tall); the cabin side is whichever
-    // half holds MORE glass triangles.
+  if (cfg.stripVertexColors) {
+    for (const mesh of root.listMeshes()) {
+      for (const prim of mesh.listPrimitives()) {
+        const c = prim.getAttribute('COLOR_0');
+        if (c) prim.setAttribute('COLOR_0', null);
+      }
+    }
+  }
+
+  // ── Zone split ────────────────────────────────────────────────────
+  // Model axes: longest bbox axis = longitudinal, smallest = vertical.
+  {
     let mn = [1e9, 1e9, 1e9], mx = [-1e9, -1e9, -1e9];
     for (const mesh of root.listMeshes()) for (const p of mesh.listPrimitives()) {
       const pos = p.getAttribute('POSITION');
@@ -177,88 +190,132 @@ for (const [vehicle, cfg] of Object.entries(MODELS)) {
       for (let i = 0; i < 3; i++) { mn[i] = Math.min(mn[i], a[i]); mx[i] = Math.max(mx[i], b[i]); }
     }
     const ext = [mx[0] - mn[0], mx[1] - mn[1], mx[2] - mn[2]];
-    const axis = ext.indexOf(Math.min(...ext));
-    const mid = mn[axis] + ext[axis] * 0.5;
+    const L = ext.indexOf(Math.max(...ext)); // longitudinal
+    const V = ext.indexOf(Math.min(...ext)); // vertical
+    const vMid = mn[V] + ext[V] * 0.5;
+    const up = cfg.upSign ?? 1;
 
-    let lampMat = root.listMaterials().find((m) => m.getName() === 'glass_lamps') ?? null;
+    // Collect glass primitives (excluding named lamps).
+    const glassPrims = [];
     for (const mesh of root.listMeshes()) {
-      for (const prim of [...mesh.listPrimitives()]) {
-        const mat = prim.getMaterial();
-        const name = mat?.getName() || '';
-        if (!mat || !cfg.glass.test(name) || name === 'glass_lamps') continue;
+      for (const prim of mesh.listPrimitives()) {
+        const n = prim.getMaterial()?.getName() || '';
+        if (isGlassName(n) && n !== 'glass_lamps') glassPrims.push({ mesh, prim });
+      }
+    }
+    if (glassPrims.length) {
+      const baseMat = glassPrims[0].prim.getMaterial();
+
+      // Pass 1: lamp lenses = glass triangles below the vertical midline
+      // (cabin glass sits above the beltline). Also find the cabin span.
+      const tri = { lamp: [], cabin: [] };
+      let cMin = 1e9, cMax = -1e9;
+      const centroid = (pos, idx, t, axis) => {
+        const v = [0, 0, 0];
+        let c = 0;
+        for (let k = 0; k < 3; k++) c += pos.getElement(idx.getScalar(t + k), v)[axis];
+        return c / 3;
+      };
+      for (const { prim } of glassPrims) {
         const pos = prim.getAttribute('POSITION');
         const idx = prim.getIndices();
-        if (!pos || !idx) continue;
-        const above = [], below = [];
-        const v = [0, 0, 0];
         for (let t = 0; t < idx.getCount(); t += 3) {
-          let c = 0;
-          for (let k = 0; k < 3; k++) c += pos.getElement(idx.getScalar(t + k), v)[axis];
-          (c / 3 > mid ? above : below).push(idx.getScalar(t), idx.getScalar(t + 1), idx.getScalar(t + 2));
-        }
-        // Cabin glass is the bulk; lamps the minority half.
-        const [keep, lamps] = above.length >= below.length ? [above, below] : [below, above];
-        if (!lamps.length) continue;
-        if (!lampMat) lampMat = mat.clone().setName('glass_lamps').setRoughnessFactor(0.06);
-        // New index accessors; both primitives share the same vertex streams.
-        const buffer = root.listBuffers()[0];
-        const mkIndices = (arr) => doc.createAccessor().setType('SCALAR').setArray(new Uint32Array(arr)).setBuffer(buffer);
-        prim.setIndices(mkIndices(keep));
-        const lampPrim = prim.clone().setIndices(mkIndices(lamps)).setMaterial(lampMat);
-        lampPrim.setExtension('KHR_materials_variants', null);
-        mesh.addPrimitive(lampPrim);
-        console.log(`  carved ${lamps.length / 3} lamp tris below beltline out of "${name}" (kept ${keep.length / 3})`);
-      }
-    }
-  }
-
-  if (cfg.stripVertexColors) {
-    let stripped = 0;
-    for (const mesh of root.listMeshes()) {
-      for (const prim of mesh.listPrimitives()) {
-        const color = prim.getAttribute('COLOR_0');
-        if (color) {
-          prim.setAttribute('COLOR_0', null);
-          color.dispose();
-          stripped++;
+          if ((centroid(pos, idx, t, V) - vMid) * up < 0) continue;
+          const c = centroid(pos, idx, t, L);
+          if (c < cMin) cMin = c;
+          if (c > cMax) cMax = c;
         }
       }
-    }
-    console.log(`  stripped vertex colors from ${stripped} primitives`);
-  }
+      const span = cMax - cMin;
 
-  // Attach the four shade variants to every window-glass primitive
-  // (glass_lamps and factory light glass are deliberately left out).
-  {
-    const variantsExt = doc.createExtension(KHRMaterialsVariants);
-    const shadeMaterials = {};
-    const variants = {};
-    for (const [shade, t] of Object.entries(SHADE_T)) {
-      variants[shade] = variantsExt.createVariant(shade);
-    }
-    let mapped = 0;
-    for (const mesh of root.listMeshes()) {
-      for (const prim of mesh.listPrimitives()) {
-        const mat = prim.getMaterial();
-        if (!mat || !cfg.glass.test(mat.getName() || '') || mat.getName() === 'glass_lamps') continue;
-        const list = variantsExt.createMappingList();
-        for (const [shade, t] of Object.entries(SHADE_T)) {
-          const key = mat.getName() + ':' + shade;
-          if (!shadeMaterials[key]) {
-            shadeMaterials[key] = mat.clone().setName(key).setBaseColorFactor(glassRGBA(shade));
+      // On the Forza rips the light lenses share the window material AND sit
+      // high (above the beltline), so height alone cannot catch them. They DO
+      // sit at the absolute longitudinal extremes of the glass span, separated
+      // from the cabin by hood and trunk — trim those extremes off as lamps,
+      // then band the remaining cabin span into zones.
+      const cuts = cfg.zoneCuts;
+      const rawNoseFrac = (c) => {
+        const f = (c - cMin) / span;
+        return cfg.noseSign > 0 ? 1 - f : f; // 0 at the nose
+      };
+      const lampFront = cfg.lampFrontFrac ?? 0;
+      const lampRear = cfg.lampRearFrac ?? 0;
+      // Cabin span in nose-fraction terms: [lampFront, 1 - lampRear].
+      const cabinLen = 1 - lampFront - lampRear;
+      const noseFrac = (c) => (rawNoseFrac(c) - lampFront) / cabinLen;
+      const isLampFrac = (c) => {
+        const f = rawNoseFrac(c);
+        return f < lampFront || f > 1 - lampRear;
+      };
+
+      let wsTop = -1e9, wsBottom = 1e9; // in up-oriented coords
+      for (const { prim } of glassPrims) {
+        const pos = prim.getAttribute('POSITION');
+        const idx = prim.getIndices();
+        for (let t = 0; t < idx.getCount(); t += 3) {
+          const vC = centroid(pos, idx, t, V);
+          if ((vC - vMid) * up < 0) continue;
+          const cL = centroid(pos, idx, t, L);
+          if (isLampFrac(cL)) continue;
+          const f = noseFrac(cL);
+          if (f >= 0 && f < cuts.ws) {
+            const vU = vC * up;
+            if (vU > wsTop) wsTop = vU;
+            if (vU < wsBottom) wsBottom = vU;
           }
-          list.addMapping(variantsExt.createMapping().setMaterial(shadeMaterials[key]).addVariant(variants[shade]));
         }
-        prim.setExtension('KHR_materials_variants', list);
-        mapped++;
       }
+      const visorLine = wsTop - (wsTop - wsBottom) * 0.3; // top 30% of windshield
+
+      // Pass 2: bucket every triangle.
+      const zoneMats = {};
+      const zoneOf = (vC, cL) => {
+        if ((vC - vMid) * up < 0) return 'glass_lamps';
+        if (isLampFrac(cL)) return 'glass_lamps';
+        const f = noseFrac(cL);
+        if (f < cuts.ws) return vC * up > visorLine ? 'glass_visor' : 'glass_windshield';
+        if (f < cuts.front) return 'glass_front';
+        if (f < cuts.rearside) return 'glass_rearside';
+        return 'glass_rearwin';
+      };
+      const buffer = root.listBuffers()[0];
+      let counts = {};
+      for (const { mesh, prim } of glassPrims) {
+        const pos = prim.getAttribute('POSITION');
+        const idx = prim.getIndices();
+        const buckets = {};
+        for (let t = 0; t < idx.getCount(); t += 3) {
+          const z = zoneOf(centroid(pos, idx, t, V), centroid(pos, idx, t, L));
+          (buckets[z] ??= []).push(idx.getScalar(t), idx.getScalar(t + 1), idx.getScalar(t + 2));
+        }
+        const zones = Object.keys(buckets);
+        zones.forEach((z, i) => {
+          counts[z] = (counts[z] || 0) + buckets[z].length / 3;
+          let mat;
+          if (z === 'glass_lamps') mat = lampMat ??= mkGlassMat(baseMat, 'glass_lamps');
+          else mat = zoneMats[z] ??= mkGlassMat(baseMat, z);
+          const indices = doc.createAccessor().setType('SCALAR').setArray(new Uint32Array(buckets[z])).setBuffer(buffer);
+          if (i === 0) {
+            prim.setIndices(indices).setMaterial(mat);
+          } else {
+            mesh.addPrimitive(prim.clone().setIndices(indices).setMaterial(mat));
+          }
+        });
+      }
+      console.log('  zones:', Object.entries(counts).map(([z, n]) => `${z.replace('glass_', '')}=${n}`).join(' '));
     }
-    console.log(`  shade variants attached to ${mapped} glass primitives`);
   }
 
-  // 2. Geometry + texture diet.
+  if (COLOR_ZONES) {
+    for (const mat of root.listMaterials()) {
+      const c = ZONE_DEBUG_COLORS[mat.getName()];
+      if (c) mat.setBaseColorFactor(c).setAlphaMode('OPAQUE');
+    }
+  }
+
+  // ── Geometry + texture diet ──
   await doc.transform(
-    dedup(),
+    dedup({ keepUniqueNames: true }),
     prune(),
     weld(),
     simplify({ simplifier: MeshoptSimplifier, ratio: cfg.simplifyRatio, error: 0.0008 }),
@@ -268,8 +325,6 @@ for (const [vehicle, cfg] of Object.entries(MODELS)) {
 
   await io.write(outAbs, doc);
   const after = fs.statSync(outAbs).size;
-  console.log(
-    `✓ ${vehicle}.glb  ${(before / 1e6).toFixed(1)}MB → ${(after / 1e6).toFixed(2)}MB  (${cfg.src})`
-  );
+  console.log(`✓ ${vehicle}.glb  ${(before / 1e6).toFixed(1)}MB → ${(after / 1e6).toFixed(2)}MB${COLOR_ZONES ? '  [ZONE DEBUG COLORS]' : ''}`);
 }
 console.log('\nDone. Optimized models in public/models3d/');

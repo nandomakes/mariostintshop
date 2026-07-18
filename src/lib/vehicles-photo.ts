@@ -242,7 +242,7 @@ export const initialPhoto = PHOTO_VEHICLES[0];
 // Mini coverage icon for the zone pickers: a gray sedan silhouette with one
 // zone highlighted in accent blue (sedan is the generic reference body).
 const SEDAN = CFGS[0];
-function sedanZonePath(zoneId: string): string {
+export function sedanZonePath(zoneId: string): string {
   const a = SEDAN.a, g = SEDAN.g;
   const ppf = buildPPF(a);
   if (ppf[zoneId]) return ppf[zoneId];
