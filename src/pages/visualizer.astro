@@ -260,11 +260,14 @@ const PRIORITIES = [
                 class="absolute inset-0 h-full w-full"
                 style="background-color: #ffffff;"
                 src="/models3d/sedan.glb"
+                loading="eager"
+                bounds="tight"
                 shadow-intensity="0.9"
                 shadow-softness="0.8"
                 exposure="1.1"
                 environment-image="neutral"
-                camera-orbit="-35deg 78deg 80%"
+                camera-orbit="-35deg 78deg 85%"
+                field-of-view="20deg"
                 disable-zoom
                 disable-tap
                 interaction-prompt="none"
@@ -398,6 +401,7 @@ const PRIORITIES = [
     const viewer = document.getElementById('car-3d-viewer') as HTMLElement & {
       src: string;
       cameraOrbit: string;
+      cameraTarget: string;
       jumpCameraToGoal(): void;
       toDataURL(type?: string): string;
       model?: { materials: GlbMaterial[] };
@@ -426,10 +430,20 @@ const PRIORITIES = [
     // other three models, so its front theta is offset 180°.
     const FRONT_THETA: Record<string, number> = { sedan: -35, suv: -35, sport: -35, truck: 145 };
     let angle: 'front' | 'rear' = 'front';
+    // Auto-framing centers the 3D bounding box, but a ¾ view carries more
+    // visual mass toward the near end — nudge the camera target 7% of the
+    // car's length toward the nose (sign flips with model facing + view).
+    let modelCenter: { x: number; y: number; z: number } | null = null;
+    let modelLength = 0;
     function applyAngle() {
       const front = FRONT_THETA[state.vehicle] ?? -35;
       const theta = angle === 'front' ? front : front + 180;
-      viewer.cameraOrbit = `${theta}deg 78deg 80%`;
+      viewer.cameraOrbit = `${theta}deg 78deg 85%`;
+      if (modelCenter) {
+        const facing = front === -35 ? 1 : -1;
+        const dir = facing * (angle === 'front' ? 1 : -1);
+        viewer.cameraTarget = `${modelCenter.x}m ${modelCenter.y}m ${modelCenter.z + dir * modelLength * 0.07}m`;
+      }
       viewer.jumpCameraToGoal?.();
     }
     $$('.angle-btn').forEach((b) =>
@@ -440,29 +454,42 @@ const PRIORITIES = [
       })
     );
 
-    // model-viewer gates loading on visibility, and its load event is not
-    // reliable when src is swapped — poll model.materials until ready.
+    // Harvest the tintable glass every time a model finishes loading. This
+    // is event-driven with NO time budget: model-viewer defers loading until
+    // the element scrolls into view, so any timeout here would silently give
+    // up on slower connections or below-the-fold layouts — which is exactly
+    // how tint stopped applying in production.
+    let prefetched = false;
+    viewer.addEventListener('load', () => {
+      const materials = viewer.model?.materials ?? [];
+      glassMaterials = materials.filter((m) => isTintableGlass(m.name || ''));
+      applyTint3D();
+      // Capture the auto-framed center of THIS model, then re-frame with
+      // the nose-shift applied.
+      try {
+        const t = (viewer as any).getCameraTarget();
+        const d = (viewer as any).getDimensions();
+        modelCenter = { x: t.x, y: t.y, z: t.z };
+        modelLength = Math.max(d.x, d.z);
+      } catch {
+        modelCenter = null;
+      }
+      applyAngle();
+      if (!prefetched) {
+        prefetched = true;
+        prefetchOthers();
+      }
+    });
+
     function loadModel(vehicleId: string) {
       const src = `/models3d/${vehicleId}.glb`;
       if (currentSrc === src) return;
       currentSrc = src;
       glassMaterials = [];
+      modelCenter = null;
+      (viewer as any).cameraTarget = 'auto auto auto'; // re-resolve for the new model
       viewer.src = src;
       applyAngle();
-      let tries = 0;
-      const poll = () => {
-        if (currentSrc !== src) return; // superseded
-        const materials = viewer.model?.materials ?? [];
-        // materials belong to the *new* model only once src has swapped in;
-        // model-viewer clears .model while loading, so any list is current.
-        if (materials.length) {
-          glassMaterials = materials.filter((m) => isTintableGlass(m.name || ''));
-          applyTint3D();
-        } else if (tries++ < 150) {
-          setTimeout(poll, 100);
-        }
-      };
-      setTimeout(poll, 100);
     }
 
     // Warm the HTTP cache for the other models so switching vehicles is
@@ -575,21 +602,14 @@ const PRIORITIES = [
     });
 
     // ══ Boot ═══════════════════════════════════════════════════════════
+    // The initial model comes from the markup's src; its glass is harvested
+    // by the permanent 'load' listener above. If the custom element upgraded
+    // and loaded before this script attached the listener, harvest once now.
     currentSrc = '/models3d/sedan.glb'; // matches the src baked into the markup
-    (function pollInitial() {
-      let tries = 0;
-      const poll = () => {
-        const materials = viewer.model?.materials ?? [];
-        if (materials.length) {
-          glassMaterials = materials.filter((m) => isTintableGlass(m.name || ''));
-          applyTint3D();
-          prefetchOthers();
-        } else if (tries++ < 150) {
-          setTimeout(poll, 100);
-        }
-      };
-      poll();
-    })();
+    if (viewer.model?.materials?.length) {
+      glassMaterials = viewer.model.materials.filter((m) => isTintableGlass(m.name || ''));
+      applyTint3D();
+    }
     render();
 
     // ══ PDF configuration download (SunTek-style summary sheet) ═════════
