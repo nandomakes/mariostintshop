@@ -5,7 +5,7 @@ import QuoteCTA from '../components/QuoteCTA.astro';
 import Footer from '../components/Footer.astro';
 import CallFab from '../components/CallFab.astro';
 import { SITE, IMAGES, WHATSAPP_NUMBER } from '../consts';
-import { PHOTO_VEHICLES, zoneIconPhoto as zoneIcon } from '../lib/vehicles-photo';
+import { PHOTO_VEHICLES } from '../lib/vehicles-photo';
 
 // 3D-only visualizer: one optimized GLB per category (public/models3d/*.glb).
 const VEHICLE_IDS = ['sedan', 'suv', 'sport', 'truck'];
@@ -19,10 +19,35 @@ const description =
 const TINT_ZONES = [
   { id: 'rear-side', label: 'Rear side windows' },
   { id: 'front-side', label: 'Front side windows' },
-  { id: 'rear', label: 'Rear window' },
   { id: 'visor', label: 'Visor strip' },
-  { id: 'sunroof', label: 'Sunroof' },
+  { id: 'rear', label: 'Rear window' },
 ];
+
+// Coverage tile icons: a vector sedan profile (nose to the right) with the
+// covered glass highlighted in accent blue. Same silhouette for all zones.
+function sedanZoneIcon(zone: string): string {
+  const on = '#00A8E8';
+  const glass = '#EDF2F6';
+  const body = '#5B6470';
+  const pane = (d: string, id: string) =>
+    `<path d="${d}" fill="${zone === id ? on : glass}"/>`;
+  return (
+    // body silhouette + wheels
+    `<path d="M10 62 L10 56 Q10 51 18 49 L46 44 Q56 27 82 21 L100 17 Q126 13 152 17 L170 21 Q188 25 198 40 L220 46 Q232 50 232 58 L232 63 Q232 67 226 67 L16 67 Q10 67 10 62 Z" fill="${body}"/>` +
+    `<circle cx="58" cy="66" r="11" fill="#2E333B"/><circle cx="188" cy="66" r="11" fill="#2E333B"/>` +
+    `<circle cx="58" cy="66" r="5" fill="#9AA3AE"/><circle cx="188" cy="66" r="5" fill="#9AA3AE"/>` +
+    // rear glass (sloped, left)
+    pane('M62 31 L80 24 L86 41 L68 43 Z', 'rear') +
+    // rear door window
+    pane('M90 23 L120 20 L120 41 L94 41 Z', 'rear-side') +
+    // front door window
+    pane('M126 20 L154 22 L158 41 L126 41 Z', 'front-side') +
+    // windshield (front, right)
+    `<path d="M162 24 L186 39 L164 41 L160 25 Z" fill="${glass}"/>` +
+    // visor strip: top band of the windshield
+    (zone === 'visor' ? `<path d="M161 24 L172 30 L163 31 L160 25 Z" fill="${on}"/>` : '')
+  );
+}
 const SHADES = [
   { id: 'dark', label: 'Dark', vlt: 'VLT 5–35', op: 0.85 },
   { id: 'medium', label: 'Medium', vlt: 'VLT 35–65', op: 0.58 },
@@ -142,7 +167,7 @@ const PRIORITIES = [
             </button>
             <div class="acc-body grid grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]">
               <div class="min-h-0 overflow-hidden">
-                <div class="grid grid-cols-3 gap-2 pb-5 sm:grid-cols-3">
+                <div class="grid grid-cols-2 gap-2 pb-5 sm:grid-cols-4">
                   {
                     TINT_ZONES.map((z) => (
                       <button
@@ -151,8 +176,8 @@ const PRIORITIES = [
                         aria-pressed={z.id === 'front-side' || z.id === 'rear-side' ? 'true' : 'false'}
                         class="zone-tile pressable group flex flex-col items-center gap-1 border border-sand bg-paper px-1.5 pb-2 pt-2.5 transition-colors duration-200 hover:border-ash/60 aria-pressed:border-accent aria-pressed:bg-mint"
                       >
-                        <svg viewBox="20 80 820 240" class="h-7 w-full" aria-hidden="true">
-                          <g set:html={zoneIcon(z.id)} />
+                        <svg viewBox="0 0 242 82" class="h-9 w-full" aria-hidden="true">
+                          <g set:html={sedanZoneIcon(z.id)} />
                         </svg>
                         <span class="text-center text-[10px] font-bold leading-tight text-ink group-aria-pressed:text-accentDk">{z.label}</span>
                       </button>
@@ -266,7 +291,7 @@ const PRIORITIES = [
                 shadow-softness="0.8"
                 exposure="1.1"
                 environment-image="neutral"
-                camera-orbit="-35deg 78deg 85%"
+                camera-orbit="-35deg 78deg 75%"
                 field-of-view="20deg"
                 disable-zoom
                 disable-tap
@@ -376,7 +401,6 @@ const PRIORITIES = [
       'front-side': 'Front side windows',
       rear: 'Rear window',
       visor: 'Visor strip',
-      sunroof: 'Sunroof',
       price: 'Price',
       heat: 'Heat rejection',
       signal: 'Signal clarity',
@@ -394,36 +418,24 @@ const PRIORITIES = [
     const cta = document.getElementById('visualizer-cta') as HTMLAnchorElement;
 
     // ══ 3D viewer ═════════════════════════════════════════════════════
-    type GlbMaterial = {
-      name: string;
-      pbrMetallicRoughness: { setBaseColorFactor(rgba: number[]): void };
-    };
     const viewer = document.getElementById('car-3d-viewer') as HTMLElement & {
       src: string;
       cameraOrbit: string;
       cameraTarget: string;
+      variantName: string | null;
       jumpCameraToGoal(): void;
       toDataURL(type?: string): string;
-      model?: { materials: GlbMaterial[] };
+      model?: { materials: Array<{ name: string }> };
     };
 
-    // Window glass only — never headlights/taillights (RED_GLASS, orange_GLASS,
-    // LightGlass, lamps…). Matches the names baked by scripts/build-models.mjs.
-    const isTintableGlass = (n: string) =>
-      /window_material|^glass/i.test(n) && !/red|orange|light|lamp|lens|luces/i.test(n);
-
-    let glassMaterials: GlbMaterial[] = [];
     let currentSrc = '';
 
-    // Darken the glass to match the selected shade. Alpha is capped at 0.85
-    // and the base keeps a cool blue-gray cast so reflections still read on
-    // the mirror-smooth glass instead of going flat opaque black.
+    // The four shades are baked into every GLB as KHR_materials_variants on
+    // the window-glass primitives only (headlights/taillights excluded at
+    // build time). Switching is declarative and handled by model-viewer
+    // itself — no live material mutation, no race with texture loading.
     function applyTint3D() {
-      if (!glassMaterials.length) return;
-      const t = Math.max(0, Math.min(1, (state.shadeOp - 0.14) / 0.71));
-      const lerp = (a: number, b: number) => a + (b - a) * t;
-      const rgba = [lerp(0.35, 0.012), lerp(0.4, 0.016), lerp(0.45, 0.022), lerp(0.3, 0.85)];
-      for (const mat of glassMaterials) mat.pbrMetallicRoughness.setBaseColorFactor(rgba);
+      viewer.variantName = state.shade;
     }
 
     // Fixed ¾ camera angles. The Raptor rip faces the opposite way from the
@@ -438,7 +450,7 @@ const PRIORITIES = [
     function applyAngle() {
       const front = FRONT_THETA[state.vehicle] ?? -35;
       const theta = angle === 'front' ? front : front + 180;
-      viewer.cameraOrbit = `${theta}deg 78deg 85%`;
+      viewer.cameraOrbit = `${theta}deg 78deg 75%`;
       if (modelCenter) {
         const facing = front === -35 ? 1 : -1;
         const dir = facing * (angle === 'front' ? 1 : -1);
@@ -454,15 +466,13 @@ const PRIORITIES = [
       })
     );
 
-    // Harvest the tintable glass every time a model finishes loading. This
-    // is event-driven with NO time budget: model-viewer defers loading until
-    // the element scrolls into view, so any timeout here would silently give
-    // up on slower connections or below-the-fold layouts — which is exactly
-    // how tint stopped applying in production.
     let prefetched = false;
     viewer.addEventListener('load', () => {
-      const materials = viewer.model?.materials ?? [];
-      glassMaterials = materials.filter((m) => isTintableGlass(m.name || ''));
+      // Force the variant onto the freshly loaded model: if variantName
+      // already equals the target (e.g. 'dark' carried over from the previous
+      // vehicle), assigning the same value is a no-op and the new model would
+      // stay on its clear default — reset to null first.
+      viewer.variantName = null;
       applyTint3D();
       // Capture the auto-framed center of THIS model, then re-frame with
       // the nose-shift applied.
@@ -485,7 +495,6 @@ const PRIORITIES = [
       const src = `/models3d/${vehicleId}.glb`;
       if (currentSrc === src) return;
       currentSrc = src;
-      glassMaterials = [];
       modelCenter = null;
       (viewer as any).cameraTarget = 'auto auto auto'; // re-resolve for the new model
       viewer.src = src;
@@ -606,10 +615,6 @@ const PRIORITIES = [
     // by the permanent 'load' listener above. If the custom element upgraded
     // and loaded before this script attached the listener, harvest once now.
     currentSrc = '/models3d/sedan.glb'; // matches the src baked into the markup
-    if (viewer.model?.materials?.length) {
-      glassMaterials = viewer.model.materials.filter((m) => isTintableGlass(m.name || ''));
-      applyTint3D();
-    }
     render();
 
     // ══ PDF configuration download (SunTek-style summary sheet) ═════════
