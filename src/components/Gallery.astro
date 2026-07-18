@@ -19,7 +19,8 @@ const posts = await getInstagramFeed(8);
     <div class="relative mt-12">
       <div
         id="gallery-track"
-        class="no-scrollbar flex snap-x snap-proximity gap-4 overflow-x-auto pb-2"
+        class="no-scrollbar flex gap-4 overflow-x-auto pb-2"
+        style="overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch;"
       >
         {
           posts.map((img) => (
@@ -27,7 +28,7 @@ const posts = await getInstagramFeed(8);
               href={img.href}
               target="_blank"
               rel="noopener noreferrer"
-              class="group relative w-[260px] shrink-0 snap-start overflow-hidden sm:w-[300px]"
+              class="group relative w-[260px] shrink-0 overflow-hidden sm:w-[300px]"
             >
               <img
                 src={img.src}
@@ -35,6 +36,8 @@ const posts = await getInstagramFeed(8);
                 width="600"
                 height="600"
                 loading="lazy"
+                decoding="async"
+                draggable="false"
                 class="aspect-square w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
               />
               <span
@@ -121,5 +124,38 @@ const posts = await getInstagramFeed(8);
     window.addEventListener('resize', sync);
     // Wait a frame so layout (and lazy images) settle before first measure.
     requestAnimationFrame(sync);
+
+    // Desktop drag-to-scroll: 1:1 with the pointer, no snap fighting back —
+    // this is what makes the strip feel smooth instead of sticky.
+    let dragging = false;
+    let startX = 0;
+    let startScroll = 0;
+    let moved = false;
+    track.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'mouse') return; // touch already scrolls natively
+      dragging = true;
+      moved = false;
+      startX = e.clientX;
+      startScroll = track.scrollLeft;
+      track.style.cursor = 'grabbing';
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > 4) moved = true;
+      track.scrollLeft = startScroll - dx;
+    });
+    window.addEventListener('pointerup', () => {
+      dragging = false;
+      track.style.cursor = '';
+    });
+    // Swallow the click that ends a drag so links don't open accidentally.
+    track.addEventListener('click', (e) => {
+      if (moved) {
+        e.preventDefault();
+        e.stopPropagation();
+        moved = false;
+      }
+    }, true);
   }
 </script>

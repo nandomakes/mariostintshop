@@ -87,8 +87,8 @@ export const GLASS_LOOK = {
   medium: [0.17, 0.19, 0.21, 0.66],
   dark: [0.02, 0.024, 0.03, 0.88],
 };
-const GLASS_METALLIC = 1;
-const GLASS_ROUGHNESS = 0.04;
+const GLASS_METALLIC = 0.5;
+const GLASS_ROUGHNESS = 0.03;
 
 const ZONE_DEBUG_COLORS = {
   glass_windshield: [1, 0, 0, 1],
@@ -267,26 +267,74 @@ for (const [vehicle, cfg] of Object.entries(MODELS)) {
       }
       const visorLine = wsTop - (wsTop - wsBottom) * 0.3; // top 30% of windshield
 
-      // Pass 2: bucket every triangle.
-      const zoneMats = {};
-      const zoneOf = (vC, cL) => {
+      // Pass 2: find the REAL panes. Each physical pane (a door window, the
+      // windshield, the rear glass, a lamp lens) is a connected component of
+      // the glass mesh — triangles sharing vertices. Zoning whole components
+      // instead of individual triangles means the tint never cuts mid-pane.
+      const zoneOfPoint = (vC, cL) => {
         if ((vC - vMid) * up < 0) return 'glass_lamps';
         if (isLampFrac(cL)) return 'glass_lamps';
         const f = noseFrac(cL);
-        if (f < cuts.ws) return vC * up > visorLine ? 'glass_visor' : 'glass_windshield';
+        if (f < cuts.ws) return 'ws'; // visor split happens per-triangle below
         if (f < cuts.front) return 'glass_front';
         if (f < cuts.rearside) return 'glass_rearside';
         return 'glass_rearwin';
       };
+      const zoneMats = {};
       const buffer = root.listBuffers()[0];
       let counts = {};
       for (const { mesh, prim } of glassPrims) {
         const pos = prim.getAttribute('POSITION');
         const idx = prim.getIndices();
+        const triCount = idx.getCount() / 3;
+
+        // Union-find over triangles via shared vertex indices.
+        const parent = new Int32Array(triCount).fill(-1);
+        const find = (a) => { while (parent[a] >= 0) a = parent[a]; return a; };
+        const union = (a, b) => {
+          a = find(a); b = find(b);
+          if (a !== b) parent[b] = a;
+        };
+        const vertOwner = new Map();
+        for (let t = 0; t < triCount; t++) {
+          for (let k = 0; k < 3; k++) {
+            const vi = idx.getScalar(t * 3 + k);
+            if (vertOwner.has(vi)) union(vertOwner.get(vi), t);
+            else vertOwner.set(vi, t);
+          }
+        }
+
+        // Vote each component's zone by its triangles' point-classification;
+        // majority wins so a pane never splits across zones.
+        const compVotes = new Map();
+        const triZone = new Array(triCount);
+        for (let t = 0; t < triCount; t++) {
+          const z = zoneOfPoint(centroid(pos, idx, t * 3, V), centroid(pos, idx, t * 3, L));
+          triZone[t] = z;
+          const c = find(t);
+          const votes = compVotes.get(c) ?? (compVotes.set(c, {}), compVotes.get(c));
+          votes[z] = (votes[z] || 0) + 1;
+        }
+        // Majority zone per component; if a component's votes are heavily
+        // mixed (panes welded together in the source), fall back to
+        // per-triangle zoning for that component only.
+        const compZone = new Map();
+        for (const [c, votes] of compVotes) {
+          const sorted = Object.entries(votes).sort((a, b) => b[1] - a[1]);
+          const total = sorted.reduce((s, [, n]) => s + n, 0);
+          compZone.set(c, sorted[0][1] / total >= 0.7 ? sorted[0][0] : null);
+        }
+
+        // Bucket triangles by their COMPONENT's zone. The windshield pane is
+        // the one exception: it splits per-triangle at the visor line.
         const buckets = {};
-        for (let t = 0; t < idx.getCount(); t += 3) {
-          const z = zoneOf(centroid(pos, idx, t, V), centroid(pos, idx, t, L));
-          (buckets[z] ??= []).push(idx.getScalar(t), idx.getScalar(t + 1), idx.getScalar(t + 2));
+        for (let t = 0; t < triCount; t++) {
+          let z = compZone.get(find(t)) ?? triZone[t]; // null → mixed comp → per-tri
+          if (z === 'ws') {
+            const vC = centroid(pos, idx, t * 3, V);
+            z = vC * up > visorLine ? 'glass_visor' : 'glass_windshield';
+          }
+          (buckets[z] ??= []).push(idx.getScalar(t * 3), idx.getScalar(t * 3 + 1), idx.getScalar(t * 3 + 2));
         }
         const zones = Object.keys(buckets);
         zones.forEach((z, i) => {

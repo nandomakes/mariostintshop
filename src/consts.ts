@@ -110,10 +110,10 @@ export const IMAGES = {
     height: 1400,
   },
   install: {
-    src: '/images/lambo.svg',
+    src: '/images/lambo-hero.webp',
     alt: 'Lamborghini with premium tint and paint protection',
-    width: 774,
-    height: 284,
+    width: 1400,
+    height: 798,
   },
   detail: {
     src: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1400&h=1000&q=80',
@@ -494,14 +494,14 @@ export const TESTIMONIALS = [
   },
 ];
 
-// ── Instagram gallery (placeholder photos — ⚠️ REPLACE with real work) ──
+// ── Instagram gallery (real posts from @mariostintshop) ─────────────
 export const GALLERY = [
-  { src: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=600&h=600&q=80', alt: 'Sports car detail' },
-  { src: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=600&h=600&q=80', alt: 'Glossy dark car surface' },
-  { src: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=600&h=600&q=80', alt: 'Muscle car front' },
-  { src: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=600&h=600&q=80', alt: 'Premium vehicle' },
-  { src: 'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=600&h=600&q=80', alt: 'Film installation' },
-  { src: 'https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=600&h=600&q=80', alt: 'Car rear detail' },
+  { src: '/images/instagram/ig-1.webp', alt: "Window tint work by Mario's Tint Shop" },
+  { src: '/images/instagram/ig-2.webp', alt: "Paint protection film install by Mario's Tint Shop" },
+  { src: '/images/instagram/ig-3.webp', alt: "Tinted vehicle at Mario's Tint Shop" },
+  { src: '/images/instagram/ig-4.webp', alt: "Detail work by Mario's Tint Shop" },
+  { src: '/images/instagram/ig-5.webp', alt: "Fresh tint install by Mario's Tint Shop" },
+  { src: '/images/instagram/ig-6.webp', alt: "Finished vehicle by Mario's Tint Shop" },
 ];
 
 // ── Navigation ──────────────────────────────────────────────────────

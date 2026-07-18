@@ -233,7 +233,7 @@ const CFGS: Cfg[] = [
 export const PHOTO_VEHICLES: PhotoVehicle[] = CFGS.map((c) => ({
   id: c.id,
   label: c.label,
-  photo: `/images/vehicles/${c.id}.png`,
+  photo: `/images/vehicles/${c.id}-icon.png`,
   overlay: buildOverlay(c),
 }));
 

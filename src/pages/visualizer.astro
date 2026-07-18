@@ -5,7 +5,7 @@ import QuoteCTA from '../components/QuoteCTA.astro';
 import Footer from '../components/Footer.astro';
 import CallFab from '../components/CallFab.astro';
 import { SITE, IMAGES, WHATSAPP_NUMBER } from '../consts';
-import { PHOTO_VEHICLES, sedanZonePath } from '../lib/vehicles-photo';
+import { PHOTO_VEHICLES } from '../lib/vehicles-photo';
 
 // 3D-only visualizer: one optimized GLB per category (public/models3d/*.glb).
 const VEHICLE_IDS = ['sedan', 'suv', 'sport', 'truck'];
@@ -23,9 +23,22 @@ const TINT_ZONES = [
   { id: 'rear', label: 'Rear window' },
 ];
 
-// Coverage tiles use the sedan side-view photo (the same imagery as the
-// vehicle picker) with the covered glass vectorized on top in accent blue.
-const zoneTiles = TINT_ZONES.map((z) => ({ ...z, path: sedanZonePath(z.id) }));
+// Coverage tiles use the sedan icon (528×191, nose to the RIGHT, window
+// cutouts transparent). Selected glass shows as accent blue: for the two
+// door windows the blue sits UNDER the icon and shines through the cutout
+// (pixel-perfect, the icon itself masks it); visor and rear window are
+// bands drawn on top of the solid silhouette.
+const ZONE_ICON: Record<string, { under?: string; over?: string }> = {
+  // front door window cutout bbox (295..405, 16..64)
+  'front-side': { under: 'M293 14 H408 V66 H293 Z' },
+  // rear door window cutout bbox (172..283, 17..67)
+  'rear-side': { under: 'M170 15 H287 V69 H170 Z' },
+  // visor: top band of the windshield slope (solid area right of the front window)
+  visor: { over: 'M404 20 L426 24 L440 39 L414 34 Z' },
+  // rear window: the sloped glass area left of the rear side window
+  rear: { over: 'M172 22 L148 34 L136 55 L162 52 Z' },
+};
+const zoneTiles = TINT_ZONES.map((z) => ({ ...z, icon: ZONE_ICON[z.id] ?? {} }));
 const SHADES = [
   { id: 'dark', label: 'Dark', vlt: 'VLT 5–35', op: 0.85 },
   { id: 'medium', label: 'Medium', vlt: 'VLT 35–65', op: 0.58 },
@@ -154,9 +167,10 @@ const PRIORITIES = [
                         aria-pressed={z.id === 'front-side' || z.id === 'rear-side' ? 'true' : 'false'}
                         class="zone-tile pressable group flex flex-col items-center gap-1 border border-sand bg-paper px-1.5 pb-2 pt-2.5 transition-colors duration-200 hover:border-ash/60 aria-pressed:border-accent aria-pressed:bg-mint"
                       >
-                        <svg viewBox="30 70 800 265" class="h-10 w-full" aria-hidden="true">
-                          <image href="/images/vehicles/sedan.png" x="0" y="0" width="860" height="340" />
-                          <path d={z.path} fill="#00A8E8" fill-opacity="0.9" stroke="#0077B6" stroke-width="1.5" />
+                        <svg viewBox="0 0 528 191" class="h-10 w-full" aria-hidden="true">
+                          {z.icon.under && <path d={z.icon.under} fill="#00A8E8" />}
+                          <image href="/images/vehicles/sedan-icon.png" x="0" y="0" width="528" height="191" />
+                          {z.icon.over && <path d={z.icon.over} fill="#00A8E8" />}
                         </svg>
                         <span class="text-center text-[10px] font-bold leading-tight text-ink group-aria-pressed:text-accentDk">{z.label}</span>
                       </button>
@@ -280,7 +294,7 @@ const PRIORITIES = [
                 shadow-intensity="0.9"
                 shadow-softness="0.8"
                 exposure="1.1"
-                environment-image="neutral"
+                environment-image="/models3d/studio-env.jpg"
                 camera-orbit="-35deg 78deg 75%"
                 field-of-view="20deg"
                 disable-zoom
