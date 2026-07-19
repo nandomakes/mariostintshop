@@ -89,7 +89,7 @@ export const IMAGES = {
     src: '/images/tesla-1.webp',
     alt: 'Tesla with premium tint and protection',
     width: 1400,
-    height: 786,
+    height: 933,
   },
   office: {
     src: '/images/office.webp',
@@ -101,7 +101,7 @@ export const IMAGES = {
     src: '/images/office-2.webp',
     alt: 'Commercial building with window film installed',
     width: 1400,
-    height: 1050,
+    height: 1400,
   },
   hero: {
     src: 'https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=1200&h=1400&q=80',
@@ -424,8 +424,8 @@ export const SERVICES: Service[] = [
       { q: 'What kinds of commercial film do you offer?', a: 'Solar/heat-control, glare-reduction, decorative and privacy frost, reflective, and safety/security films for storefronts and office buildings.' },
       { q: 'Can film really lower our energy bills?', a: 'Yes. By rejecting solar heat gain, quality window film reduces cooling load and can deliver a meaningful return on energy costs.' },
     ],
-    image: 'office',
-    pageImage: 'office2',
+    image: 'office2',
+    pageImage: 'office',
   },
 ];
 
