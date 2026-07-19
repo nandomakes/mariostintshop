@@ -113,7 +113,7 @@ export const IMAGES = {
     src: '/images/lambo-hero.webp',
     alt: 'Lamborghini with premium tint and paint protection',
     width: 1400,
-    height: 798,
+    height: 438,
   },
   detail: {
     src: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1400&h=1000&q=80',
