@@ -23,22 +23,15 @@ const TINT_ZONES = [
   { id: 'rear', label: 'Rear window' },
 ];
 
-// Coverage tiles use the sedan icon (528×191, nose to the RIGHT, window
-// cutouts transparent). Selected glass shows as accent blue: for the two
-// door windows the blue sits UNDER the icon and shines through the cutout
-// (pixel-perfect, the icon itself masks it); visor and rear window are
-// bands drawn on top of the solid silhouette.
-const ZONE_ICON: Record<string, { under?: string; over?: string }> = {
-  // front door window cutout bbox (295..405, 16..64)
-  'front-side': { under: 'M293 14 H408 V66 H293 Z' },
-  // rear door window cutout bbox (172..283, 17..67)
-  'rear-side': { under: 'M170 15 H287 V69 H170 Z' },
-  // visor: top band of the windshield slope (solid area right of the front window)
-  visor: { over: 'M404 20 L426 24 L440 39 L414 34 Z' },
-  // rear window: the sloped glass area left of the rear side window
-  rear: { over: 'M172 22 L148 34 L136 55 L162 52 Z' },
+// Coverage tiles: a dedicated sedan icon per zone with that zone's glass
+// highlighted in accent blue (public/images/vehicles/<file>.png).
+const ZONE_ICON_FILE: Record<string, string> = {
+  'front-side': 'front-side-windows',
+  'rear-side': 'rear-side-windows',
+  visor: 'visor-strip',
+  rear: 'rear-window',
 };
-const zoneTiles = TINT_ZONES.map((z) => ({ ...z, icon: ZONE_ICON[z.id] ?? {} }));
+const zoneTiles = TINT_ZONES.map((z) => ({ ...z, iconFile: ZONE_ICON_FILE[z.id] }));
 const SHADES = [
   { id: 'dark', label: 'Dark', vlt: 'VLT 5–35', op: 0.85 },
   { id: 'medium', label: 'Medium', vlt: 'VLT 35–65', op: 0.58 },
@@ -167,11 +160,14 @@ const PRIORITIES = [
                         aria-pressed={z.id === 'front-side' || z.id === 'rear-side' ? 'true' : 'false'}
                         class="zone-tile pressable group flex flex-col items-center gap-1 border border-sand bg-paper px-1.5 pb-2 pt-2.5 transition-colors duration-200 hover:border-ash/60 aria-pressed:border-accent aria-pressed:bg-mint"
                       >
-                        <svg viewBox="0 0 528 191" class="h-10 w-full" aria-hidden="true">
-                          {z.icon.under && <path d={z.icon.under} fill="#00A8E8" />}
-                          <image href="/images/vehicles/sedan-icon.png" x="0" y="0" width="528" height="191" />
-                          {z.icon.over && <path d={z.icon.over} fill="#00A8E8" />}
-                        </svg>
+                        <img
+                          src={`/images/vehicles/${z.iconFile}.png`}
+                          alt=""
+                          width="528"
+                          height="191"
+                          loading="lazy"
+                          class="h-10 w-full object-contain"
+                        />
                         <span class="text-center text-[10px] font-bold leading-tight text-ink group-aria-pressed:text-accentDk">{z.label}</span>
                       </button>
                     ))
