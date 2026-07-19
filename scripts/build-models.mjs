@@ -43,6 +43,7 @@ const MODELS = {
     glass: /Window_Material$/i,
     bodyPaint: /Paint_Material$/i,
     bodyColor: '#13b545',
+    blackParts: /Wheel|Grille/i, // carbon-black rims + grille
     simplifyRatio: 0.6,
     noseSign: +1,
     upSign: +1,
@@ -150,6 +151,11 @@ for (const [vehicle, cfg] of Object.entries(MODELS)) {
         mat.setBaseColorTexture(null);
         mat.setBaseColorFactor(hexToLinear(cfg.bodyColor));
       }
+    } else if (cfg.blackParts?.test(name)) {
+      mat.setBaseColorTexture(null);
+      mat.setBaseColorFactor(hexToLinear('#1c1c1c'));
+      mat.setMetallicFactor(0.6);
+      mat.setRoughnessFactor(0.35);
     } else if (/chrome|crome/i.test(name)) {
       mat.setMetallicFactor(1);
       mat.setRoughnessFactor(0.12);
