@@ -67,6 +67,12 @@ export const IMAGES = {
     height: 1241,
   },
   // Per-service imagery (card preview + service page).
+  tinting1: {
+    src: '/images/tinting-1.webp',
+    alt: 'White SUV with freshly installed window tint in the shop',
+    width: 1600,
+    height: 893,
+  },
   tinting: {
     src: '/images/tinting-2.webp',
     alt: 'Car window tinting installation',
@@ -273,6 +279,7 @@ export const SERVICES: Service[] = [
       { q: 'Will the tint turn purple over time?', a: 'No. Our premium ceramic and carbon films are dyed and constructed to never fade to purple, unlike low-cost dyed films.' },
     ],
     image: 'tinting',
+    pageImage: 'tinting1',
   },
   {
     id: 'ppf',
