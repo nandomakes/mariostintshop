@@ -41,6 +41,8 @@ const MODELS = {
   sedan: {
     src: '2022_bmw_m5_cs.glb',
     glass: /Window_Material$/i,
+    bodyPaint: /Paint_Material$/i,
+    bodyColor: '#13b545',
     simplifyRatio: 0.6,
     noseSign: +1,
     upSign: +1,
@@ -69,6 +71,8 @@ const MODELS = {
   truck: {
     src: 'ford-f150-raptor/source/Ford Raptor.glb',
     glass: /^glass/i,
+    bodyPaint: /PAINT_1/i, // body only, not PAINT_2 (tyre wall)
+    bodyColor: '#cc1518',
     simplifyRatio: 0.5,
     stripVertexColors: true,
     lampMeshes: ['Object_104'],
@@ -87,6 +91,13 @@ export const GLASS_LOOK = {
   medium: [0.17, 0.19, 0.21, 0.66],
   dark: [0.02, 0.024, 0.03, 0.88],
 };
+// Hex sRGB → linear RGBA (glTF baseColorFactor is linear).
+function hexToLinear(hex) {
+  const s = (v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+  const n = parseInt(hex.replace('#', ''), 16);
+  return [s(((n >> 16) & 255) / 255), s(((n >> 8) & 255) / 255), s((n & 255) / 255), 1];
+}
+
 const GLASS_METALLIC = 0.5;
 const GLASS_ROUGHNESS = 0.03;
 
@@ -135,6 +146,10 @@ for (const [vehicle, cfg] of Object.entries(MODELS)) {
     } else if (/paint|coloured/i.test(name)) {
       mat.setMetallicFactor(0.4);
       mat.setRoughnessFactor(0.22);
+      if (cfg.bodyColor && cfg.bodyPaint?.test(name)) {
+        mat.setBaseColorTexture(null);
+        mat.setBaseColorFactor(hexToLinear(cfg.bodyColor));
+      }
     } else if (/chrome|crome/i.test(name)) {
       mat.setMetallicFactor(1);
       mat.setRoughnessFactor(0.12);
