@@ -1,0 +1,56 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import CallFab from '../components/CallFab.astro';
+import Logo from '../components/Logo.astro';
+import { SITE } from '../consts';
+
+const title = `Page not found | ${SITE.brand}`;
+const description = "The page you're looking for doesn't exist — head back home or check out our services.";
+---
+
+<Layout title={title} description={description}>
+  <Header />
+  <main id="content">
+    <section class="relative overflow-hidden border-b border-line bg-ink">
+      <div class="relative mx-auto flex min-h-[70vh] max-w-3xl flex-col items-center justify-center px-5 py-24 text-center">
+        <nav class="reveal text-[11px] font-bold uppercase tracking-[0.16em] text-smoke" aria-label="Breadcrumb">
+          <a href="/" class="transition-colors hover:text-paper">Home</a>
+          <span class="mx-2 text-line">/</span>
+          <span class="text-accent">Page not found</span>
+        </nav>
+
+        <Logo class="reveal mt-8 h-14 w-auto opacity-90" />
+
+        <p class="reveal headline mt-8 text-[clamp(3.5rem,14vw,7rem)] leading-none text-paper">
+          404
+        </p>
+        <h1 class="reveal headline mt-3 text-[clamp(1.3rem,3vw,2rem)] text-paper">
+          This page rolled off the lot
+        </h1>
+        <p class="reveal mx-auto mt-4 max-w-[52ch] text-[15px] leading-relaxed text-smoke">
+          The page you're looking for doesn't exist or may have moved. Let's get you back on the road —
+          check out our tint visualizer or head back to the homepage.
+        </p>
+
+        <div class="reveal mt-8 flex flex-wrap items-center justify-center gap-3">
+          <a
+            href="/"
+            class="pressable sticker bg-accent px-8 py-4 text-center text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
+          >
+            Back to Home →
+          </a>
+          <a
+            href="/visualizer"
+            class="pressable border border-line bg-transparent px-8 py-4 text-center text-xs font-bold uppercase tracking-[0.12em] text-paper transition-colors duration-200 hover:border-accent hover:text-accent"
+          >
+            Try the Tint Visualizer
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+  <CallFab />
+</Layout>

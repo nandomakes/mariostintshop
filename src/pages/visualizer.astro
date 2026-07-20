@@ -17,9 +17,9 @@ const description =
 
 // ── Control data ─────────────────────────────────────────────────────
 const TINT_ZONES = [
-  { id: 'rear-side', label: 'Rear side windows' },
   { id: 'front-side', label: 'Front side windows' },
-  { id: 'visor', label: 'Visor strip' },
+  { id: 'rear-side', label: 'Rear side windows' },
+  { id: 'visor', label: 'Front window' },
   { id: 'rear', label: 'Rear window' },
 ];
 
@@ -100,14 +100,16 @@ const PRIORITIES = [
                   i === 0 ? 'border-accent bg-mint' : 'border-sand hover:border-ash/60',
                 ]}
               >
-                <img
-                  src={v.photo}
-                  alt=""
-                  width="120"
-                  height="47"
-                  loading="lazy"
-                  class="veh-thumb h-9 w-full object-contain transition-[filter,opacity] duration-200"
-                />
+                <span class="veh-thumb-frame flex h-9 w-full items-center justify-center overflow-hidden" data-veh={v.id}>
+                  <img
+                    src={v.photo}
+                    alt=""
+                    width="120"
+                    height="47"
+                    loading="lazy"
+                    class="veh-thumb h-full w-full object-contain transition-[filter,opacity] duration-200"
+                  />
+                </span>
                 <span class="text-[10px] font-bold uppercase tracking-[0.14em] text-ink transition-colors group-aria-checked:text-accentDk">
                   {v.label}
                 </span>
@@ -289,15 +291,20 @@ const PRIORITIES = [
                 bounds="tight"
                 shadow-intensity="0.9"
                 shadow-softness="0.8"
-                exposure="1.1"
-                environment-image="/models3d/studio-env.jpg"
-                camera-orbit="-35deg 78deg 75%"
+                exposure="1.0"
+                tone-mapping="neutral"
+                environment-image="/models3d/studio-env.hdr"
+                camera-orbit="-35deg 78deg 54%"
                 field-of-view="20deg"
                 disable-zoom
                 disable-tap
                 interaction-prompt="none"
                 aria-label="3D vehicle with the selected tint applied to the glass"
               ></model-viewer>
+              <div id="model-loading" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white">
+                <span class="model-spinner" aria-hidden="true"></span>
+                <span id="model-loading-pct" class="text-[11px] font-bold uppercase tracking-[0.14em] text-ink">0%</span>
+              </div>
             </div>
             <p class="mt-2 text-[10px] leading-relaxed text-ash">
               Switch between front and rear view · pick a tint shade to see it on the glass
@@ -348,6 +355,15 @@ const PRIORITIES = [
       opacity: 1;
     }
 
+    /* Vehicle-type icons: source PNGs have different framing/aspect ratios
+       (sedan 2.76:1, sport 3.02:1, suv 2.32:1, truck 2.35:1). A fixed-height
+       flex frame + object-fit: contain scales every icon to the same
+       rendered height (no cropping), so the four line up at matching
+       visual weight regardless of source canvas size. */
+    .veh-thumb-frame[data-veh='sport'] .veh-thumb {
+      transform: scale(0.94);
+    }
+
     /* Accordions: +/− icon morph and body collapse. */
     .acc[data-open='false'] .acc-body {
       grid-template-rows: 0fr;
@@ -364,6 +380,32 @@ const PRIORITIES = [
     @media (prefers-reduced-motion: reduce) {
       .acc-body {
         transition: none !important;
+      }
+    }
+
+    /* 3D model loading overlay */
+    #model-loading {
+      transition: opacity 200ms ease;
+    }
+    #model-loading[hidden] {
+      display: none;
+    }
+    .model-spinner {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 3px solid var(--tw-color-sand, #eeeeee);
+      border-top-color: #00a8ff;
+      animation: model-spin 800ms linear infinite;
+    }
+    @keyframes model-spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .model-spinner {
+        animation-duration: 1600ms;
       }
     }
   </style>
@@ -391,7 +433,7 @@ const PRIORITIES = [
       'rear-side': 'Rear side windows',
       'front-side': 'Front side windows',
       rear: 'Rear window',
-      visor: 'Visor strip',
+      visor: 'Front window',
       price: 'Price',
       heat: 'Heat rejection',
       signal: 'Signal clarity',
@@ -424,12 +466,28 @@ const PRIORITIES = [
 
     let currentSrc = '';
 
+    // ══ Loading overlay ═══════════════════════════════════════════════
+    const loadingEl = document.getElementById('model-loading')!;
+    const loadingPct = document.getElementById('model-loading-pct')!;
+    function showLoading() {
+      loadingPct.textContent = '0%';
+      loadingEl.hidden = false;
+    }
+    function hideLoading() {
+      loadingEl.hidden = true;
+    }
+    viewer.addEventListener('progress', (e: Event) => {
+      const detail = (e as CustomEvent<{ totalProgress: number }>).detail;
+      const pct = Math.round((detail?.totalProgress ?? 0) * 100);
+      loadingPct.textContent = `${pct}%`;
+    });
+
     // Glass looks per shade — must match GLASS_LOOK in scripts/build-models.mjs.
     const GLASS_LOOK: Record<string, number[]> = {
-      clear: [0.8, 0.84, 0.88, 0.18],
-      light: [0.5, 0.54, 0.58, 0.42],
-      medium: [0.17, 0.19, 0.21, 0.66],
-      dark: [0.02, 0.024, 0.03, 0.88],
+      clear: [0.8, 0.84, 0.88, 0.08],
+      light: [0.5, 0.54, 0.58, 0.22],
+      medium: [0.17, 0.19, 0.21, 0.36],
+      dark: [0.02, 0.024, 0.03, 0.5],
     };
     // Each coverage zone owns a glass material, split at build time.
     // glass_windshield and glass_lamps are never tinted.
@@ -463,9 +521,8 @@ const PRIORITIES = [
     }
     setInterval(applyTint3D, 700);
 
-    // Fixed ¾ camera angles. The Raptor rip faces the opposite way from the
-    // other three models, so its front theta is offset 180°.
-    const FRONT_THETA: Record<string, number> = { sedan: -35, suv: -35, sport: -35, truck: 145 };
+    // Fixed ¾ camera angles. All four models face the same way.
+    const FRONT_THETA: Record<string, number> = { sedan: -35, suv: -35, sport: -35, truck: -35 };
     let angle: 'front' | 'rear' = 'front';
     // Auto-framing centers the 3D bounding box, but a ¾ view carries more
     // visual mass toward the near end — nudge the camera target 7% of the
@@ -475,7 +532,7 @@ const PRIORITIES = [
     function applyAngle() {
       const front = FRONT_THETA[state.vehicle] ?? -35;
       const theta = angle === 'front' ? front : front + 180;
-      viewer.cameraOrbit = `${theta}deg 78deg 75%`;
+      viewer.cameraOrbit = `${theta}deg 78deg 54%`;
       if (modelCenter) {
         const facing = front === -35 ? 1 : -1;
         const dir = facing * (angle === 'front' ? 1 : -1);
@@ -493,6 +550,7 @@ const PRIORITIES = [
 
     let prefetched = false;
     viewer.addEventListener('load', () => {
+      hideLoading();
       applyTint3D();
       // Capture the auto-framed center of THIS model, then re-frame with
       // the nose-shift applied.
@@ -516,6 +574,7 @@ const PRIORITIES = [
       if (currentSrc === src) return;
       currentSrc = src;
       modelCenter = null;
+      showLoading();
       (viewer as any).cameraTarget = 'auto auto auto'; // re-resolve for the new model
       viewer.src = src;
       applyAngle();
@@ -635,6 +694,7 @@ const PRIORITIES = [
     // by the permanent 'load' listener above. If the custom element upgraded
     // and loaded before this script attached the listener, harvest once now.
     currentSrc = '/models3d/sedan.glb'; // matches the src baked into the markup
+    showLoading();
     render();
 
     // ══ PDF configuration download (SunTek-style summary sheet) ═════════
@@ -651,49 +711,113 @@ const PRIORITIES = [
         const frontTinted = state.tintZones.has('front-side');
         const legal = !frontTinted || SHADE_META[state.shade].frontLegal;
 
+        // Brand palette (matches Tailwind theme: ink/paper/accent/char/sand).
+        const INK: [number, number, number] = [17, 17, 17];
+        const PAPER: [number, number, number] = [255, 255, 255];
+        const ACCENT: [number, number, number] = [0, 168, 255];
+        const CHAR: [number, number, number] = [51, 51, 51];
+        const SAND: [number, number, number] = [238, 238, 238];
+        const SMOKE: [number, number, number] = [163, 163, 163];
+
+        // The site's display/body fonts (Special Gothic Expanded One, Inter)
+        // ship only as woff/woff2 (self-hosted via @fontsource), which
+        // jsPDF's TTF-only font embedding can't parse — embedding would
+        // either silently fail or throw mid-render. Helvetica bold/normal,
+        // set uppercase to echo the display font's blocky industrial look,
+        // is the robust choice here: it always renders correctly.
+        const displayFont = 'helvetica';
+        const displayStyle: 'bold' | 'normal' = 'bold';
+        const bodyFont = 'helvetica';
+
+        // Logo: rasterize the site SVG onto a canvas (jsPDF needs a raster).
+        let logoData: string | null = null;
+        let logoRatio = 1;
+        try {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          await new Promise<void>((resolve, reject) => {
+            img.onload = () => resolve();
+            img.onerror = () => reject(new Error('logo load failed'));
+            img.src = '/images/logo-mario.svg';
+          });
+          const canvas = document.createElement('canvas');
+          const size = 256;
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext('2d')!;
+          ctx.drawImage(img, 0, 0, size, size);
+          logoData = canvas.toDataURL('image/png');
+          logoRatio = img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1;
+        } catch {
+          /* logo unavailable — header still carries the brand text */
+        }
+
         // Header band
-        doc.setFillColor(11, 21, 36);
+        doc.setFillColor(...INK);
         doc.rect(0, 0, W, 30, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFont('helvetica', 'bold');
+        let headerTextX = 14;
+        if (logoData) {
+          const logoH = 16;
+          const logoW = logoH * logoRatio;
+          doc.addImage(logoData, 'PNG', 14, 7, logoW, logoH, undefined, 'FAST');
+          headerTextX = 14 + logoW + 5;
+        }
+        doc.setTextColor(...PAPER);
+        doc.setFont(displayFont, displayStyle);
         doc.setFontSize(16);
-        doc.text("MARIO'S TINT SHOP", 14, 13);
+        doc.text("MARIO'S TINT SHOP", headerTextX, 13);
         doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        doc.text('Window Tint Configuration · Murfreesboro, TN', 14, 20);
+        doc.setFont(bodyFont, 'normal');
+        doc.setTextColor(...ACCENT);
+        doc.text('Window Tint Configuration · Murfreesboro, TN', headerTextX, 20);
         doc.setFontSize(8);
+        doc.setTextColor(...PAPER);
         doc.text(new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }), W - 14, 13, { align: 'right' });
 
-        // Vehicle snapshot from the 3D viewer
+        // Vehicle snapshot from the 3D viewer, fit within the box without
+        // stretching (the stage is 860:520 ≈ 1.65:1, not the box's own ratio).
         try {
           const shot = viewer.toDataURL('image/png');
-          doc.setFillColor(255, 255, 255);
-          doc.setDrawColor(224, 219, 209);
-          doc.rect(14, 38, W - 28, 92, 'S');
-          doc.addImage(shot, 'PNG', 16, 40, W - 32, 88, undefined, 'FAST');
+          const boxX = 14, boxY = 38, boxW = W - 28, boxH = 92;
+          doc.setFillColor(...PAPER);
+          doc.setDrawColor(...SAND);
+          doc.rect(boxX, boxY, boxW, boxH, 'FD');
+          const shotRatio = viewer.clientWidth && viewer.clientHeight ? viewer.clientWidth / viewer.clientHeight : 860 / 520;
+          const padding = 4;
+          const availW = boxW - padding * 2;
+          const availH = boxH - padding * 2;
+          let drawW = availW;
+          let drawH = drawW / shotRatio;
+          if (drawH > availH) {
+            drawH = availH;
+            drawW = drawH * shotRatio;
+          }
+          const drawX = boxX + (boxW - drawW) / 2;
+          const drawY = boxY + (boxH - drawH) / 2;
+          doc.addImage(shot, 'PNG', drawX, drawY, drawW, drawH, undefined, 'FAST');
         } catch {
           /* snapshot unavailable — PDF still carries the config table */
         }
 
         // Configuration table
         let y = 142;
-        doc.setTextColor(26, 28, 32);
-        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...INK);
+        doc.setFont(displayFont, displayStyle);
         doc.setFontSize(12);
         doc.text('Your build', 14, y);
         y += 8;
         const row = (label: string, value: string) => {
-          doc.setFont('helvetica', 'bold');
+          doc.setFont(bodyFont, 'bold');
           doc.setFontSize(9);
-          doc.setTextColor(120, 116, 108);
+          doc.setTextColor(...ACCENT);
           doc.text(label.toUpperCase(), 14, y);
-          doc.setFont('helvetica', 'normal');
+          doc.setFont(bodyFont, 'normal');
           doc.setFontSize(10);
-          doc.setTextColor(26, 28, 32);
+          doc.setTextColor(...CHAR);
           const lines = doc.splitTextToSize(value, W - 78);
           doc.text(lines, 64, y);
           y += 7 * lines.length;
-          doc.setDrawColor(235, 231, 223);
+          doc.setDrawColor(...SAND);
           doc.line(14, y - 4.5, W - 14, y - 4.5);
         };
         row('Vehicle type', state.vehicleLabel);
@@ -705,20 +829,20 @@ const PRIORITIES = [
 
         // Footer
         y = 272;
-        doc.setFillColor(245, 242, 236);
+        doc.setFillColor(...INK);
         doc.rect(0, y - 8, W, 40, 'F');
-        doc.setFont('helvetica', 'bold');
+        doc.setFont(displayFont, displayStyle);
         doc.setFontSize(10);
-        doc.setTextColor(26, 28, 32);
+        doc.setTextColor(...PAPER);
         doc.text('Ready for a free quote?', 14, y);
-        doc.setFont('helvetica', 'normal');
+        doc.setFont(bodyFont, 'normal');
         doc.setFontSize(9);
-        doc.setTextColor(90, 86, 80);
+        doc.setTextColor(...ACCENT);
         doc.text('Send this configuration via WhatsApp or bring it to the shop — we reply fast.', 14, y + 6);
-        doc.setTextColor(26, 28, 32);
+        doc.setTextColor(...PAPER);
         doc.text("Mario's Tint Shop · Murfreesboro, Tennessee", 14, y + 14);
         doc.setFontSize(7.5);
-        doc.setTextColor(140, 136, 128);
+        doc.setTextColor(...SMOKE);
         doc.text('Visual representations are illustrative only; vehicles are generic 3D models and actual film appearance may vary.', 14, y + 21);
 
         doc.save('marios-tint-shop-configuration.pdf');

@@ -7,8 +7,7 @@
 // mirror glass, split into TINT ZONES so the visualizer can darken each
 // coverage zone independently:
 //
-//   glass_windshield  — never tinted (legal)
-//   glass_visor       — top band of the windshield
+//   glass_visor       — the whole windshield (front-glass sun tint)
 //   glass_front       — front door windows
 //   glass_rearside    — rear door windows + quarters
 //   glass_rearwin     — rear window
@@ -43,12 +42,19 @@ const MODELS = {
     glass: /Window_Material$/i,
     bodyPaint: /Paint_Material$/i,
     bodyColor: '#13b545',
-    blackParts: /Wheel|Grille/i, // carbon-black rims + grille
+    blackParts: /Wheel|Grille/i, // dark-gray rims + grille
+    silverParts: /SpecularTint/i, // silver-grey grille trim
     simplifyRatio: 0.6,
     noseSign: +1,
     upSign: +1,
-    zoneCuts: { ws: 0.44, front: 0.7, rearside: 0.85 },
-    lampFrontFrac: 0.16, lampRearFrac: 0.08,
+    // Raw pane noseFracs (0=nose): tiny front-glass bits ~0.02-0.04,
+    // windshield ~0.38, front door ~0.48, rear door ~0.63, rear quarter
+    // ~0.73, rear window ~0.83, tail-light lenses ~0.93-0.97. lampFront trims
+    // the front bits, lampRear trims the tail-light lenses (both sit high
+    // enough to dodge the beltline test but must never tint); cuts are
+    // rescaled to keep every real window's zone identical.
+    zoneCuts: { ws: 0.38, front: 0.55, rearside: 0.89 },
+    lampFrontFrac: 0.15, lampRearFrac: 0.12,
   },
   suv: {
     src: '2023-lamborghini-urus-performante/source/2023_lamborghini_urus_performante.glb',
@@ -56,7 +62,11 @@ const MODELS = {
     simplifyRatio: 0.6,
     noseSign: +1,
     upSign: +1,
-    zoneCuts: { ws: 0.44, front: 0.64, rearside: 0.85 },
+    // Pane noseFracs (0=nose): windshield ~0.27, front door ~0.38, rear
+    // door ~0.64, rear quarter ~0.76, rear hatch ~0.94. Cuts fall between
+    // panes: windshield→visor, front door→front, rear door+quarter→rearside,
+    // rear hatch→rearwin.
+    zoneCuts: { ws: 0.33, front: 0.5, rearside: 0.83 },
     lampFrontFrac: 0.16, lampRearFrac: 0.08,
   },
   sport: {
@@ -65,32 +75,44 @@ const MODELS = {
     simplifyRatio: 0.75,
     noseSign: +1,
     upSign: +1,
-    // two-door: no rear side band worth splitting finely
-    zoneCuts: { ws: 0.4, front: 0.75, rearside: 0.88 },
+    // Two-door. Pane noseFracs (0=nose): windshield ~0.26, door window
+    // ~0.48, rear quarter light ~0.70, rear window ~0.91. front/rearside cut
+    // at 0.6 splits the big door window (front-side) from the small quarter
+    // behind it (rear-side).
+    zoneCuts: { ws: 0.4, front: 0.6, rearside: 0.88 },
     lampFrontFrac: 0.18, lampRearFrac: 0.13,
   },
   truck: {
-    src: 'ford-f150-raptor/source/Ford Raptor.glb',
-    glass: /^glass/i,
-    bodyPaint: /PAINT_1/i, // body only, not PAINT_2 (tyre wall)
+    src: '2021-ram-1500-trx/source/ram1500trx.glb',
+    glass: /Window_Material$/i,
+    bodyPaint: /Paint_Material$/i,
     bodyColor: '#cc1518',
-    simplifyRatio: 0.5,
-    stripVertexColors: true,
-    lampMeshes: ['Object_104'],
-    noseSign: -1,
-    upSign: -1,
-    zoneCuts: { ws: 0.34, front: 0.6, rearside: 0.88 },
+    blackParts: /Wheel|Grille/i,
+    simplifyRatio: 0.6,
+    noseSign: +1,
+    upSign: +1,
+    // Pane noseFracs (0=nose): windshield ~0.02-0.13 (centred), front door
+    // ~0.18-0.25 (sides), rear door ~0.41-0.48 (sides), 3-piece rear cab
+    // window ~0.555, tail glass ~1.0. rearside cut at 0.52 keeps the rear
+    // doors as rear-side and sends the cab backlight to rear-window.
+    zoneCuts: { ws: 0.15, front: 0.33, rearside: 0.52 },
+    lampFrontFrac: 0, lampRearFrac: 0,
   },
 };
 
 // Real-glass look per shade: mirror-smooth metallic surface (strong
 // environment reflections) whose body darkens with the film's VLT.
 // The visualizer holds the same table for runtime zone toggling.
+// Alpha = how opaque the film reads. Kept intentionally below full opacity
+// on every shade (even Dark) so part of the interior stays visible through
+// the glass — real automotive film darkens the cabin but never hides it
+// completely. The RGB still darkens per VLT, so darker shades tint the
+// interior you see rather than blacking it out.
 export const GLASS_LOOK = {
-  clear: [0.8, 0.84, 0.88, 0.18],
-  light: [0.5, 0.54, 0.58, 0.42],
-  medium: [0.17, 0.19, 0.21, 0.66],
-  dark: [0.02, 0.024, 0.03, 0.88],
+  clear: [0.8, 0.84, 0.88, 0.08],
+  light: [0.5, 0.54, 0.58, 0.22],
+  medium: [0.17, 0.19, 0.21, 0.36],
+  dark: [0.02, 0.024, 0.03, 0.5],
 };
 // Hex sRGB → linear RGBA (glTF baseColorFactor is linear).
 function hexToLinear(hex) {
@@ -99,8 +121,12 @@ function hexToLinear(hex) {
   return [s(((n >> 16) & 255) / 255), s(((n >> 8) & 255) / 255), s((n & 255) / 255), 1];
 }
 
-const GLASS_METALLIC = 0.5;
-const GLASS_ROUGHNESS = 0.03;
+// Glass is dielectric: reflections should come from Fresnel (strong at
+// grazing angles, see-through face-on) — that reads as real tinted glass.
+// A little metalness keeps the dark-tint "mirror" feel without going full
+// chrome. Very low roughness keeps the softbox reflections crisp.
+const GLASS_METALLIC = 0.35;
+const GLASS_ROUGHNESS = 0.04;
 
 const ZONE_DEBUG_COLORS = {
   glass_windshield: [1, 0, 0, 1],
@@ -108,7 +134,7 @@ const ZONE_DEBUG_COLORS = {
   glass_front: [0, 1, 0, 1],
   glass_rearside: [0, 0, 1, 1],
   glass_rearwin: [1, 0, 1, 1],
-  glass_lamps: [0, 1, 1, 1],
+  glass_lamps: [1, 0.5, 0, 1],
 };
 
 const io = new NodeIO()
@@ -145,23 +171,40 @@ for (const [vehicle, cfg] of Object.entries(MODELS)) {
       mat.setDoubleSided(true);
       for (const ext of mat.listExtensions()) ext.dispose();
     } else if (/paint|coloured/i.test(name)) {
-      mat.setMetallicFactor(0.4);
-      mat.setRoughnessFactor(0.22);
+      // Automotive paint is a dielectric base under a glossy clearcoat, NOT
+      // bare metal: keep metalness low so colour stays rich instead of going
+      // chrome/plasticky, and let a smooth-ish clearcoat carry the HDR
+      // reflections. (High metalness here looked like anodized metal.)
+      mat.setMetallicFactor(0.1);
+      mat.setRoughnessFactor(0.32);
       if (cfg.bodyColor && cfg.bodyPaint?.test(name)) {
         mat.setBaseColorTexture(null);
         mat.setBaseColorFactor(hexToLinear(cfg.bodyColor));
       }
     } else if (cfg.blackParts?.test(name)) {
       mat.setBaseColorTexture(null);
-      mat.setBaseColorFactor(hexToLinear('#1c1c1c'));
+      mat.setBaseColorFactor(hexToLinear('#3a3a3a'));
       mat.setMetallicFactor(0.6);
-      mat.setRoughnessFactor(0.35);
+      mat.setRoughnessFactor(0.28);
+    } else if (cfg.silverParts?.test(name)) {
+      mat.setBaseColorTexture(null);
+      mat.setBaseColorFactor(hexToLinear('#5c6065'));
+      mat.setMetallicFactor(0.9);
+      mat.setRoughnessFactor(0.25);
     } else if (/chrome|crome/i.test(name)) {
       mat.setMetallicFactor(1);
       mat.setRoughnessFactor(0.12);
     } else if (hadMR || mat.getMetallicFactor() === 1) {
       mat.setMetallicFactor(0.1);
       mat.setRoughnessFactor(0.55);
+    }
+
+    // FBX import tags many solid parts as BLEND, which disables depth-write
+    // and renders them see-through (e.g. the RAM's wheels/tyres). Force
+    // OPAQUE for any non-glass material that is fully opaque; keep genuine
+    // translucency (lamp lenses, alpha-decal badges) on BLEND.
+    if (!cfg.glass.test(name) && mat.getAlphaMode() === 'BLEND' && (mat.getBaseColorFactor()[3] ?? 1) >= 0.99) {
+      mat.setAlphaMode('OPAQUE');
     }
   }
 
@@ -269,34 +312,17 @@ for (const [vehicle, cfg] of Object.entries(MODELS)) {
         return f < lampFront || f > 1 - lampRear;
       };
 
-      let wsTop = -1e9, wsBottom = 1e9; // in up-oriented coords
-      for (const { prim } of glassPrims) {
-        const pos = prim.getAttribute('POSITION');
-        const idx = prim.getIndices();
-        for (let t = 0; t < idx.getCount(); t += 3) {
-          const vC = centroid(pos, idx, t, V);
-          if ((vC - vMid) * up < 0) continue;
-          const cL = centroid(pos, idx, t, L);
-          if (isLampFrac(cL)) continue;
-          const f = noseFrac(cL);
-          if (f >= 0 && f < cuts.ws) {
-            const vU = vC * up;
-            if (vU > wsTop) wsTop = vU;
-            if (vU < wsBottom) wsBottom = vU;
-          }
-        }
-      }
-      const visorLine = wsTop - (wsTop - wsBottom) * 0.3; // top 30% of windshield
-
       // Pass 2: find the REAL panes. Each physical pane (a door window, the
       // windshield, the rear glass, a lamp lens) is a connected component of
       // the glass mesh — triangles sharing vertices. Zoning whole components
       // instead of individual triangles means the tint never cuts mid-pane.
+      // The whole windshield is the "visor" zone (front-glass sun tint) — a
+      // clean full pane, no ragged top-strip split.
       const zoneOfPoint = (vC, cL) => {
         if ((vC - vMid) * up < 0) return 'glass_lamps';
         if (isLampFrac(cL)) return 'glass_lamps';
         const f = noseFrac(cL);
-        if (f < cuts.ws) return 'ws'; // visor split happens per-triangle below
+        if (f < cuts.ws) return 'glass_visor';
         if (f < cuts.front) return 'glass_front';
         if (f < cuts.rearside) return 'glass_rearside';
         return 'glass_rearwin';
@@ -325,36 +351,27 @@ for (const [vehicle, cfg] of Object.entries(MODELS)) {
           }
         }
 
-        // Vote each component's zone by its triangles' point-classification;
-        // majority wins so a pane never splits across zones.
-        const compVotes = new Map();
-        const triZone = new Array(triCount);
+        // Assign each connected component to ONE zone by its centroid. The
+        // real panes overlap along the car's length (the windshield is raked
+        // back over the front doors), so per-triangle zoning slices a pane
+        // where the zone planes cross it. Zoning by the whole component's
+        // centroid keeps every physical pane intact — a front door window is
+        // all "front", never part windshield/visor.
+        const compCentroid = new Map(); // comp → { v, l, n }
         for (let t = 0; t < triCount; t++) {
-          const z = zoneOfPoint(centroid(pos, idx, t * 3, V), centroid(pos, idx, t * 3, L));
-          triZone[t] = z;
           const c = find(t);
-          const votes = compVotes.get(c) ?? (compVotes.set(c, {}), compVotes.get(c));
-          votes[z] = (votes[z] || 0) + 1;
+          const o = compCentroid.get(c) ?? (compCentroid.set(c, { v: 0, l: 0, n: 0 }), compCentroid.get(c));
+          o.v += centroid(pos, idx, t * 3, V);
+          o.l += centroid(pos, idx, t * 3, L);
+          o.n++;
         }
-        // Majority zone per component; if a component's votes are heavily
-        // mixed (panes welded together in the source), fall back to
-        // per-triangle zoning for that component only.
         const compZone = new Map();
-        for (const [c, votes] of compVotes) {
-          const sorted = Object.entries(votes).sort((a, b) => b[1] - a[1]);
-          const total = sorted.reduce((s, [, n]) => s + n, 0);
-          compZone.set(c, sorted[0][1] / total >= 0.7 ? sorted[0][0] : null);
-        }
+        for (const [c, o] of compCentroid) compZone.set(c, zoneOfPoint(o.v / o.n, o.l / o.n));
 
-        // Bucket triangles by their COMPONENT's zone. The windshield pane is
-        // the one exception: it splits per-triangle at the visor line.
+        // Bucket triangles by their COMPONENT's zone.
         const buckets = {};
         for (let t = 0; t < triCount; t++) {
-          let z = compZone.get(find(t)) ?? triZone[t]; // null → mixed comp → per-tri
-          if (z === 'ws') {
-            const vC = centroid(pos, idx, t * 3, V);
-            z = vC * up > visorLine ? 'glass_visor' : 'glass_windshield';
-          }
+          const z = compZone.get(find(t));
           (buckets[z] ??= []).push(idx.getScalar(t * 3), idx.getScalar(t * 3 + 1), idx.getScalar(t * 3 + 2));
         }
         const zones = Object.keys(buckets);
