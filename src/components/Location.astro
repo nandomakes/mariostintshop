@@ -2,7 +2,7 @@
 import { SITE, CONTACT } from '../consts';
 
 const mapQuery = encodeURIComponent(`${CONTACT.address}, ${CONTACT.city}`);
-const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${mapQuery}`;
+const directionsUrl = CONTACT.googleBusinessUrl;
 ---
 
 <section id="location" class="hex-bg border-t border-sand bg-paper">
