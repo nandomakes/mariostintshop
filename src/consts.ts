@@ -56,8 +56,8 @@ export const IMAGES = {
   heroBg: {
     src: '/images/hero-4.png',
     alt: '',
-    width: 1600,
-    height: 679,
+    width: 2752,
+    height: 1536,
   },
   // Satisfaction-badge image in the "Our services" section.
   preview: {
