@@ -54,14 +54,14 @@ export const HERO = {
 // photography. Keep the same keys or update the paths here.
 export const IMAGES = {
   heroBg: {
-    src: '/images/hero-1.webp',
+    src: '/images/hero-3.png',
     alt: '',
     width: 1600,
     height: 679,
   },
   // Satisfaction-badge image in the "Our services" section.
   preview: {
-    src: '/images/preview.webp',
+    src: '/images/preview.jpg',
     alt: 'Freshly tinted vehicle at Mario\'s Tint Shop',
     width: 1000,
     height: 1241,
