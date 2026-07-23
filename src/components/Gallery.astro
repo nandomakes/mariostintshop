@@ -123,6 +123,8 @@ const posts = await getInstagramFeed(8);
       btn.addEventListener('click', () => {
         const dir = btn.dataset.dir === 'next' ? 1 : -1;
         track.scrollBy({ left: dir * step(), behavior: 'smooth' });
+        // Sync button states after scroll completes
+        setTimeout(sync, 600);
       });
     });
 
