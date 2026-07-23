@@ -5,17 +5,17 @@ import Ticker from './Ticker.astro';
 
 <section
   id="home"
-  class="relative flex min-h-[calc(100vh)] flex-col bg-ink"
+  class="relative flex min-h-[calc(100svh-72px)] flex-col overflow-hidden bg-ink md:min-h-[calc(100svh-116px)]"
 >
   <!-- Full-bleed image with dark overlay for legibility -->
-  <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+  <div class="absolute inset-0" aria-hidden="true">
     <img
       src={IMAGES.heroBg.src}
       alt=""
       width={IMAGES.heroBg.width}
       height={IMAGES.heroBg.height}
       fetchpriority="high"
-      class="h-full w-full scale-110 object-contain object-center"
+      class="h-full w-full object-contain object-center"
     />
     <div class="absolute inset-0 bg-black/45"></div>
     <div class="absolute inset-0 bg-gradient-to-b from-ink/60 via-transparent to-ink"></div>
