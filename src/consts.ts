@@ -35,7 +35,7 @@ export const CONTACT = {
   scheduleShort: 'Mon–Fri 8–5',
   geo: { lat: 35.8470688, lng: -86.3974265 },
   googleBusinessUrl:
-    "https://maps.app.goo.gl/7LN1Lp3xAQ2YDge96",
+    "https://maps.app.goo.gl/ChC6iGfAj8wzBpwk6",
   bbbUrl: '#',
 };
 
