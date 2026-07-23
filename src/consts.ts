@@ -54,7 +54,7 @@ export const HERO = {
 // photography. Keep the same keys or update the paths here.
 export const IMAGES = {
   heroBg: {
-    src: '/images/hero-3.png',
+    src: '/images/hero-4.png',
     alt: '',
     width: 1600,
     height: 679,
