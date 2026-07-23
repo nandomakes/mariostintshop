@@ -673,15 +673,15 @@ const PRIORITIES = [
 
     // Start over
     document.getElementById('reset-btn')!.addEventListener('click', () => {
-      state.tintZones = new Set(['front-side', 'rear-side']);
-      state.shade = 'dark';
-      state.shadeLabel = 'Dark';
-      state.shadeOp = 0.85;
+      state.tintZones = new Set();
+      state.shade = 'clear';
+      state.shadeLabel = 'Clear';
+      state.shadeOp = 0.14;
       state.priorities = new Set();
       $$('.zone-tile[data-tint-zone]').forEach((t) =>
         t.setAttribute('aria-pressed', String(state.tintZones.has(t.dataset.tintZone!)))
       );
-      $$('.shade-chip').forEach((c) => c.setAttribute('aria-checked', String(c.dataset.shade === 'dark')));
+      $$('.shade-chip').forEach((c) => c.setAttribute('aria-checked', String(c.dataset.shade === 'clear')));
       $$('.prio-chip').forEach((c) => c.setAttribute('aria-pressed', 'false'));
       angle = 'front';
       $$('.angle-btn').forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.angle === 'front')));
