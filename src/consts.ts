@@ -35,7 +35,7 @@ export const CONTACT = {
   scheduleShort: 'Mon–Fri 8–5',
   geo: { lat: 35.8470688, lng: -86.3974265 },
   googleBusinessUrl:
-    "https://www.google.com/maps/place/Mario's+Tint+Shop/@35.8470688,-86.4000014,17z/data=!4m8!3m7!1s0x886407f99c411c3b:0x274579f0ecaef14!8m2!3d35.8470688!4d-86.3974265!9m1!1b1!16s%2Fg%2F11c1rsgy6y",
+    "https://maps.app.goo.gl/7LN1Lp3xAQ2YDge96",
   bbbUrl: '#',
 };
 
