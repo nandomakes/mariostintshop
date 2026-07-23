@@ -19,8 +19,8 @@ const posts = await getInstagramFeed(8);
     <div class="relative mt-12">
       <div
         id="gallery-track"
-        class="no-scrollbar flex gap-4 overflow-x-auto pb-2"
-        style="overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch;"
+        class="no-scrollbar flex gap-4 overflow-x-auto scroll-smooth pb-2"
+        style="overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; scroll-behavior: smooth;"
       >
         {
           posts.map((img) => (
@@ -95,6 +95,7 @@ const posts = await getInstagramFeed(8);
       document.querySelectorAll<HTMLButtonElement>('.gallery-arrow')
     );
     const EPS = 4;
+    let resizeTimeout: number;
 
     // Advance three cards per click, so each press reveals a fresh set of three
     // images (plus the half-peek of the next, since ~3.5 fit in view).
@@ -126,9 +127,30 @@ const posts = await getInstagramFeed(8);
     });
 
     track.addEventListener('scroll', sync, { passive: true });
-    window.addEventListener('resize', sync);
+
+    // Debounced resize handler to avoid frequent recalculations
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = window.setTimeout(sync, 150);
+    }, { passive: true });
+
     // Wait a frame so layout (and lazy images) settle before first measure.
-    requestAnimationFrame(sync);
+    requestAnimationFrame(() => {
+      sync();
+      // Re-sync after images load to account for lazy-loaded dimensions
+      const images = track.querySelectorAll('img');
+      let loadedCount = 0;
+      images.forEach((img) => {
+        if (img.complete) {
+          loadedCount++;
+        } else {
+          img.addEventListener('load', () => {
+            loadedCount++;
+            if (loadedCount === images.length) sync();
+          }, { once: true });
+        }
+      });
+    });
 
     // Desktop drag-to-scroll: 1:1 with the pointer, no snap fighting back —
     // this is what makes the strip feel smooth instead of sticky.
@@ -136,6 +158,8 @@ const posts = await getInstagramFeed(8);
     let startX = 0;
     let startScroll = 0;
     let moved = false;
+    let rafId: number;
+
     track.addEventListener('pointerdown', (e) => {
       if (e.pointerType !== 'mouse') return; // touch already scrolls natively
       dragging = true;
@@ -143,17 +167,29 @@ const posts = await getInstagramFeed(8);
       startX = e.clientX;
       startScroll = track.scrollLeft;
       track.style.cursor = 'grabbing';
-    });
-    window.addEventListener('pointermove', (e) => {
+      track.style.willChange = 'scroll-position';
+    }, { passive: true });
+
+    const handleMove = (e: PointerEvent) => {
       if (!dragging) return;
       const dx = e.clientX - startX;
       if (Math.abs(dx) > 4) moved = true;
       track.scrollLeft = startScroll - dx;
-    });
+    };
+
+    window.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => handleMove(e));
+    }, { passive: true });
+
     window.addEventListener('pointerup', () => {
+      if (rafId) cancelAnimationFrame(rafId);
       dragging = false;
       track.style.cursor = '';
-    });
+      track.style.willChange = 'auto';
+    }, { passive: true });
+
     // Swallow the click that ends a drag so links don't open accidentally.
     track.addEventListener('click', (e) => {
       if (moved) {
