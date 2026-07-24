@@ -159,7 +159,7 @@ const PRIORITIES = [
                       <button
                         type="button"
                         data-tint-zone={z.id}
-                        aria-pressed={z.id === 'front-side' || z.id === 'rear-side' ? 'true' : 'false'}
+                        aria-pressed="false"
                         class="zone-tile pressable group flex flex-col items-center gap-1 border border-sand bg-paper px-1.5 pb-2 pt-2.5 transition-colors duration-200 hover:border-ash/60 aria-pressed:border-accent aria-pressed:bg-mint"
                       >
                         <img
@@ -197,7 +197,7 @@ const PRIORITIES = [
                     SHADES.map((s) => (
                       <button
                         type="button" role="radio"
-                        aria-checked={s.id === 'dark' ? 'true' : 'false'}
+                        aria-checked={s.id === 'clear' ? 'true' : 'false'}
                         data-shade={s.id} data-shade-label={s.label} data-op={s.op}
                         class="shade-chip pressable border border-sand bg-paper p-2 text-center transition-colors duration-200 hover:border-ash/60 aria-checked:border-accent"
                       >
@@ -422,10 +422,10 @@ const PRIORITIES = [
     const state = {
       vehicle: 'sedan',
       vehicleLabel: 'Sedan',
-      tintZones: new Set(['front-side', 'rear-side']),
-      shade: 'dark',
-      shadeLabel: 'Dark',
-      shadeOp: 0.85,
+      tintZones: new Set<string>(),
+      shade: 'clear',
+      shadeLabel: 'Clear',
+      shadeOp: 0.14,
       priorities: new Set<string>(),
     };
 
