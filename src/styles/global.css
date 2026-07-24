@@ -14,6 +14,13 @@
     scroll-padding-top: 5rem;
   }
 
+  /* Defense-in-depth: decorative full-bleed elements (About uses w-[200vw]/
+     w-screen) rely on ancestor overflow clipping. This body-level clip is a
+     safety net so no wide element can ever trigger horizontal page scroll. */
+  body {
+    overflow-x: clip;
+  }
+
   :focus-visible {
     outline: 2px solid theme('colors.accent');
     outline-offset: 3px;

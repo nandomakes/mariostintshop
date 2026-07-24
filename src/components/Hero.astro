@@ -15,14 +15,14 @@ import Ticker from './Ticker.astro';
       width={IMAGES.heroBg.width}
       height={IMAGES.heroBg.height}
       fetchpriority="high"
-      class="h-full w-full scale-150 object-contain object-center"
+      class="h-full w-full object-cover object-center"
     />
     <div class="absolute inset-0 bg-black/45"></div>
     <div class="absolute inset-0 bg-gradient-to-b from-ink/60 via-transparent to-ink"></div>
   </div>
 
   <div class="relative w-full flex-1 content-center px-4 py-10 text-left sm:px-5 sm:py-12 md:py-16">
-    <div class="w-full max-w-2xl pl-8 sm:pl-12 md:pl-16">
+    <div class="w-full max-w-2xl sm:pl-6 md:pl-16">
       <p class="reveal kicker text-[clamp(1rem,3vw,1.35rem)] text-accent">{HERO.kicker}</p>
 
       <h1 class="reveal headline mt-3 text-[clamp(1.6rem,4.5vw,3.25rem)] text-paper md:mt-4">

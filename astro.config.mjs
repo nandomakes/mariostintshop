@@ -5,8 +5,8 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  // ⚠️ REPLACE with the real domain before deploy.
-  site: 'https://www.mariostintshop.com',
+  // Canonical domain — must match SITE.url in src/consts.ts (non-www).
+  site: 'https://mariostintshop.com',
   integrations: [tailwind(), sitemap()],
   build: {
     inlineStylesheets: 'auto',
