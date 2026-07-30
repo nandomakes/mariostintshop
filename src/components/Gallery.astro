@@ -4,31 +4,46 @@ import { getInstagramFeed } from '../lib/instagram';
 
 // Pulls the shop's latest Instagram posts at build time (falls back to the
 // curated images in consts.ts when no INSTAGRAM_TOKEN is configured).
-const posts = await getInstagramFeed(8);
+const posts = await getInstagramFeed(6);
+
+// Bento layout: columns 1–3 each stack two photos (varying split per column),
+// column 4 is one full-height photo — 7 tiles total. We only have 6 real
+// photos today, so tile 5 (col 3, bottom) reuses tile 4's photo as a
+// placeholder until a 7th curated photo is added — swap it for a real one
+// then and this duplication goes away.
+const tiles = [...posts, posts[4]];
+// 20-row grid so column 3's split can land at a moderate 45/55 — columns 1–2
+// keep their original ~30/70 ratio (just rescaled onto the finer 20 rows).
+const layout = [
+  { col: 1, row: '1 / 7' },   // 0: col 1, short (top)   — 30%
+  { col: 1, row: '7 / 21' },  // 1: col 1, tall (bottom)  — 70%
+  { col: 2, row: '1 / 15' },  // 2: col 2, tall (top)     — 70%
+  { col: 2, row: '15 / 21' }, // 3: col 2, short (bottom) — 30%
+  { col: 3, row: '1 / 10' },  // 4: col 3, short (top)    — 45%
+  { col: 4, row: '1 / 21' },  // 5: col 4, full height
+  { col: 3, row: '10 / 21' }, // 6: col 3, tall (bottom, duplicate placeholder) — 55%
+];
 ---
 
 <section id="gallery" class="bg-ink">
   <div class="mx-auto max-w-6xl px-5 py-20 md:py-24">
     <div class="text-center">
-      <p class="reveal kicker text-accent">Our instagram</p>
+      <p class="reveal kicker text-accent">Our latest work</p>
       <h2 class="reveal headline mx-auto mt-3 max-w-3xl text-[clamp(1.4rem,2.8vw,2.2rem)] text-paper">
         Where craftsmanship meets flawless finish
       </h2>
     </div>
 
-    <div class="relative mt-12">
-      <div
-        id="gallery-track"
-        class="no-scrollbar flex gap-4 overflow-x-auto scroll-smooth pb-2"
-        style="overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; scroll-behavior: smooth;"
-      >
-        {
-          posts.map((img) => (
-            <a
-              href={img.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="group relative w-[260px] shrink-0 overflow-hidden sm:w-[300px]"
+    <div
+      class="reveal showcase-grid mt-12 grid h-[700px] grid-cols-2 [grid-template-rows:repeat(4,1fr)] gap-4 sm:h-[420px] sm:grid-cols-4 sm:[grid-template-rows:repeat(20,1fr)] md:h-[560px]"
+    >
+      {
+        tiles.map((img, i) => {
+          const spot = layout[i];
+          return (
+            <div
+              class="group relative overflow-hidden"
+              style={`--col:${spot.col}; --row:${spot.row};`}
             >
               <img
                 src={img.src}
@@ -38,45 +53,12 @@ const posts = await getInstagramFeed(8);
                 loading="lazy"
                 decoding="async"
                 draggable="false"
-                class="aspect-square w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+                class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
               />
-              <span
-                class="pointer-events-none absolute inset-0 flex items-end bg-gradient-to-t from-ink/70 via-transparent to-transparent p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                aria-hidden="true"
-              >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="2" y="2" width="20" height="20" rx="5" />
-                  <circle cx="12" cy="12" r="4" />
-                  <circle cx="17.5" cy="6.5" r="1.2" fill="#fff" stroke="none" />
-                </svg>
-              </span>
-            </a>
-          ))
-        }
-      </div>
-
-      <!-- Full-height edge click-zones: clicking anywhere in the left/right
-           column scrolls the strip; the center images still open Instagram. -->
-      <button
-        type="button"
-        data-dir="prev"
-        class="gallery-arrow group/arrow pressable absolute inset-y-0 left-0 z-10 hidden w-16 items-center justify-start bg-gradient-to-r from-ink/90 via-ink/40 to-transparent pl-1 transition-opacity duration-200 disabled:pointer-events-none disabled:opacity-0 md:flex sm:w-20"
-        aria-label="Previous photos"
-      >
-        <span class="flex h-12 w-12 items-center justify-center bg-accent text-ink shadow-lg shadow-accent/25 transition-[background-color] duration-200 group-hover/arrow:bg-accentDk">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
-        </span>
-      </button>
-      <button
-        type="button"
-        data-dir="next"
-        class="gallery-arrow group/arrow pressable absolute inset-y-0 right-0 z-10 hidden w-16 items-center justify-end bg-gradient-to-l from-ink/90 via-ink/40 to-transparent pr-1 transition-opacity duration-200 disabled:pointer-events-none disabled:opacity-0 md:flex sm:w-20"
-        aria-label="Next photos"
-      >
-        <span class="flex h-12 w-12 items-center justify-center bg-accent text-ink shadow-lg shadow-accent/25 transition-[background-color] duration-200 group-hover/arrow:bg-accentDk">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
-        </span>
-      </button>
+            </div>
+          );
+        })
+      }
     </div>
 
     <p class="reveal mt-8 text-center text-sm text-smoke">
@@ -93,117 +75,22 @@ const posts = await getInstagramFeed(8);
   </div>
 </section>
 
-<script>
-  const track = document.getElementById('gallery-track');
-  if (track) {
-    const arrows = Array.from(
-      document.querySelectorAll<HTMLButtonElement>('.gallery-arrow')
-    );
-    const EPS = 4;
-    let resizeTimeout: number;
-
-    // Advance three cards per click, so each press reveals a fresh set of three
-    // images (plus the half-peek of the next, since ~3.5 fit in view).
-    const step = () => {
-      const card = track.querySelector<HTMLElement>('a');
-      return (card ? card.offsetWidth + 16 : 300) * 3;
-    };
-    const maxScroll = () => track.scrollWidth - track.clientWidth;
-
-    // Dim/disable arrows at the track edges so the control state is honest.
-    const sync = () => {
-      const max = maxScroll();
-      const prev = arrows.find((a) => a.dataset.dir === 'prev');
-      const next = arrows.find((a) => a.dataset.dir === 'next');
-      if (prev) prev.disabled = track.scrollLeft <= EPS;
-      if (next) next.disabled = track.scrollLeft >= max - EPS || max <= EPS;
-    };
-
-    arrows.forEach((btn) => {
-      // Prevent the button from taking focus on press: a focused control that
-      // then becomes `disabled` at a track edge makes the browser scroll the
-      // page to the top ("the box jumps down"). Suppressing focus keeps the
-      // page perfectly still while the strip slides.
-      btn.addEventListener('pointerdown', (e) => e.preventDefault());
-      btn.addEventListener('click', () => {
-        const dir = btn.dataset.dir === 'next' ? 1 : -1;
-        track.scrollBy({ left: dir * step(), behavior: 'smooth' });
-        // Sync button states after scroll completes
-        setTimeout(sync, 600);
-      });
-    });
-
-    track.addEventListener('scroll', sync, { passive: true });
-
-    // Debounced resize handler to avoid frequent recalculations
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = window.setTimeout(sync, 150);
-    }, { passive: true });
-
-    // Wait a frame so layout (and lazy images) settle before first measure.
-    requestAnimationFrame(() => {
-      sync();
-      // Re-sync after images load to account for lazy-loaded dimensions
-      const images = track.querySelectorAll('img');
-      let loadedCount = 0;
-      images.forEach((img) => {
-        if (img.complete) {
-          loadedCount++;
-        } else {
-          img.addEventListener('load', () => {
-            loadedCount++;
-            if (loadedCount === images.length) sync();
-          }, { once: true });
-        }
-      });
-    });
-
-    // Desktop drag-to-scroll: 1:1 with the pointer, no snap fighting back —
-    // this is what makes the strip feel smooth instead of sticky.
-    let dragging = false;
-    let startX = 0;
-    let startScroll = 0;
-    let moved = false;
-    let rafId: number;
-
-    track.addEventListener('pointerdown', (e) => {
-      if (e.pointerType !== 'mouse') return; // touch already scrolls natively
-      dragging = true;
-      moved = false;
-      startX = e.clientX;
-      startScroll = track.scrollLeft;
-      track.style.cursor = 'grabbing';
-      track.style.willChange = 'scroll-position';
-    }, { passive: true });
-
-    const handleMove = (e: PointerEvent) => {
-      if (!dragging) return;
-      const dx = e.clientX - startX;
-      if (Math.abs(dx) > 4) moved = true;
-      track.scrollLeft = startScroll - dx;
-    };
-
-    window.addEventListener('pointermove', (e) => {
-      if (!dragging) return;
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(() => handleMove(e));
-    }, { passive: true });
-
-    window.addEventListener('pointerup', () => {
-      if (rafId) cancelAnimationFrame(rafId);
-      dragging = false;
-      track.style.cursor = '';
-      track.style.willChange = 'auto';
-    }, { passive: true });
-
-    // Swallow the click that ends a drag so links don't open accidentally.
-    track.addEventListener('click', (e) => {
-      if (moved) {
-        e.preventDefault();
-        e.stopPropagation();
-        moved = false;
-      }
-    }, true);
+<style>
+  /* Desktop bento: each photo's column/row span comes from its --col/--row
+     custom properties (set inline per-item above). */
+  @media (min-width: 640px) {
+    .showcase-grid > div {
+      grid-column: var(--col);
+      grid-row: var(--row);
+    }
   }
-</script>
+  /* Mobile: collapse to a plain 2-col grid of equal-height photos — the
+     bento proportions only make sense once there's room for 4 columns. */
+  @media (max-width: 639px) {
+    .showcase-grid > div {
+      grid-column: auto;
+      grid-row: auto;
+      height: 100%;
+    }
+  }
+</style>

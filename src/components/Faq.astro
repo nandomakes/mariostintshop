@@ -69,10 +69,35 @@ const { items } = Astro.props;
   const EASE_IN = 'cubic-bezier(0.4, 0, 0.6, 1)';
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  document.querySelectorAll<HTMLDetailsElement>('details.faq').forEach((d) => {
+  const allFaqs = Array.from(document.querySelectorAll<HTMLDetailsElement>('details.faq'));
+  const closers = new Map<HTMLDetailsElement, () => void>();
+
+  allFaqs.forEach((d) => {
     const summary = d.querySelector<HTMLElement>('summary')!;
     const content = d.querySelector<HTMLElement>('.faq-content')!;
     let anim: Animation | null = null;
+
+    const close = () => {
+      if (!d.open) return;
+      anim?.cancel();
+      if (reduce) {
+        d.open = false;
+        return;
+      }
+      const h = content.offsetHeight;
+      anim = content.animate(
+        [
+          { height: `${h}px`, opacity: 1, filter: 'blur(0px)' },
+          { height: '0px', opacity: 0, filter: 'blur(6px)' },
+        ],
+        { duration: 260, easing: EASE_IN }
+      );
+      anim.onfinish = () => {
+        d.open = false;
+        anim = null;
+      };
+    };
+    closers.set(d, close);
 
     summary.addEventListener('click', (e) => {
       if (reduce) return; // let the browser toggle natively
@@ -80,6 +105,10 @@ const { items } = Astro.props;
       anim?.cancel();
 
       if (!d.open) {
+        // Only one answer open at a time — collapse any other open item first.
+        closers.forEach((fn, other) => {
+          if (other !== d && other.open) fn();
+        });
         // Opening: reveal, measure, then grow from zero.
         d.open = true;
         const h = content.offsetHeight;
@@ -96,18 +125,7 @@ const { items } = Astro.props;
         };
       } else {
         // Closing: collapse to zero, then drop the [open] state.
-        const h = content.offsetHeight;
-        anim = content.animate(
-          [
-            { height: `${h}px`, opacity: 1, filter: 'blur(0px)' },
-            { height: '0px', opacity: 0, filter: 'blur(6px)' },
-          ],
-          { duration: 260, easing: EASE_IN }
-        );
-        anim.onfinish = () => {
-          d.open = false;
-          anim = null;
-        };
+        close();
       }
     });
   });

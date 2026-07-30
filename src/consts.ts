@@ -23,7 +23,10 @@ export const SITE = {
 // ── Contact / Phone ─────────────────────────────────────────────────
 export const PHONE_DISPLAY = '(615) 410-7170';
 export const PHONE_TEL = '+16154107170';
-export const WHATSAPP_NUMBER = '16154107170'; // digits only, no +
+// Tintwiz booking/quote form — the client's live estimator. Embedded as an
+// iframe in QuoteCTA. Replace only if Tintwiz issues a new embed URL.
+export const TINTWIZ_FORM_URL =
+  'https://app.tintwiz.com/web/ce/k555dou4xrsun17jpll6ltqkldyiejb8';
 
 export const CONTACT = {
   address: '515 NW Broad St',
@@ -158,7 +161,7 @@ export const STATS: Stat[] = [
   { num: 25, suffix: '+', label: 'Years Experience' },
   { text: 'A+', label: 'BBB Rating' },
   { text: '3M', label: 'Platinum Dealer' },
-  { num: 128, suffix: '+', label: '5-Star Reviews' },
+  { num: 390, suffix: '+', label: '5-Star Reviews' },
 ];
 
 // ── "Why choose us" ─────────────────────────────────────────────────
@@ -167,10 +170,10 @@ export const WHY_US = {
   intro:
     'We use only the highest quality materials and tools to ensure perfect results — and our A+ rating from the Better Business Bureau is a testament to our commitment to excellence.',
   bullets: [
-    'Authorized 3M Platinum Dealer — certified 3M, XPEL & SunTek installers.',
+    'Authorized 3M Platinum Dealer — certified 3M installers.',
     'Over 25 years of experience in the automotive and window film industry.',
     'Lifetime warranty available on our window films.',
-    '5.0-star Google rating from 128+ customer reviews.',
+    '5.0-star Google rating from 390+ customer reviews.',
     'A+ rated by the Better Business Bureau.',
   ],
   cards: [
@@ -180,7 +183,7 @@ export const WHY_US = {
     },
     {
       title: 'Premium Materials Only',
-      body: 'We use industry-leading brands like 3M, XPEL, SunTek, and STEK on every job. First we assess your vehicle and recommend exactly what it needs — no bargain film, no surprises, no hidden charges.',
+      body: 'We use exclusively 3M film and coating products on every job. First we assess your vehicle and recommend exactly what it needs — no bargain film, no surprises, no hidden charges.',
     },
   ],
 };
@@ -199,7 +202,7 @@ export const ABOUT = {
   body1:
     "For more than 10 years, Mario's Tint Shop has proudly served Murfreesboro, Nashville, and the surrounding Middle Tennessee communities with professional automotive window tinting and paint protection film installation, building a strong reputation for high-quality workmanship, premium materials, and exceptional customer service.",
   body2:
-    "We're a one-stop shop for window tinting, paint protection film, ceramic coating, and office & commercial films. Our attention to detail and commitment to premium brands like 3M, XPEL, and SunTek ensure every installation meets the highest standards — backed by an A+ BBB rating and a 5.0-star Google rating.",
+    "We're a one-stop shop for window tinting, paint protection film, ceramic coating, and office & commercial films. Our attention to detail and commitment to premium 3M products ensure every installation meets the highest standards — backed by an A+ BBB rating and a 5.0-star Google rating.",
 };
 
 // ── Instagram ───────────────────────────────────────────────────────
@@ -287,24 +290,24 @@ export const SERVICES: Service[] = [
     kicker: 'Paint Protection',
     name: 'Paint Protection Film (PPF)',
     short:
-      'Professional clear bra installation by certified 3M, XPEL & SunTek installers — self-healing defense against scratches, UV damage, and rock chips.',
-    meta: '3M PPF & STEK DYNO Platinum · 10-year warranty',
+      'Professional clear bra installation by certified 3M installers — self-healing defense against scratches, UV damage, and rock chips.',
+    meta: '3M Paint Protection Film · 10-year warranty',
     startingPrice: 'Free quote',
     includes: [
       'Partial Front End: 12"–18" hood, fenders, bumper & mirrors',
       'Full Front End: full hood, fenders, bumper & mirrors',
       'Complete Coverage: every exposed painted surface',
-      '10-year manufacturer warranty (3M / STEK)',
+      '10-year manufacturer warranty (3M)',
     ],
     heroSubcopy:
-      "Premium self-healing paint protection film (clear bra) from 3M and STEK — safeguarding your car's factory paint against scratches, chips, and road hazards.",
+      "Premium self-healing paint protection film (clear bra) from 3M — safeguarding your car's factory paint against scratches, chips, and road hazards.",
     intro:
-      "At Mario's Tint Shop we specialize in premium paint protection film (PPF) — an invisible clear bra that protects your factory paint from scratches, chips, and road debris. We are certified dealers and installers for 3M, XPEL, and SunTek, with cutting-edge self-healing films where minor scratches vanish when exposed to heat.",
+      "At Mario's Tint Shop we specialize in premium 3M paint protection film (PPF) — an invisible clear bra that protects your factory paint from scratches, chips, and road debris. We are certified 3M dealers and installers, with cutting-edge self-healing film where minor scratches vanish when exposed to heat.",
     features: [
       { title: '3M Paint Protection', body: 'Self-healing PPF combined with ceramic coating technology — exceptional clarity, gloss, and hydrophobic performance, backed by a 10-year warranty.' },
-      { title: 'STEK DYNO Platinum', body: 'High-gloss, self-healing top coat resistant to UV, chemicals, and stains, with excellent optical clarity for a nearly invisible finish. 10-year warranty.' },
       { title: 'Self-Healing Technology', body: "Minor scratches and swirl marks on the film's surface vanish when exposed to heat — warm water or sunlight — keeping your vehicle looking new." },
       { title: 'Enhanced Resale Value', body: 'A vehicle protected with PPF retains its appearance and value over time, and the film is virtually invisible once applied.' },
+      { title: '10-Year 3M Warranty', body: "Every installation is backed by 3M's comprehensive manufacturer warranty against yellowing, cracking, and delamination." },
     ],
     process: [
       'Walk-around to map high-impact zones and coverage options',
@@ -401,19 +404,19 @@ export const SERVICES: Service[] = [
     kicker: 'Commercial Films',
     name: 'Office & Commercial Films',
     short:
-      '3M and Avery Dennison window tinting solutions for office and commercial buildings — professional installation for optimal protection and energy efficiency.',
+      '3M window tinting solutions for office and commercial buildings — professional installation for optimal protection and energy efficiency.',
     meta: '3M Prestige · Ceramic · Night Vision · Low-E',
     startingPrice: 'Custom quote',
     includes: [
       '3M Prestige: up to 97% IR / 60% total heat rejection',
       '3M Ceramic Architectural: up to 80% IR rejection',
       '3M Night Vision & All Season (Low-E) films',
-      'Avery Dennison spectrally selective & reflective lines',
+      '3M spectrally selective & reflective lines',
     ],
     heroSubcopy:
       'Enhance your business environment with 3M commercial and office window films — heat rejection up to 97% IR, 99% UV blocking, energy savings, and preserved views.',
     intro:
-      "At Mario's Tint Shop, we understand the importance of creating a comfortable, functional, and aesthetically pleasing environment for your business and employees. We install 3M and Avery Dennison architectural films that reject heat, block 99% of UV rays, and lower energy costs — with paybacks in as little as three years.",
+      "At Mario's Tint Shop, we understand the importance of creating a comfortable, functional, and aesthetically pleasing environment for your business and employees. We install 3M architectural films that reject heat, block 99% of UV rays, and lower energy costs — with paybacks in as little as three years.",
     features: [
       { title: '3M Prestige Series', body: "The ultimate in heat rejection — blocks up to 97% of the sun's infrared light and up to 60% of total heat while remaining virtually clear." },
       { title: 'Significant Energy Savings', body: 'By rejecting solar heat, the films reduce HVAC strain and lower air conditioning costs, with potential paybacks in as little as three years.' },
@@ -442,7 +445,7 @@ export const getService = (slug: string) =>
 
 // ── Testimonials ────────────────────────────────────────────────────
 // Real 5-star Google reviews from the shop's Google Business profile
-// (5.0 rating · 390+ reviews). Photos are the customers' own review photos,
+// (5.0 rating, on our way to 400+ reviews). Photos are the customers' own review photos,
 // pulled from Google Maps and self-hosted under /public/images/reviews.
 export const TESTIMONIALS = [
   {
@@ -499,7 +502,68 @@ export const TESTIMONIALS = [
       alt: "Damone's white sedan tinted in Mario's Tint Shop",
     },
   },
+  {
+    quote:
+      "This place is incredible. Don't go anywhere else. Save your money and get the best professional tint you've ever had in your life! I've been here twice already and they do incredible work.",
+    author: 'Jody Locke',
+    photo: { src: '/images/reviews/review-jody.jpg', alt: "Jody Locke's vehicle after tint installation" },
+  },
+  {
+    quote:
+      "Amazing work, attention to detail, very professional and friendly! I highly recommend Mario's tint shop!",
+    author: 'Whitney Stanbrough',
+    photo: { src: '/images/reviews/review-whitney.jpg', alt: "Whitney Stanbrough's vehicle after tint installation" },
+  },
+  {
+    quote:
+      'I have experienced excellent service twice so far. They always complete my request with high quality. I recommend this shop because the work time is fast and the price is fair.',
+    author: 'H N',
+    photo: { src: '/images/reviews/review-hn.jpg', alt: "H N's vehicle after tint installation" },
+  },
+  {
+    quote:
+      'Mario is very professional and does an amazing job. He has actually tinted three of my cars. I would definitely recommend him, so go and check him out!',
+    author: 'Reshonda Goins',
+    photo: { src: '/images/reviews/review-reshonda.jpg', alt: "Reshonda Goins's vehicle after tint installation" },
+  },
+  {
+    quote:
+      'These guys are professionals and treated my brand-new IS with care and respect. Their work is outstanding and exceeded my expectations, money well spent!',
+    author: 'Erik Allerup',
+    photo: { src: '/images/reviews/review-erik.jpg', alt: "Erik Allerup's Lexus IS after tint installation" },
+  },
+  {
+    quote:
+      'Mario greeted me when I walked into his shop. Very nice guy and hard worker. I was in and out within an hour of arrival with great-looking tint at a great price. I would highly recommend his shop for tint.',
+    author: 'Daniel Bess',
+    photo: { src: '/images/reviews/review-daniel.jpg', alt: "Daniel Bess's vehicle after tint installation" },
+  },
+  {
+    quote:
+      'Very professional tint job. Very informative and knowledgeable staff. Recommend to anyone needing automobile tint done.',
+    author: 'Justin',
+    photo: { src: '/images/reviews/review-justin.jpg', alt: "Justin's vehicle after tint installation" },
+  },
+  {
+    quote:
+      'Mario is extremely professional and a pleasure to work with. He tinted my new 2500 and it looks awesome.',
+    author: 'James Perrigo',
+    photo: { src: '/images/reviews/review-james.jpg', alt: "James Perrigo's RAM 2500 after tint installation" },
+  },
+  {
+    quote: 'They did an excellent job on my F-150. I highly recommend.',
+    author: 'Scott Hammers',
+    photo: { src: '/images/reviews/review-scott.jpg', alt: "Scott Hammers's F-150 after tint installation" },
+  },
 ];
+
+// Aggregate rating shown on the Google review badge — keep in sync with
+// Layout.astro's schema.org aggregateRating and the STATS review count.
+export const GOOGLE_RATING = {
+  value: 5.0,
+  count: 390,
+  url: CONTACT.googleBusinessUrl,
+};
 
 // ── Instagram gallery (real posts from @mariostintshop) ─────────────
 export const GALLERY = [
@@ -536,7 +600,7 @@ export const BENEFITS = [
   },
   {
     title: 'Authorized 3M Platinum Dealer',
-    body: 'Certified 3M, XPEL & SunTek installers using industry-leading films and coatings, backed by comprehensive manufacturer warranties.',
+    body: 'Certified 3M installers using industry-leading films and coatings, backed by comprehensive manufacturer warranties.',
   },
   {
     title: 'One-Stop Shop',
@@ -544,7 +608,7 @@ export const BENEFITS = [
   },
   {
     title: 'Trusted by Middle Tennessee',
-    body: 'A+ BBB rating and a 5.0-star Google rating from 128+ reviews, serving Murfreesboro, Nashville, Smyrna, La Vergne & beyond.',
+    body: 'A+ BBB rating and a 5.0-star Google rating from 390+ reviews, serving Murfreesboro, Nashville, Smyrna, La Vergne & beyond.',
   },
 ];
 

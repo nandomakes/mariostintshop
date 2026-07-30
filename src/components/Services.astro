@@ -1,38 +1,6 @@
 ---
 import { SERVICES, IMAGES, CONTACT } from '../consts';
 
-// Scalloped "certification seal" outline: symmetric rounded lobes with rounded
-// valleys, traced with Catmull-Rom → bézier for a smooth, cusp-free wave edge.
-const seal = (() => {
-  const N = 15,
-    cx = 100,
-    cy = 100,
-    base = 90,
-    amp = 6;
-  const steps = N * 8;
-  const pts: [number, number][] = [];
-  for (let i = 0; i < steps; i++) {
-    const t = (i / steps) * Math.PI * 2 - Math.PI / 2;
-    const phase = N * (t + Math.PI / 2);
-    const r = base + amp * Math.cos(phase);
-    pts.push([cx + r * Math.cos(t), cy + r * Math.sin(t)]);
-  }
-  const p = (i: number) => pts[(i + pts.length) % pts.length];
-  let d = `M ${p(0)[0].toFixed(2)} ${p(0)[1].toFixed(2)}`;
-  for (let i = 0; i < pts.length; i++) {
-    const p0 = p(i - 1),
-      p1 = p(i),
-      p2 = p(i + 1),
-      p3 = p(i + 2);
-    const c1x = p1[0] + (p2[0] - p0[0]) / 6;
-    const c1y = p1[1] + (p2[1] - p0[1]) / 6;
-    const c2x = p2[0] - (p3[0] - p1[0]) / 6;
-    const c2y = p2[1] - (p3[1] - p1[1]) / 6;
-    d += ` C ${c1x.toFixed(2)} ${c1y.toFixed(2)}, ${c2x.toFixed(2)} ${c2y.toFixed(2)}, ${p2[0].toFixed(2)} ${p2[1].toFixed(2)}`;
-  }
-  return d + ' Z';
-})();
-
 // Distinct line icon per service (inner SVG paths, 24×24 stroke grid).
 const ICONS: Record<string, string> = {
   'window-tinting':
@@ -79,11 +47,11 @@ const IMG_FX_DEFAULT = 'object-center';
               <path id="seal-top" d="M100 100 m-61 0 a61 61 0 1 1 122 0" fill="none" />
               <path id="seal-bottom" d="M100 100 m-73 0 a73 73 0 1 0 146 0" fill="none" />
             </defs>
-            <path d={seal} fill="url(#seal-grad)" />
-            <!-- Faint concentric guilloche rings -->
-            <circle cx="100" cy="100" r="52" fill="none" stroke="#0A6FB0" stroke-opacity="0.35" stroke-width="1" />
-            <circle cx="100" cy="100" r="47" fill="none" stroke="#0A6FB0" stroke-opacity="0.35" stroke-width="1" />
-            <circle cx="100" cy="100" r="42" fill="none" stroke="#0A6FB0" stroke-opacity="0.35" stroke-width="1" />
+            <circle cx="100" cy="100" r="90" fill="url(#seal-grad)" />
+            <!-- Concentric guilloche rings around the center emblem -->
+            <circle cx="100" cy="100" r="52" fill="none" stroke="#0A6FB0" stroke-opacity="0.6" stroke-width="1.5" />
+            <circle cx="100" cy="100" r="47" fill="none" stroke="#0A6FB0" stroke-opacity="0.6" stroke-width="1.5" />
+            <circle cx="100" cy="100" r="42" fill="none" stroke="#0A6FB0" stroke-opacity="0.6" stroke-width="1.5" />
             <text fill="#FFFFFF" font-family="Gabarito, sans-serif" font-size="17.5" font-weight="400">
               <textPath href="#seal-top" startOffset="50%" text-anchor="middle" textLength="170" lengthAdjust="spacing">100% SATISFACTION</textPath>
             </text>

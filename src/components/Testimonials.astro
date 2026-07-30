@@ -1,40 +1,57 @@
 ---
 import { TESTIMONIALS } from '../consts';
+import GoogleRatingBadge from './GoogleRatingBadge.astro';
 
-// Duplicate the set so the carousel can loop seamlessly: when the auto-play
-// reaches the second copy it jumps back (instantly) to the first.
-const slides = [...TESTIMONIALS, ...TESTIMONIALS];
+const slides = TESTIMONIALS;
+
+const initials = (name: string) =>
+  name
+    .split(' ')
+    .map((w) => w[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
 ---
 
 <section id="testimonials" class="hex-bg bg-paper">
   <div class="mx-auto max-w-6xl px-5 py-20 md:py-24">
-    <div class="text-center">
+    <div class="flex flex-col items-center gap-6 text-center">
       <p class="reveal kicker text-accentDk">Testimonials</p>
-      <h2 class="reveal headline mx-auto mt-3 max-w-3xl text-[clamp(1.4rem,2.8vw,2.2rem)] text-ink">
+      <h2 class="reveal headline max-w-3xl text-[clamp(1.4rem,2.8vw,2.2rem)] text-ink">
         Real reviews from real people
       </h2>
+      <GoogleRatingBadge class="reveal" />
     </div>
 
+    <div class="relative mt-12">
     <div
       id="testimonial-track"
-      class="no-scrollbar mt-12 flex gap-6 overflow-x-auto"
+      class="no-scrollbar flex gap-6 overflow-x-auto scroll-smooth outline-none"
+      style="overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; -webkit-tap-highlight-color: transparent;"
       aria-label="Customer reviews carousel"
     >
       {
-        slides.map((t, i) => (
+        slides.map((t) => (
           <figure
             class="flex w-full shrink-0 flex-col bg-mint sm:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-3rem)/3)]"
-            aria-hidden={i >= TESTIMONIALS.length ? 'true' : undefined}
           >
-            <!-- Evidence shot: the customer's finished vehicle -->
-            <img
-              src={t.photo.src}
-              alt={t.photo.alt}
-              width="800"
-              height="500"
-              loading="lazy"
-              class="aspect-[8/5] w-full object-cover"
-            />
+            {t.photo ? (
+              <img
+                src={t.photo.src}
+                alt={t.photo.alt}
+                width="800"
+                height="500"
+                loading="lazy"
+                draggable="false"
+                class="aspect-[8/5] w-full select-none object-cover outline-none"
+              />
+            ) : (
+              <div class="flex aspect-[8/5] w-full items-center justify-center bg-accent/10">
+                <span class="headline text-4xl tracking-[0.06em] text-accentDk" aria-hidden="true">
+                  {initials(t.author)}
+                </span>
+              </div>
+            )}
             <div class="relative flex flex-1 flex-col p-8">
               <div class="flex gap-1 text-accentDk" aria-label="5 out of 5 stars">
                 {Array.from({ length: 5 }).map(() => (
@@ -56,19 +73,51 @@ const slides = [...TESTIMONIALS, ...TESTIMONIALS];
         ))
       }
     </div>
+
+    <!-- Prev/next arrows: same treatment as the Instagram strip. -->
+    <button
+      type="button"
+      data-dir="prev"
+      class="testimonial-arrow absolute inset-y-0 left-0 z-10 hidden w-16 items-center justify-start bg-gradient-to-r from-paper via-paper/70 to-transparent pl-1 transition-opacity duration-200 disabled:pointer-events-none disabled:opacity-0 md:flex sm:w-20"
+      aria-label="Previous reviews"
+    >
+      <span class="pressable flex h-11 w-11 items-center justify-center border border-sand bg-paper text-ink shadow-lg transition-colors duration-200 hover:border-accent hover:text-accentDk">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
+      </span>
+    </button>
+    <button
+      type="button"
+      data-dir="next"
+      class="testimonial-arrow absolute inset-y-0 right-0 z-10 hidden w-16 items-center justify-end bg-gradient-to-l from-paper via-paper/70 to-transparent pr-1 transition-opacity duration-200 disabled:pointer-events-none disabled:opacity-0 md:flex sm:w-20"
+      aria-label="Next reviews"
+    >
+      <span class="pressable flex h-11 w-11 items-center justify-center border border-sand bg-paper text-ink shadow-lg transition-colors duration-200 hover:border-accent hover:text-accentDk">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+      </span>
+    </button>
+    </div>
+
+    <!-- Scroll progress bar: fills to show position in the review list. -->
+    <div class="mx-auto mt-4 h-1 w-full max-w-xs bg-sand" aria-hidden="true">
+      <div id="testimonial-progress" class="h-full w-0 bg-accent transition-[width] duration-150"></div>
+    </div>
   </div>
 </section>
 
 <script>
-  // Auto-advance one card every 4s; jumps back seamlessly thanks to the
-  // duplicated slide set. Pauses on hover/touch and under reduced motion.
+  // Auto-advance one card every 4s; wraps back to the start with an instant
+  // (non-animated) jump — no duplicated slides needed. Pauses on
+  // hover/touch/focus, arrow-nav, or under reduced motion; manual arrow use
+  // turns off the autoplay for good.
   const track = document.getElementById('testimonial-track');
+  const progress = document.getElementById('testimonial-progress');
   if (track) {
     const slides = Array.from(track.children) as HTMLElement[];
-    const half = slides.length / 2;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const arrows = Array.from(document.querySelectorAll<HTMLButtonElement>('.testimonial-arrow'));
     let idx = 0;
     let paused = false;
+    let autoplay: ReturnType<typeof setInterval> | null = null;
 
     const go = (i: number, smooth: boolean) => {
       track.scrollTo({
@@ -77,24 +126,75 @@ const slides = [...TESTIMONIALS, ...TESTIMONIALS];
       });
     };
 
+    // Which slide is currently leading the viewport — used so arrow clicks
+    // snap to an exact card boundary instead of scrolling by a fixed pixel
+    // amount. A fixed-pixel step drifts against the cards' fractional
+    // (calc()) widths over repeated clicks, leaving a sliver of the next
+    // card's photo peeking out past the arrow's fade zone — that sliver is
+    // the "blink" the fade doesn't fully cover.
+    const currentIndex = () => {
+      const left = track.scrollLeft;
+      let closest = 0;
+      let closestDist = Infinity;
+      slides.forEach((s, i) => {
+        const dist = Math.abs(s.offsetLeft - slides[0].offsetLeft - left);
+        if (dist < closestDist) {
+          closestDist = dist;
+          closest = i;
+        }
+      });
+      return closest;
+    };
+
+    const maxScroll = () => track.scrollWidth - track.clientWidth;
+    const EPS = 4;
+    const syncArrows = () => {
+      const max = maxScroll();
+      const prev = arrows.find((a) => a.dataset.dir === 'prev');
+      const next = arrows.find((a) => a.dataset.dir === 'next');
+      if (prev) prev.disabled = track.scrollLeft <= EPS;
+      if (next) next.disabled = track.scrollLeft >= max - EPS || max <= EPS;
+    };
+    const syncProgress = () => {
+      const max = maxScroll();
+      if (progress) progress.style.width = `${max <= EPS ? 100 : Math.min(100, (track.scrollLeft / max) * 100)}%`;
+    };
+    track.addEventListener('scroll', () => {
+      syncArrows();
+      syncProgress();
+    });
+    syncArrows();
+    syncProgress();
+
     track.addEventListener('mouseenter', () => (paused = true));
     track.addEventListener('mouseleave', () => (paused = false));
     track.addEventListener('touchstart', () => (paused = true), { passive: true });
     track.addEventListener('touchend', () => setTimeout(() => (paused = false), 4000), { passive: true });
 
+    arrows.forEach((btn) => {
+      btn.addEventListener('pointerdown', (e) => e.preventDefault());
+      btn.addEventListener('click', () => {
+        if (autoplay) {
+          clearInterval(autoplay);
+          autoplay = null;
+        }
+        const dir = btn.dataset.dir === 'next' ? 1 : -1;
+        const target = Math.min(Math.max(currentIndex() + dir, 0), slides.length - 1);
+        idx = target;
+        go(target, true);
+      });
+    });
+
     if (!reduce) {
-      setInterval(() => {
+      autoplay = setInterval(() => {
         if (paused || document.hidden) return;
-        idx += 1;
-        go(idx, true);
-        if (idx >= half) {
-          // After the smooth scroll lands on the duplicate, snap back to the
-          // matching original card without animation.
-          const back = idx - half;
-          setTimeout(() => {
-            go(back, false);
-            idx = back;
-          }, 700);
+        if (idx >= slides.length - 1) {
+          // Wrap to the start instantly — no duplicate slides to ease into.
+          idx = 0;
+          go(idx, false);
+        } else {
+          idx += 1;
+          go(idx, true);
         }
       }, 4000);
     }

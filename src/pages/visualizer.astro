@@ -4,7 +4,7 @@ import Header from '../components/Header.astro';
 import QuoteCTA from '../components/QuoteCTA.astro';
 import Footer from '../components/Footer.astro';
 import CallFab from '../components/CallFab.astro';
-import { SITE, IMAGES, WHATSAPP_NUMBER } from '../consts';
+import { SITE, IMAGES } from '../consts';
 import { PHOTO_VEHICLES } from '../lib/vehicles-photo';
 
 // 3D-only visualizer: one optimized GLB per category (public/models3d/*.glb).
@@ -294,8 +294,8 @@ const PRIORITIES = [
                 exposure="1.0"
                 tone-mapping="neutral"
                 environment-image="/models3d/studio-env.hdr"
-                camera-orbit="-35deg 78deg 54%"
-                field-of-view="20deg"
+                camera-orbit="-35deg 84deg 70%"
+                field-of-view="22deg"
                 disable-zoom
                 disable-tap
                 interaction-prompt="none"
@@ -320,15 +320,13 @@ const PRIORITIES = [
           <!-- CTAs under the preview -->
           <a
             id="visualizer-cta"
-            href={`https://wa.me/${WHATSAPP_NUMBER}`}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#contact"
             class="pressable sticker mx-auto mt-6 block max-w-md bg-accent px-8 py-4 text-center text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
           >
-            Contact Your Installer →
+            Get a Quote for This Build →
           </a>
           <p class="mt-2.5 text-center text-[11px] text-ash">
-            Opens WhatsApp with your build pre-filled — we reply with a free quote.
+            Jumps to our quote form below — we reply with a free quote.
           </p>
 
           <p class="mx-auto mt-6 max-w-xl text-center text-[11px] leading-relaxed text-ash">
@@ -448,8 +446,6 @@ const PRIORITIES = [
 
     const summary = document.getElementById('build-summary')!;
     const badge = document.getElementById('legal-badge')!;
-    const cta = document.getElementById('visualizer-cta') as HTMLAnchorElement;
-
     // ══ 3D viewer ═════════════════════════════════════════════════════
     type GlbMaterial = {
       name: string;
@@ -532,7 +528,7 @@ const PRIORITIES = [
     function applyAngle() {
       const front = FRONT_THETA[state.vehicle] ?? -35;
       const theta = angle === 'front' ? front : front + 180;
-      viewer.cameraOrbit = `${theta}deg 78deg 54%`;
+      viewer.cameraOrbit = `${theta}deg 84deg 70%`;
       if (modelCenter) {
         const facing = front === -35 ? 1 : -1;
         const dir = facing * (angle === 'front' ? 1 : -1);
@@ -602,14 +598,6 @@ const PRIORITIES = [
         ? 'shrink-0 bg-accent/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-accentDk'
         : 'shrink-0 bg-[#FFF1CC] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#8A5B00]';
 
-      const zonesMsg = [...state.tintZones].map((z) => ZONE_LABELS[z]).join(', ') || 'to be decided';
-      const prio = [...state.priorities].map((p) => ZONE_LABELS[p] ?? p).join(', ');
-      const msg =
-        `Hi! I built this in your tint visualizer — Window tint on a ${state.vehicleLabel.toLowerCase()}.` +
-        ` Zones: ${zonesMsg}. Shade: ${state.shadeLabel} (${SHADE_META[state.shade].vlt}).` +
-        (prio ? ` Priorities: ${prio}.` : '') +
-        ` Can I get a quote?`;
-      cta.href = `${cta.href.split('?')[0]}?text=${encodeURIComponent(msg)}`;
     }
 
     // ══ Controls ═══════════════════════════════════════════════════════
