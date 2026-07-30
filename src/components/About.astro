@@ -42,16 +42,16 @@ const bandSeq = [...bandItems, ...bandItems, ...bandItems, ...bandItems];
 
       <!-- Light-blue marquee band, vertically centered behind the image -->
       <div
-        class="marquee absolute left-1/2 top-1/2 w-screen -translate-x-1/2 -translate-y-1/2 -rotate-2 bg-[#5FC2FF] py-3"
+        class="marquee absolute left-1/2 top-1/2 w-screen -translate-x-1/2 -translate-y-1/2 -rotate-2 bg-[#5FC2FF] py-1.5 sm:py-2 md:py-3"
         aria-hidden="true"
       >
         <div class="marquee-track">
           {
             bandSeq.map((label, i) => (
-              <span class="mx-5 flex items-center gap-10 whitespace-nowrap">
+              <span class="mx-3 flex items-center gap-6 whitespace-nowrap sm:mx-4 sm:gap-8 md:mx-5 md:gap-10">
                 <span
                   class:list={[
-                    'headline text-xl tracking-[0.08em]',
+                    'headline text-sm tracking-[0.06em] sm:text-base sm:tracking-[0.08em] md:text-xl',
                     i % 2 === 0 ? 'text-paper' : 'text-ink/70',
                   ]}
                 >
@@ -70,7 +70,7 @@ const bandSeq = [...bandItems, ...bandItems, ...bandItems, ...bandItems];
         width={IMAGES.install.width}
         height={IMAGES.install.height}
         loading="lazy"
-        class="relative mx-auto w-[90%] object-contain"
+        class="relative mx-auto w-full object-contain sm:w-[90%]"
       />
     </div>
   </div>

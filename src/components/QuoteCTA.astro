@@ -58,14 +58,13 @@ const { defaultService } = Astro.props;
            nothing posts from this site. -->
       <div class="reveal overflow-hidden bg-paper p-2 shadow-[0_30px_60px_-30px_rgba(0,0,0,0.6)] sm:p-4">
         <h3 class="sr-only">Request a Quote</h3>
-        <div class="h-[548px] w-full overflow-hidden">
+        <div class="quotewrap w-full overflow-hidden">
           <iframe
             src={TINTWIZ_FORM_URL}
             title="Request a quote from Mario's Tint Shop"
             loading="lazy"
             scrolling="no"
-            class="w-[138.9%] border-0"
-            style="height: 761px; transform: scale(0.72); transform-origin: top left;"
+            class="quoteiframe border-0"
             referrerpolicy="strict-origin-when-cross-origin"
           ></iframe>
         </div>
@@ -79,3 +78,28 @@ const { defaultService } = Astro.props;
     </div>
   </div>
 </section>
+
+<style>
+  /* The form's own CSS is cross-origin, so we scale the whole iframe and
+     compensate its width/height to fill the card. The scale factor has to
+     differ per breakpoint because it's tuned against the card's width. */
+  .quotewrap {
+    height: 540px;
+  }
+  .quoteiframe {
+    width: 160%;
+    height: 864px;
+    transform: scale(0.625);
+    transform-origin: top left;
+  }
+  @media (min-width: 640px) {
+    .quotewrap {
+      height: 548px;
+    }
+    .quoteiframe {
+      width: 138.9%;
+      height: 761px;
+      transform: scale(0.72);
+    }
+  }
+</style>

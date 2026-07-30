@@ -35,14 +35,18 @@ const layout = [
     </div>
 
     <div
-      class="reveal showcase-grid mt-12 grid h-[700px] grid-cols-2 [grid-template-rows:repeat(4,1fr)] gap-4 sm:h-[420px] sm:grid-cols-4 sm:[grid-template-rows:repeat(20,1fr)] md:h-[560px]"
+      class="reveal showcase-grid mt-12 grid aspect-[3/4] grid-cols-2 [grid-template-rows:repeat(3,1fr)] gap-4 sm:aspect-auto sm:h-[420px] sm:grid-cols-4 sm:[grid-template-rows:repeat(20,1fr)] md:h-[560px]"
     >
       {
         tiles.map((img, i) => {
           const spot = layout[i];
+          // The 7th tile only exists to fill the desktop bento; on mobile's
+          // 2-column grid it would show as a visible duplicate plus an orphan
+          // half-empty row, so it's dropped below sm.
+          const isFiller = i === tiles.length - 1;
           return (
             <div
-              class="group relative overflow-hidden"
+              class:list={['group relative overflow-hidden', isFiller && 'hidden sm:block']}
               style={`--col:${spot.col}; --row:${spot.row};`}
             >
               <img
