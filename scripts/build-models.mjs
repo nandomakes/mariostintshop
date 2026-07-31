@@ -13,6 +13,21 @@
 //   glass_rearwin     — rear window
 //   glass_lamps       — head/tail-light lenses, never tinted
 //
+// The body paint is likewise silver-grey and split into PPF ZONES so the
+// visualizer can shade each paint-protection package independently:
+//
+//   ppf_bumper_f      — front bumper
+//   ppf_hood_f        — leading section of hood + fender fronts (partial)
+//   ppf_hood_r        — remainder of hood/fenders up to the windshield
+//   ppf_roof          — roof + A-pillars / roofline
+//   ppf_rocker        — rockers + lower doors
+//   ppf_side          — door skins (full-wrap only)
+//   ppf_rear          — everything aft of the cabin (full-wrap only)
+//
+// Unlike glass, PPF zones are split PER-TRIANGLE rather than per connected
+// component: a "partial hood" really is a straight cut across the middle of
+// one panel, which is exactly how the film is laid in the real world.
+//
 // Debug: COLOR_ZONES=1 node scripts/build-models.mjs paints each zone a
 // loud color so the split can be verified visually.
 //
@@ -36,12 +51,15 @@ const COLOR_ZONES = !!process.env.COLOR_ZONES;
 // and the zone split along the cabin-glass long axis. `noseSign` says which
 // end of the long axis the nose points to (+1 = positive coordinates).
 // Fractions are measured nose → tail across the cabin glass span.
+// Every car is silver-grey so the green PPF shading reads clearly against it.
+const BODY_SILVER = '#b9bec4';
+
 const MODELS = {
   sedan: {
     src: '2022_bmw_m5_cs.glb',
     glass: /Window_Material$/i,
     bodyPaint: /Paint_Material$/i,
-    bodyColor: '#13b545',
+    bodyColor: BODY_SILVER,
     blackParts: /Wheel|Grille/i, // dark-gray rims + grille
     silverParts: /SpecularTint/i, // silver-grey grille trim
     simplifyRatio: 0.6,
@@ -55,10 +73,13 @@ const MODELS = {
     // rescaled to keep every real window's zone identical.
     zoneCuts: { ws: 0.38, front: 0.55, rearside: 0.89 },
     lampFrontFrac: 0.15, lampRearFrac: 0.12,
+    ppfCuts: { bumper: 0.09, hoodF: 0.21, hoodR: 0.38, rear: 0.76, high: 0.74, low: 0.42 },
   },
   suv: {
     src: '2023-lamborghini-urus-performante/source/2023_lamborghini_urus_performante.glb',
     glass: /Window_Material$/i,
+    bodyPaint: /Paint_Material$/i,
+    bodyColor: BODY_SILVER,
     simplifyRatio: 0.6,
     noseSign: +1,
     upSign: +1,
@@ -68,10 +89,13 @@ const MODELS = {
     // rear hatch→rearwin.
     zoneCuts: { ws: 0.33, front: 0.5, rearside: 0.83 },
     lampFrontFrac: 0.16, lampRearFrac: 0.08,
+    ppfCuts: { bumper: 0.10, hoodF: 0.22, hoodR: 0.36, rear: 0.80, high: 0.76, low: 0.46 },
   },
   sport: {
     src: '2020-porsche-718-cayman-gt4/source/2020_porsche_718_cayman_gt4.glb',
     glass: /Window_Material$/i,
+    bodyPaint: /Paint_Material$/i,
+    bodyColor: BODY_SILVER,
     simplifyRatio: 0.75,
     noseSign: +1,
     upSign: +1,
@@ -81,12 +105,14 @@ const MODELS = {
     // behind it (rear-side).
     zoneCuts: { ws: 0.4, front: 0.6, rearside: 0.88 },
     lampFrontFrac: 0.18, lampRearFrac: 0.13,
+    // Mid-engine: short frunk up front, engine deck from ~0.66 back.
+    ppfCuts: { bumper: 0.10, hoodF: 0.20, hoodR: 0.32, rear: 0.66, high: 0.78, low: 0.42 },
   },
   truck: {
     src: '2021-ram-1500-trx/source/ram1500trx.glb',
     glass: /Window_Material$/i,
     bodyPaint: /Paint_Material$/i,
-    bodyColor: '#cc1518',
+    bodyColor: BODY_SILVER,
     blackParts: /Wheel|Grille/i,
     simplifyRatio: 0.6,
     noseSign: +1,
@@ -97,6 +123,8 @@ const MODELS = {
     // doors as rear-side and sends the cab backlight to rear-window.
     zoneCuts: { ws: 0.15, front: 0.33, rearside: 0.52 },
     lampFrontFrac: 0, lampRearFrac: 0,
+    // Crew cab: short hood, cab to ~0.60, bed + tailgate behind that.
+    ppfCuts: { bumper: 0.07, hoodF: 0.16, hoodR: 0.29, rear: 0.60, high: 0.80, low: 0.48 },
   },
 };
 
@@ -128,6 +156,25 @@ function hexToLinear(hex) {
 const GLASS_METALLIC = 0.35;
 const GLASS_ROUGHNESS = 0.04;
 
+// PPF body zones. `nose` cuts are fractions of the car's length measured
+// nose(0) → tail(1); `high`/`low` are fractions of its height (0 = ground).
+// Defaults suit a normal three-box car; per-vehicle overrides live in MODELS.
+const PPF_CUTS_DEFAULT = {
+  bumper: 0.10, // nose → here is the front bumper
+  hoodF: 0.22, //  bumper → here is the "partial front" hood/fender strip
+  hoodR: 0.40, //  → here is the rest of the hood, ending at the windshield
+  rear: 0.78, //   from here back is rear quarters/bumper/trunk
+  high: 0.72, //   above this in the cabin band is roof + A-pillars
+  low: 0.30, //    below this in the cabin band is rockers + lower doors
+};
+
+// Paint zone colors: silver body, green where film is applied. The green
+// matches the accent used across the site's tint previews.
+export const PPF_LOOK = {
+  bare: hexToLinear(BODY_SILVER),
+  covered: hexToLinear('#13b545'),
+};
+
 const ZONE_DEBUG_COLORS = {
   glass_windshield: [1, 0, 0, 1],
   glass_visor: [1, 1, 0, 1],
@@ -135,6 +182,13 @@ const ZONE_DEBUG_COLORS = {
   glass_rearside: [0, 0, 1, 1],
   glass_rearwin: [1, 0, 1, 1],
   glass_lamps: [1, 0.5, 0, 1],
+  ppf_bumper_f: [1, 0, 0, 1],
+  ppf_hood_f: [1, 0.55, 0, 1],
+  ppf_hood_r: [1, 1, 0, 1],
+  ppf_roof: [0, 0.8, 1, 1],
+  ppf_rocker: [0.6, 0, 1, 1],
+  ppf_side: [0, 1, 0.3, 1],
+  ppf_rear: [1, 0, 0.8, 1],
 };
 
 const io = new NodeIO()
@@ -259,6 +313,15 @@ for (const [vehicle, cfg] of Object.entries(MODELS)) {
     const vMid = mn[V] + ext[V] * 0.5;
     const up = cfg.upSign ?? 1;
 
+    // Average of a triangle's three vertices along one axis. Shared by the
+    // glass and PPF splits below.
+    const centroid = (pos, idx, t, axis) => {
+      const v = [0, 0, 0];
+      let c = 0;
+      for (let k = 0; k < 3; k++) c += pos.getElement(idx.getScalar(t + k), v)[axis];
+      return c / 3;
+    };
+
     // Collect glass primitives (excluding named lamps).
     const glassPrims = [];
     for (const mesh of root.listMeshes()) {
@@ -274,12 +337,6 @@ for (const [vehicle, cfg] of Object.entries(MODELS)) {
       // (cabin glass sits above the beltline). Also find the cabin span.
       const tri = { lamp: [], cabin: [] };
       let cMin = 1e9, cMax = -1e9;
-      const centroid = (pos, idx, t, axis) => {
-        const v = [0, 0, 0];
-        let c = 0;
-        for (let k = 0; k < 3; k++) c += pos.getElement(idx.getScalar(t + k), v)[axis];
-        return c / 3;
-      };
       for (const { prim } of glassPrims) {
         const pos = prim.getAttribute('POSITION');
         const idx = prim.getIndices();
@@ -389,6 +446,66 @@ for (const [vehicle, cfg] of Object.entries(MODELS)) {
         });
       }
       console.log('  zones:', Object.entries(counts).map(([z, n]) => `${z.replace('glass_', '')}=${n}`).join(' '));
+    }
+
+    // ── PPF split: carve the painted body into film zones ───────────
+    // Per-triangle (not per-component): the body shell is one connected
+    // surface, and a real "partial front" is a straight cut across the
+    // hood anyway.
+    if (cfg.bodyPaint) {
+      const paintPrims = [];
+      for (const mesh of root.listMeshes()) {
+        for (const prim of mesh.listPrimitives()) {
+          if (cfg.bodyPaint.test(prim.getMaterial()?.getName() || '')) paintPrims.push({ mesh, prim });
+        }
+      }
+      if (paintPrims.length) {
+        const basePaint = paintPrims[0].prim.getMaterial();
+        const c = { ...PPF_CUTS_DEFAULT, ...(cfg.ppfCuts ?? {}) };
+        const lenSpan = ext[L] || 1;
+        const vSpan = ext[V] || 1;
+        // 0 at the nose, 1 at the tail.
+        const bodyNose = (p) => {
+          const f = (p - mn[L]) / lenSpan;
+          return cfg.noseSign > 0 ? 1 - f : f;
+        };
+        // 0 at the ground, 1 at the roof.
+        const bodyHigh = (p) => {
+          const f = (p - mn[V]) / vSpan;
+          return (cfg.upSign ?? 1) > 0 ? f : 1 - f;
+        };
+        const ppfZone = (nf, hf) => {
+          if (nf < c.bumper) return 'ppf_bumper_f';
+          if (nf < c.hoodF) return 'ppf_hood_f';
+          if (nf < c.hoodR) return 'ppf_hood_r';
+          if (nf > c.rear) return 'ppf_rear';
+          if (hf > c.high) return 'ppf_roof';
+          if (hf < c.low) return 'ppf_rocker';
+          return 'ppf_side';
+        };
+
+        const paintMats = {};
+        const buffer2 = root.listBuffers()[0];
+        const pcounts = {};
+        for (const { mesh, prim } of paintPrims) {
+          const pos = prim.getAttribute('POSITION');
+          const idx = prim.getIndices();
+          if (!pos || !idx) continue;
+          const buckets = {};
+          for (let t = 0; t < idx.getCount(); t += 3) {
+            const z = ppfZone(bodyNose(centroid(pos, idx, t, L)), bodyHigh(centroid(pos, idx, t, V)));
+            (buckets[z] ??= []).push(idx.getScalar(t), idx.getScalar(t + 1), idx.getScalar(t + 2));
+          }
+          Object.keys(buckets).forEach((z, i) => {
+            pcounts[z] = (pcounts[z] || 0) + buckets[z].length / 3;
+            const mat = paintMats[z] ??= basePaint.clone().setName(z);
+            const indices = doc.createAccessor().setType('SCALAR').setArray(new Uint32Array(buckets[z])).setBuffer(buffer2);
+            if (i === 0) prim.setIndices(indices).setMaterial(mat);
+            else mesh.addPrimitive(prim.clone().setIndices(indices).setMaterial(mat));
+          });
+        }
+        console.log('  ppf:  ', Object.entries(pcounts).map(([z, n]) => `${z.replace('ppf_', '')}=${n}`).join(' '));
+      }
     }
   }
 

@@ -11,9 +11,9 @@ import { PHOTO_VEHICLES } from '../lib/vehicles-photo';
 const VEHICLE_IDS = ['sedan', 'suv', 'sport', 'truck'];
 const VEHICLES = PHOTO_VEHICLES.filter((v) => VEHICLE_IDS.includes(v.id));
 
-const title = `Window Tint Visualizer | ${SITE.brand}`;
+const title = `Window Tint & PPF Visualizer | ${SITE.brand}`;
 const description =
-  "See 3M window tint on a 3D car. Pick a vehicle type, choose the coverage and shade, and rotate the model to preview the look — then send your build to Mario's Tint Shop in Murfreesboro, TN for a free quote.";
+  "See 3M window tint and paint protection film on a 3D car. Pick a vehicle type, choose your tint shade or PPF coverage, and preview the look — then send your build to Mario's Tint Shop in Murfreesboro, TN for a free quote.";
 
 // ── Control data ─────────────────────────────────────────────────────
 const TINT_ZONES = [
@@ -43,6 +43,47 @@ const PRIORITIES = [
   { id: 'heat', label: 'Heat rejection' },
   { id: 'signal', label: 'Signal clarity' },
   { id: 'appearance', label: 'Appearance' },
+];
+
+// Paint protection film packages, mirroring the industry-standard coverage
+// tiers. `zones` are the ppf_* materials split out in build-models.mjs.
+const PPF_PACKAGES = [
+  {
+    id: 'none',
+    label: 'No protection',
+    blurb: 'Bare paint — nothing applied.',
+    panels: 'No film applied.',
+    zones: [] as string[],
+  },
+  {
+    id: 'partial-front',
+    label: 'Partial front',
+    tag: 'Popular',
+    blurb: 'The high-impact leading edges.',
+    panels: 'Front bumper · partial hood · partial fenders · mirrors',
+    zones: ['ppf_bumper_f', 'ppf_hood_f'],
+  },
+  {
+    id: 'full-front',
+    label: 'Full front',
+    blurb: 'No cut line across the hood.',
+    panels: 'Front bumper · full hood · full fenders · mirrors',
+    zones: ['ppf_bumper_f', 'ppf_hood_f', 'ppf_hood_r'],
+  },
+  {
+    id: 'track-pack',
+    label: 'Track pack',
+    blurb: 'Full front plus the panels that catch road debris.',
+    panels: 'Full front · rockers & lower doors · A-pillars & roofline · door cups and edges',
+    zones: ['ppf_bumper_f', 'ppf_hood_f', 'ppf_hood_r', 'ppf_rocker', 'ppf_roof'],
+  },
+  {
+    id: 'full-wrap',
+    label: 'Full wrap',
+    blurb: 'Every painted panel on the vehicle.',
+    panels: 'Every painted surface, front to back',
+    zones: ['ppf_bumper_f', 'ppf_hood_f', 'ppf_hood_r', 'ppf_rocker', 'ppf_roof', 'ppf_side', 'ppf_rear'],
+  },
 ];
 ---
 
@@ -125,12 +166,22 @@ const PRIORITIES = [
       <div class="mx-auto grid max-w-6xl gap-8 px-5 py-10 md:py-14 lg:grid-cols-[5fr_7fr] lg:items-start">
         <!-- Controls column -->
         <div class="min-w-0 border border-sand bg-whisper lg:order-1">
-          <!-- Header + reset -->
-          <div class="flex items-center border-b border-sand pr-3">
-            <span class="relative px-4 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-accentDk">
+          <!-- Mode tabs + reset -->
+          <div class="flex items-center border-b border-sand pr-3" role="tablist" aria-label="Simulator mode">
+            <button
+              type="button" role="tab" data-mode="tint" aria-selected="true"
+              class="mode-tab pressable relative px-4 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-ash transition-colors duration-200 aria-selected:text-accentDk"
+            >
               Window Tint
-              <span class="absolute inset-x-0 bottom-0 h-0.5 bg-accent"></span>
-            </span>
+              <span class="mode-underline absolute inset-x-0 bottom-0 h-0.5 bg-accent opacity-0 transition-opacity duration-200"></span>
+            </button>
+            <button
+              type="button" role="tab" data-mode="ppf" aria-selected="false"
+              class="mode-tab pressable relative px-4 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-ash transition-colors duration-200 aria-selected:text-accentDk"
+            >
+              Paint Protection
+              <span class="mode-underline absolute inset-x-0 bottom-0 h-0.5 bg-accent opacity-0 transition-opacity duration-200"></span>
+            </button>
             <button
               type="button" id="reset-btn"
               class="pressable ml-auto flex items-center gap-1.5 px-2 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-ash transition-colors hover:text-accentDk"
@@ -140,6 +191,8 @@ const PRIORITIES = [
             </button>
           </div>
 
+          <!-- ══ Window-tint panel ══ -->
+          <div data-panel="tint">
           <!-- Accordion: coverage -->
           <div class="acc border-b border-sand px-6" data-open="true">
             <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
@@ -249,6 +302,55 @@ const PRIORITIES = [
               </div>
             </div>
           </div>
+          </div>
+
+          <!-- ══ Paint-protection panel ══ -->
+          <div data-panel="ppf" hidden>
+            <div class="acc border-b border-sand px-6" data-open="true">
+              <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
+                <span>
+                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the coverage</span>
+                  <span class="mt-0.5 block text-xs text-ash">Protected panels are highlighted in green on the model.</span>
+                </span>
+                <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+                  <path d="M5 12h14" /><path class="acc-vert" d="M12 5v14" />
+                </svg>
+              </button>
+              <div class="acc-body grid grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]">
+                <div class="min-h-0 overflow-hidden">
+                  <div class="flex flex-col gap-2 pb-5" role="radiogroup" aria-label="PPF coverage">
+                    {
+                      PPF_PACKAGES.map((p) => (
+                        <button
+                          type="button" role="radio"
+                          aria-checked={p.id === 'none' ? 'true' : 'false'}
+                          data-ppf={p.id}
+                          data-ppf-label={p.label}
+                          data-ppf-panels={p.panels}
+                          data-ppf-zones={p.zones.join(',')}
+                          class="ppf-tile pressable border border-sand bg-paper p-3 text-left transition-colors duration-200 hover:border-ash/60 aria-checked:border-accent aria-checked:bg-mint"
+                        >
+                          <span class="flex items-center gap-2">
+                            <span class="text-xs font-bold text-ink">{p.label}</span>
+                            {p.tag && (
+                              <span class="bg-accent px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-ink">
+                                {p.tag}
+                              </span>
+                            )}
+                          </span>
+                          <span class="mt-0.5 block text-[11px] leading-snug text-ash">{p.blurb}</span>
+                        </button>
+                      ))
+                    }
+                  </div>
+                  <p class="pb-5 text-[11px] leading-relaxed text-ash">
+                    Self-healing 3M film. If it's painted, it can be protected — ask us about
+                    headlights, door sills, trunk wear strips, and interior screens.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Preview column: 3D model on a white stage -->
@@ -306,7 +408,7 @@ const PRIORITIES = [
                 <span id="model-loading-pct" class="text-[11px] font-bold uppercase tracking-[0.14em] text-ink">0%</span>
               </div>
             </div>
-            <p class="mt-2 text-[10px] leading-relaxed text-ash">
+            <p id="preview-hint" class="mt-2 text-[10px] leading-relaxed text-ash">
               Switch between front and rear view · pick a tint shade to see it on the glass
             </p>
 
@@ -323,7 +425,7 @@ const PRIORITIES = [
             href="#contact"
             class="pressable sticker mx-auto mt-6 block max-w-md bg-accent px-8 py-4 text-center text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
           >
-            Get Free Quote →
+            Get Free Quote <span class="ml-0.5 font-black">&gt;</span>
           </a>
           <p class="mt-2.5 text-center text-[11px] text-ash">
             Jumps to our quote form below — we reply with a free quote.
@@ -420,11 +522,16 @@ const PRIORITIES = [
     const state = {
       vehicle: 'sedan',
       vehicleLabel: 'Sedan',
+      mode: 'tint' as 'tint' | 'ppf',
       tintZones: new Set<string>(),
       shade: 'clear',
       shadeLabel: 'Clear',
       shadeOp: 0.14,
       priorities: new Set<string>(),
+      ppf: 'none',
+      ppfLabel: 'No protection',
+      ppfPanels: 'No film applied.',
+      ppfZones: [] as string[],
     };
 
     const ZONE_LABELS: Record<string, string> = {
@@ -499,6 +606,22 @@ const PRIORITIES = [
     // asynchronously while textures wire up and can overwrite live edits,
     // so a permanent watchdog re-asserts the state every 700ms — any revert
     // is corrected within a frame or two of it happening.
+    // Body paint looks — must match PPF_LOOK in scripts/build-models.mjs.
+    const PPF_LOOK: Record<string, number[]> = {
+      bare: [0.4851, 0.5149, 0.552, 1], // #b9bec4
+      covered: [0.0065, 0.4621, 0.0595, 1], // #13b545
+    };
+    const PPF_ZONES = [
+      'ppf_bumper_f', 'ppf_hood_f', 'ppf_hood_r',
+      'ppf_roof', 'ppf_rocker', 'ppf_side', 'ppf_rear',
+    ];
+
+    // Apply the selected shade to the selected zones' glass materials and
+    // reset unselected zones to clear, then shade the body panels covered by
+    // the chosen PPF package green. three.js re-syncs materials
+    // asynchronously while textures wire up and can overwrite live edits,
+    // so a permanent watchdog re-asserts the state every 700ms — any revert
+    // is corrected within a frame or two of it happening.
     function applyTint3D() {
       const materials = viewer.model?.materials;
       if (!materials?.length) return;
@@ -508,8 +631,13 @@ const PRIORITIES = [
         glass_lamps: GLASS_LOOK.clear,
       };
       for (const [zone, matName] of Object.entries(ZONE_MATERIAL)) {
-        wanted[matName] = state.tintZones.has(zone) ? shadeLook : GLASS_LOOK.clear;
+        // Tint only reads as a choice in tint mode; PPF mode shows clear glass
+        // so nothing competes with the green film for attention.
+        const on = state.mode === 'tint' && state.tintZones.has(zone);
+        wanted[matName] = on ? shadeLook : GLASS_LOOK.clear;
       }
+      const covered = state.mode === 'ppf' ? new Set(state.ppfZones) : new Set<string>();
+      for (const z of PPF_ZONES) wanted[z] = covered.has(z) ? PPF_LOOK.covered : PPF_LOOK.bare;
       for (const mat of materials) {
         const target = wanted[mat.name];
         if (target) mat.pbrMetallicRoughness.setBaseColorFactor(target);
@@ -585,8 +713,20 @@ const PRIORITIES = [
     }
 
     // ══ Render cycle ═══════════════════════════════════════════════════
+    const okBadge =
+      'shrink-0 bg-accent/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-accentDk';
+    const warnBadge =
+      'shrink-0 bg-[#FFF1CC] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#8A5B00]';
+
     function render() {
       applyTint3D();
+
+      if (state.mode === 'ppf') {
+        summary.textContent = `${state.vehicleLabel} · ${state.ppfLabel} · ${state.ppfPanels}`;
+        badge.textContent = state.ppf === 'none' ? 'Pick a coverage' : 'Self-healing 3M film';
+        badge.className = okBadge;
+        return;
+      }
 
       const zones = [...state.tintZones].map((z) => ZONE_LABELS[z]).join(', ') || 'no zones yet';
       summary.textContent = `${state.vehicleLabel} · ${state.shadeLabel} (${SHADE_META[state.shade].vlt}) · ${zones}`;
@@ -594,11 +734,41 @@ const PRIORITIES = [
       const frontTinted = state.tintZones.has('front-side');
       const legal = !frontTinted || SHADE_META[state.shade].frontLegal;
       badge.textContent = legal ? 'TN legal · selected zones' : 'TN: 35%+ required on front sides';
-      badge.className = legal
-        ? 'shrink-0 bg-accent/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-accentDk'
-        : 'shrink-0 bg-[#FFF1CC] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#8A5B00]';
-
+      badge.className = legal ? okBadge : warnBadge;
     }
+
+    // ══ Mode tabs: window tint ⇄ paint protection ═════════════════════
+    const previewHint = document.getElementById('preview-hint')!;
+    function setMode(mode: 'tint' | 'ppf') {
+      state.mode = mode;
+      $$('.mode-tab').forEach((t) => {
+        const on = t.dataset.mode === mode;
+        t.setAttribute('aria-selected', String(on));
+        t.querySelector('.mode-underline')?.classList.toggle('opacity-0', !on);
+      });
+      $$('[data-panel]').forEach((p) => {
+        (p as HTMLElement).hidden = p.dataset.panel !== mode;
+      });
+      previewHint.textContent =
+        mode === 'ppf'
+          ? "Switch between front and rear view · green shows where the film is applied"
+          : 'Switch between front and rear view · pick a tint shade to see it on the glass';
+      render();
+    }
+    $$('.mode-tab').forEach((tab) =>
+      tab.addEventListener('click', () => setMode(tab.dataset.mode as 'tint' | 'ppf'))
+    );
+
+    $$('.ppf-tile').forEach((tile) =>
+      tile.addEventListener('click', () => {
+        state.ppf = tile.dataset.ppf!;
+        state.ppfLabel = tile.dataset.ppfLabel!;
+        state.ppfPanels = tile.dataset.ppfPanels!;
+        state.ppfZones = (tile.dataset.ppfZones || '').split(',').filter(Boolean);
+        $$('.ppf-tile').forEach((t) => t.setAttribute('aria-checked', String(t === tile)));
+        render();
+      })
+    );
 
     // ══ Controls ═══════════════════════════════════════════════════════
     $$('.veh-chip').forEach((chip) =>
@@ -666,11 +836,16 @@ const PRIORITIES = [
       state.shadeLabel = 'Clear';
       state.shadeOp = 0.14;
       state.priorities = new Set();
+      state.ppf = 'none';
+      state.ppfLabel = 'No protection';
+      state.ppfPanels = 'No film applied.';
+      state.ppfZones = [];
       $$('.zone-tile[data-tint-zone]').forEach((t) =>
         t.setAttribute('aria-pressed', String(state.tintZones.has(t.dataset.tintZone!)))
       );
       $$('.shade-chip').forEach((c) => c.setAttribute('aria-checked', String(c.dataset.shade === 'clear')));
       $$('.prio-chip').forEach((c) => c.setAttribute('aria-pressed', 'false'));
+      $$('.ppf-tile').forEach((c) => c.setAttribute('aria-checked', String(c.dataset.ppf === 'none')));
       angle = 'front';
       $$('.angle-btn').forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.angle === 'front')));
       applyAngle();
@@ -683,7 +858,7 @@ const PRIORITIES = [
     // and loaded before this script attached the listener, harvest once now.
     currentSrc = '/models3d/sedan.glb'; // matches the src baked into the markup
     showLoading();
-    render();
+    setMode('tint'); // also paints the active tab underline and calls render()
 
     // ══ PDF configuration download (SunTek-style summary sheet) ═════════
     document.getElementById('pdf-btn')!.addEventListener('click', async () => {
@@ -757,7 +932,11 @@ const PRIORITIES = [
         doc.setFontSize(9);
         doc.setFont(bodyFont, 'normal');
         doc.setTextColor(...ACCENT);
-        doc.text('Window Tint Configuration · Murfreesboro, TN', headerTextX, 20);
+        doc.text(
+          `${state.mode === 'ppf' ? 'Paint Protection' : 'Window Tint'} Configuration · Murfreesboro, TN`,
+          headerTextX,
+          20
+        );
         doc.setFontSize(8);
         doc.setTextColor(...PAPER);
         doc.text(new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }), W - 14, 13, { align: 'right' });
@@ -809,11 +988,17 @@ const PRIORITIES = [
           doc.line(14, y - 4.5, W - 14, y - 4.5);
         };
         row('Vehicle type', state.vehicleLabel);
-        row('Film type', 'Window Tint (3M)');
-        row('Coverage zones', zones);
-        row('Tint shade', `${state.shadeLabel} (${SHADE_META[state.shade].vlt})`);
-        row('Priorities', prio);
-        row('TN legality', legal ? 'Legal for the selected zones' : 'Tennessee requires 35%+ VLT on front side windows');
+        if (state.mode === 'ppf') {
+          row('Film type', 'Paint Protection Film (3M)');
+          row('Coverage', state.ppfLabel);
+          row('Panels covered', state.ppfPanels);
+        } else {
+          row('Film type', 'Window Tint (3M)');
+          row('Coverage zones', zones);
+          row('Tint shade', `${state.shadeLabel} (${SHADE_META[state.shade].vlt})`);
+          row('Priorities', prio);
+          row('TN legality', legal ? 'Legal for the selected zones' : 'Tennessee requires 35%+ VLT on front side windows');
+        }
 
         // Footer
         y = 272;

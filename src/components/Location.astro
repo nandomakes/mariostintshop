@@ -2,7 +2,6 @@
 import { SITE, CONTACT } from '../consts';
 
 const mapQuery = encodeURIComponent(`${CONTACT.address}, ${CONTACT.city}`);
-const directionsUrl = CONTACT.googleBusinessUrl;
 ---
 
 <section id="location" class="hex-bg border-t border-sand bg-paper">
@@ -16,7 +15,7 @@ const directionsUrl = CONTACT.googleBusinessUrl;
 
     <div class="mt-12 grid gap-8 md:grid-cols-[2fr_3fr] md:gap-10">
       <!-- Left: contact info card -->
-      <div class="reveal border border-sand bg-paper p-8 shadow-[0_2px_10px_rgba(0,0,0,0.05)] md:p-9">
+      <div class="reveal flex flex-col justify-center border border-sand bg-paper p-8 shadow-[0_2px_10px_rgba(0,0,0,0.05)] md:p-10">
         <p class="headline text-2xl text-ink">{SITE.brand}</p>
         <dl class="mt-7 space-y-6">
           <div class="flex items-start gap-4">
@@ -51,14 +50,6 @@ const directionsUrl = CONTACT.googleBusinessUrl;
             </div>
           </div>
         </dl>
-        <a
-          href={directionsUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="pressable sticker mt-8 inline-block bg-accent px-8 py-3.5 text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
-        >
-          Get Directions →
-        </a>
       </div>
 
       <!-- Right: map -->
