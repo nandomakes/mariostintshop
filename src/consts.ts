@@ -566,13 +566,15 @@ export const GOOGLE_RATING = {
 };
 
 // ── Instagram gallery (real posts from @mariostintshop) ─────────────
+// Order matters: Gallery.astro maps these by index onto its bento layout.
 export const GALLERY = [
   { src: '/images/instagram/ig-1.webp', alt: "Window tint work by Mario's Tint Shop" },
-  { src: '/images/instagram/ig-2.webp', alt: "Paint protection film install by Mario's Tint Shop" },
-  { src: '/images/instagram/ig-3.webp', alt: "Tinted vehicle at Mario's Tint Shop" },
+  { src: '/images/instagram/columna-1.jpg', alt: "Red sedan with freshly tinted windows at Mario's Tint Shop" },
+  { src: '/images/instagram/columna2.jpeg', alt: "White Cadillac Escalade with tinted windows at Mario's Tint Shop" },
   { src: '/images/instagram/ig-4.webp', alt: "Detail work by Mario's Tint Shop" },
-  { src: '/images/instagram/ig-5.webp', alt: "Fresh tint install by Mario's Tint Shop" },
+  { src: '/images/instagram/columna3-1.jpeg', alt: "Paint protection film being applied to a red Corvette at Mario's Tint Shop" },
   { src: '/images/instagram/ig-6.webp', alt: "Finished vehicle by Mario's Tint Shop" },
+  { src: '/images/instagram/columna3-2.jpg', alt: "Tesla Model Y in the bay at Mario's Tint Shop" },
 ];
 
 // ── Navigation ──────────────────────────────────────────────────────
