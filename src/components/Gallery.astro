@@ -19,6 +19,21 @@ const layout = [
   { col: 4, row: '1 / 21' },  // 5: col 4, full height
   { col: 3, row: '10 / 21' }, // 6: col 3, tall (bottom)  — 55%
 ];
+
+// Phones get their own bento rather than a flattened version of the desktop
+// one: two columns whose tall tile sits on opposite rows so the seam between
+// them zig-zags instead of running straight across, then the odd seventh
+// photo as a full-width closing banner. 15 row tracks; both columns fill
+// exactly 11 of them before the banner takes the last 4.
+const layoutMobile = [
+  { col: 1, row: '1 / 6' },   // 0: col 1, tall
+  { col: 2, row: '1 / 4' },   // 1: col 2, short
+  { col: 2, row: '4 / 9' },   // 2: col 2, tall
+  { col: 1, row: '6 / 9' },   // 3: col 1, short
+  { col: 1, row: '9 / 12' },  // 4: col 1, short
+  { col: 2, row: '9 / 12' },  // 5: col 2, short
+  { col: '1 / -1', row: '12 / 16' }, // 6: full-width banner
+];
 ---
 
 <section id="gallery" class="bg-ink">
@@ -31,18 +46,16 @@ const layout = [
     </div>
 
     <div
-      class="reveal showcase-grid mt-12 grid aspect-[7/10] grid-cols-2 gap-4 sm:aspect-auto sm:h-[420px] sm:grid-cols-4 sm:[grid-template-rows:repeat(20,1fr)] md:h-[560px]"
+      class="reveal showcase-grid mt-12 grid grid-cols-2 gap-3 sm:aspect-auto sm:h-[420px] sm:grid-cols-4 sm:gap-4 sm:[grid-template-rows:repeat(20,1fr)] md:h-[560px]"
     >
       {
         tiles.map((img, i) => {
           const spot = layout[i];
-          // 7 tiles don't divide evenly into mobile's 2 columns, so the last
-          // one spans the full width instead of leaving a half-empty row.
-          const isLastOdd = i === tiles.length - 1 && tiles.length % 2 === 1;
+          const m = layoutMobile[i];
           return (
             <div
-              class:list={['group relative overflow-hidden', isLastOdd && 'mobile-wide']}
-              style={`--col:${spot.col}; --row:${spot.row};`}
+              class="group relative overflow-hidden"
+              style={`--col:${spot.col}; --row:${spot.row}; --mcol:${m.col}; --mrow:${m.row};`}
             >
               <img
                 src={img.src}
@@ -83,21 +96,17 @@ const layout = [
       grid-row: var(--row);
     }
   }
-  /* Mobile: collapse to a plain 2-col grid of equal-height photos — the
-     bento proportions only make sense once there's room for 4 columns.
-     The odd last photo goes full width, in a slightly taller final row so
-     the wider crop still has room to breathe. */
+  /* Phones run their own two-column bento off --mcol/--mrow. The aspect
+     ratio is what fixes the row height, so the whole block scales with the
+     screen width instead of being pinned to a magic pixel height. */
   @media (max-width: 639px) {
     .showcase-grid {
-      grid-template-rows: repeat(3, 1fr) 1.3fr;
+      aspect-ratio: 43 / 64;
+      grid-template-rows: repeat(15, 1fr);
     }
     .showcase-grid > div {
-      grid-column: auto;
-      grid-row: auto;
-      height: 100%;
-    }
-    .showcase-grid > .mobile-wide {
-      grid-column: 1 / -1;
+      grid-column: var(--mcol);
+      grid-row: var(--mrow);
     }
   }
 </style>

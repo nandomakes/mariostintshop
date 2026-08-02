@@ -165,7 +165,10 @@ const PPF_CUTS_DEFAULT = {
   hoodR: 0.40, //  → here is the rest of the hood, ending at the windshield
   rear: 0.78, //   from here back is rear quarters/bumper/trunk
   high: 0.72, //   above this in the cabin band is roof + A-pillars
-  low: 0.30, //    below this in the cabin band is rockers + lower doors
+  low: 0.30, //    below this is rockers + lower doors
+  // The rocker strip runs past the cabin and up around the front of the rear
+  // wheel arch, so it ends slightly behind `rear`. Defaults to rear + 0.06.
+  rockerEnd: undefined,
 };
 
 // Paint zone colors: silver body, green where film is applied. The green
@@ -474,13 +477,16 @@ for (const [vehicle, cfg] of Object.entries(MODELS)) {
           const f = (p - mn[V]) / vSpan;
           return (cfg.upSign ?? 1) > 0 ? f : 1 - f;
         };
+        const rockerEnd = c.rockerEnd ?? c.rear + 0.06;
         const ppfZone = (nf, hf) => {
           if (nf < c.bumper) return 'ppf_bumper_f';
           if (nf < c.hoodF) return 'ppf_hood_f';
           if (nf < c.hoodR) return 'ppf_hood_r';
+          // Rockers are tested before the rear cut so the strip carries on
+          // past the doors and wraps the front of the rear wheel arch.
+          if (hf < c.low && nf < rockerEnd) return 'ppf_rocker';
           if (nf > c.rear) return 'ppf_rear';
           if (hf > c.high) return 'ppf_roof';
-          if (hf < c.low) return 'ppf_rocker';
           return 'ppf_side';
         };
 
