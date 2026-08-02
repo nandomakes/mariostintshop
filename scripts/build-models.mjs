@@ -46,6 +46,10 @@ const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace
 const SRC = path.join(ROOT, 'assets-src', 'models3d-src');
 const OUT = path.join(ROOT, 'public', 'models3d');
 const COLOR_ZONES = !!process.env.COLOR_ZONES;
+// PPF_ZONES=1 paints the paint-protection zones instead, and knocks the glass
+// back to a flat dark grey so it can't be mistaken for a body zone (the two
+// palettes would otherwise share colours).
+const PPF_ZONES = !!process.env.PPF_ZONES;
 
 // Per model: source, how to recognize window glass, mesh simplification,
 // and the zone split along the cabin-glass long axis. `noseSign` says which
@@ -73,7 +77,9 @@ const MODELS = {
     // rescaled to keep every real window's zone identical.
     zoneCuts: { ws: 0.38, front: 0.55, rearside: 0.89 },
     lampFrontFrac: 0.15, lampRearFrac: 0.12,
-    ppfCuts: { bumper: 0.09, hoodF: 0.21, hoodR: 0.38, rear: 0.76, high: 0.74, low: 0.42 },
+    // hoodR sits just behind the windshield base (glass_visor starts at
+    // 0.311) so the front end ends on the door shut line, not across it.
+    ppfCuts: { bumper: 0.09, hoodF: 0.21, hoodR: 0.355, rear: 0.76, high: 0.74, low: 0.42 },
   },
   suv: {
     src: '2023-lamborghini-urus-performante/source/2023_lamborghini_urus_performante.glb',
@@ -193,6 +199,167 @@ const ZONE_DEBUG_COLORS = {
   ppf_side: [0, 1, 0.3, 1],
   ppf_rear: [1, 0, 0.8, 1],
 };
+
+// ── PPF zone carving ────────────────────────────────────────────────
+// The film's edges are straight lines on a real car, so the zones can't be
+// assigned per whole triangle — that leaves a ragged boundary that follows
+// the mesh topology. Instead every triangle crossing a zone plane is clipped
+// against it, producing new vertices exactly on the line.
+//
+// All zone boundaries are axis-aligned planes (a station along the car's
+// length, or a height), which keeps the clipping to a simple 1D test.
+
+// Split a polygon by an axis-aligned plane. Returns [below, above]; either
+// may be empty. Vertices are {p:[3], n:[3], t:[2]}.
+function clipPolygon(poly, axis, value) {
+  const below = [], above = [];
+  for (let i = 0; i < poly.length; i++) {
+    const a = poly[i];
+    const b = poly[(i + 1) % poly.length];
+    const da = a.p[axis] - value;
+    const db = b.p[axis] - value;
+    if (da <= 0) below.push(a);
+    if (da >= 0) above.push(a);
+    if ((da < 0 && db > 0) || (da > 0 && db < 0)) {
+      const s = da / (da - db);
+      const m = {
+        p: [0, 1, 2].map((k) => a.p[k] + (b.p[k] - a.p[k]) * s),
+        n: a.n && b.n ? [0, 1, 2].map((k) => a.n[k] + (b.n[k] - a.n[k]) * s) : null,
+        t: a.t && b.t ? [0, 1].map((k) => a.t[k] + (b.t[k] - a.t[k]) * s) : null,
+      };
+      if (m.n) {
+        const L = Math.hypot(...m.n) || 1;
+        m.n = m.n.map((v) => v / L);
+      }
+      below.push(m);
+      above.push(m);
+    }
+  }
+  return [below, above];
+}
+
+function splitPpfZones(doc, cfg) {
+  if (!cfg.bodyPaint) return;
+  const root = doc.getRoot();
+
+  // Model axes: longest bbox axis = longitudinal, smallest = vertical.
+  let mn = [1e9, 1e9, 1e9], mx = [-1e9, -1e9, -1e9];
+  for (const mesh of root.listMeshes()) for (const p of mesh.listPrimitives()) {
+    const pos = p.getAttribute('POSITION');
+    if (!pos) continue;
+    const a = pos.getMin([]), b = pos.getMax([]);
+    for (let i = 0; i < 3; i++) { mn[i] = Math.min(mn[i], a[i]); mx[i] = Math.max(mx[i], b[i]); }
+  }
+  const ext = [mx[0] - mn[0], mx[1] - mn[1], mx[2] - mn[2]];
+  const L = ext.indexOf(Math.max(...ext));
+  const V = ext.indexOf(Math.min(...ext));
+
+  const paintPrims = [];
+  for (const mesh of root.listMeshes()) {
+    for (const prim of mesh.listPrimitives()) {
+      if (cfg.bodyPaint.test(prim.getMaterial()?.getName() || '')) paintPrims.push({ mesh, prim });
+    }
+  }
+  if (!paintPrims.length) return;
+
+  const c = { ...PPF_CUTS_DEFAULT, ...(cfg.ppfCuts ?? {}) };
+  const rockerEnd = c.rockerEnd ?? c.rear + 0.06;
+  const noseUp = cfg.noseSign > 0;
+  const upPos = (cfg.upSign ?? 1) > 0;
+  // Convert a nose fraction (0 = nose) / height fraction (0 = ground) into a
+  // world coordinate on the relevant axis.
+  const noseToWorld = (f) => (noseUp ? mn[L] + (1 - f) * ext[L] : mn[L] + f * ext[L]);
+  const highToWorld = (f) => (upPos ? mn[V] + f * ext[V] : mn[V] + (1 - f) * ext[V]);
+  const noseOf = (p) => (noseUp ? 1 - (p - mn[L]) / ext[L] : (p - mn[L]) / ext[L]);
+  const highOf = (p) => (upPos ? (p - mn[V]) / ext[V] : 1 - (p - mn[V]) / ext[V]);
+
+  const zoneOf = (nf, hf) => {
+    // Roof first: the A-pillars sit directly above the cowl, so testing the
+    // hood by length alone would sweep them into the front-end zones and a
+    // "full front" would run up the pillar to the roof.
+    if (hf > c.high) return 'ppf_roof';
+    if (nf < c.bumper) return 'ppf_bumper_f';
+    if (nf < c.hoodF) return 'ppf_hood_f';
+    if (nf < c.hoodR) return 'ppf_hood_r';
+    // Rockers are tested before the rear cut so the strip carries on past
+    // the doors and wraps the front of the rear wheel arch.
+    if (hf < c.low && nf < rockerEnd) return 'ppf_rocker';
+    if (nf > c.rear) return 'ppf_rear';
+    return 'ppf_side';
+  };
+
+  // Every plane any zone boundary can lie on.
+  const planes = [
+    ...[c.bumper, c.hoodF, c.hoodR, c.rear, rockerEnd].map((f) => ({ axis: L, value: noseToWorld(f) })),
+    ...[c.low, c.high].map((f) => ({ axis: V, value: highToWorld(f) })),
+  ];
+
+  const basePaint = paintPrims[0].prim.getMaterial();
+  const buffer = root.listBuffers()[0];
+  const mats = {};
+  const out = {}; // zone → { p:[], n:[], t:[] }
+  const counts = {};
+  let hasN = false, hasT = false;
+
+  for (const { prim } of paintPrims) {
+    const pos = prim.getAttribute('POSITION');
+    const nrm = prim.getAttribute('NORMAL');
+    const uv = prim.getAttribute('TEXCOORD_0');
+    const idx = prim.getIndices();
+    if (!pos || !idx) continue;
+    if (nrm) hasN = true;
+    if (uv) hasT = true;
+
+    for (let t = 0; t < idx.getCount(); t += 3) {
+      let polys = [[0, 1, 2].map((k) => {
+        const vi = idx.getScalar(t + k);
+        return {
+          p: pos.getElement(vi, [0, 0, 0]),
+          n: nrm ? nrm.getElement(vi, [0, 0, 0]) : null,
+          t: uv ? uv.getElement(vi, [0, 0]) : null,
+        };
+      })];
+      for (const pl of planes) {
+        const next = [];
+        for (const poly of polys) {
+          const [lo, hi] = clipPolygon(poly, pl.axis, pl.value);
+          if (lo.length >= 3) next.push(lo);
+          if (hi.length >= 3) next.push(hi);
+        }
+        polys = next;
+      }
+      for (const poly of polys) {
+        let cl = 0, cv = 0;
+        for (const v of poly) { cl += v.p[L]; cv += v.p[V]; }
+        const z = zoneOf(noseOf(cl / poly.length), highOf(cv / poly.length));
+        const o = out[z] ??= { p: [], n: [], t: [] };
+        // Fan-triangulate the fragment.
+        for (let k = 1; k < poly.length - 1; k++) {
+          for (const v of [poly[0], poly[k], poly[k + 1]]) {
+            o.p.push(v.p[0], v.p[1], v.p[2]);
+            if (v.n) o.n.push(v.n[0], v.n[1], v.n[2]);
+            if (v.t) o.t.push(v.t[0], v.t[1]);
+          }
+          counts[z] = (counts[z] || 0) + 1;
+        }
+      }
+    }
+  }
+
+  // Rebuild: the first paint primitive becomes the first zone, the rest are
+  // added alongside it; any leftover paint primitives are dropped.
+  const host = paintPrims[0].mesh;
+  for (const { mesh, prim } of paintPrims) mesh.removePrimitive(prim);
+
+  for (const [z, o] of Object.entries(out)) {
+    const prim = doc.createPrimitive().setMaterial(mats[z] ??= basePaint.clone().setName(z));
+    prim.setAttribute('POSITION', doc.createAccessor().setType('VEC3').setArray(new Float32Array(o.p)).setBuffer(buffer));
+    if (hasN && o.n.length) prim.setAttribute('NORMAL', doc.createAccessor().setType('VEC3').setArray(new Float32Array(o.n)).setBuffer(buffer));
+    if (hasT && o.t.length) prim.setAttribute('TEXCOORD_0', doc.createAccessor().setType('VEC2').setArray(new Float32Array(o.t)).setBuffer(buffer));
+    host.addPrimitive(prim);
+  }
+  console.log('  ppf:  ', Object.entries(counts).map(([z, n]) => `${z.replace('ppf_', '')}=${n}`).join(' '));
+}
 
 const io = new NodeIO()
   .registerExtensions(KHRONOS_EXTENSIONS)
@@ -451,75 +618,6 @@ for (const [vehicle, cfg] of Object.entries(MODELS)) {
       console.log('  zones:', Object.entries(counts).map(([z, n]) => `${z.replace('glass_', '')}=${n}`).join(' '));
     }
 
-    // ── PPF split: carve the painted body into film zones ───────────
-    // Per-triangle (not per-component): the body shell is one connected
-    // surface, and a real "partial front" is a straight cut across the
-    // hood anyway.
-    if (cfg.bodyPaint) {
-      const paintPrims = [];
-      for (const mesh of root.listMeshes()) {
-        for (const prim of mesh.listPrimitives()) {
-          if (cfg.bodyPaint.test(prim.getMaterial()?.getName() || '')) paintPrims.push({ mesh, prim });
-        }
-      }
-      if (paintPrims.length) {
-        const basePaint = paintPrims[0].prim.getMaterial();
-        const c = { ...PPF_CUTS_DEFAULT, ...(cfg.ppfCuts ?? {}) };
-        const lenSpan = ext[L] || 1;
-        const vSpan = ext[V] || 1;
-        // 0 at the nose, 1 at the tail.
-        const bodyNose = (p) => {
-          const f = (p - mn[L]) / lenSpan;
-          return cfg.noseSign > 0 ? 1 - f : f;
-        };
-        // 0 at the ground, 1 at the roof.
-        const bodyHigh = (p) => {
-          const f = (p - mn[V]) / vSpan;
-          return (cfg.upSign ?? 1) > 0 ? f : 1 - f;
-        };
-        const rockerEnd = c.rockerEnd ?? c.rear + 0.06;
-        const ppfZone = (nf, hf) => {
-          if (nf < c.bumper) return 'ppf_bumper_f';
-          if (nf < c.hoodF) return 'ppf_hood_f';
-          if (nf < c.hoodR) return 'ppf_hood_r';
-          // Rockers are tested before the rear cut so the strip carries on
-          // past the doors and wraps the front of the rear wheel arch.
-          if (hf < c.low && nf < rockerEnd) return 'ppf_rocker';
-          if (nf > c.rear) return 'ppf_rear';
-          if (hf > c.high) return 'ppf_roof';
-          return 'ppf_side';
-        };
-
-        const paintMats = {};
-        const buffer2 = root.listBuffers()[0];
-        const pcounts = {};
-        for (const { mesh, prim } of paintPrims) {
-          const pos = prim.getAttribute('POSITION');
-          const idx = prim.getIndices();
-          if (!pos || !idx) continue;
-          const buckets = {};
-          for (let t = 0; t < idx.getCount(); t += 3) {
-            const z = ppfZone(bodyNose(centroid(pos, idx, t, L)), bodyHigh(centroid(pos, idx, t, V)));
-            (buckets[z] ??= []).push(idx.getScalar(t), idx.getScalar(t + 1), idx.getScalar(t + 2));
-          }
-          Object.keys(buckets).forEach((z, i) => {
-            pcounts[z] = (pcounts[z] || 0) + buckets[z].length / 3;
-            const mat = paintMats[z] ??= basePaint.clone().setName(z);
-            const indices = doc.createAccessor().setType('SCALAR').setArray(new Uint32Array(buckets[z])).setBuffer(buffer2);
-            if (i === 0) prim.setIndices(indices).setMaterial(mat);
-            else mesh.addPrimitive(prim.clone().setIndices(indices).setMaterial(mat));
-          });
-        }
-        console.log('  ppf:  ', Object.entries(pcounts).map(([z, n]) => `${z.replace('ppf_', '')}=${n}`).join(' '));
-      }
-    }
-  }
-
-  if (COLOR_ZONES) {
-    for (const mat of root.listMaterials()) {
-      const c = ZONE_DEBUG_COLORS[mat.getName()];
-      if (c) mat.setBaseColorFactor(c).setAlphaMode('OPAQUE');
-    }
   }
 
   // ── Geometry + texture diet ──
@@ -528,10 +626,31 @@ for (const [vehicle, cfg] of Object.entries(MODELS)) {
     prune(),
     weld(),
     simplify({ simplifier: MeshoptSimplifier, ratio: cfg.simplifyRatio, error: 0.0008 }),
-    textureCompress({ encoder: sharp, targetFormat: 'webp', resize: [1024, 1024] }),
-    draco()
+    textureCompress({ encoder: sharp, targetFormat: 'webp', resize: [1024, 1024] })
   );
 
+  // PPF zones are carved AFTER simplification, because simplifying a mesh
+  // that is already split drags the boundary vertices around and leaves the
+  // cut lines rippling.
+  splitPpfZones(doc, cfg);
+
+  if (COLOR_ZONES || PPF_ZONES) {
+    for (const mat of root.listMaterials()) {
+      const name = mat.getName();
+      const isPpf = name.startsWith('ppf_');
+      const isGlass = name.startsWith('glass_');
+      if (PPF_ZONES && isGlass) {
+        mat.setBaseColorFactor([0.05, 0.05, 0.06, 1]).setAlphaMode('OPAQUE');
+        continue;
+      }
+      if (PPF_ZONES && !isPpf) continue;
+      if (COLOR_ZONES && !PPF_ZONES && isPpf) continue;
+      const c = ZONE_DEBUG_COLORS[name];
+      if (c) mat.setBaseColorFactor(c).setAlphaMode('OPAQUE');
+    }
+  }
+
+  await doc.transform(weld(), draco());
   await io.write(outAbs, doc);
   const after = fs.statSync(outAbs).size;
   console.log(`✓ ${vehicle}.glb  ${(before / 1e6).toFixed(1)}MB → ${(after / 1e6).toFixed(2)}MB${COLOR_ZONES ? '  [ZONE DEBUG COLORS]' : ''}`);

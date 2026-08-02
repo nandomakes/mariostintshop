@@ -261,14 +261,16 @@ export const SERVICES: Service[] = [
       'Lifetime warranty available',
     ],
     heroSubcopy:
-      'Professional car window tinting with premium 3M films — increased comfort, up to 99% UV protection, improved privacy, and a stylish custom look for any vehicle.',
+      'Premium 3M™ Ceramic IR window tint in Murfreesboro — infrared heat rejection, up to 99% UV protection, less glare, and a stylish custom look for any vehicle.',
     intro:
-      "At Mario's Tint Shop in Murfreesboro, TN, we are committed to offering the best car window tinting service that enhances the appearance of your vehicle and provides numerous benefits for your daily driving. As an Authorized 3M Platinum Dealer, we offer premium 3M window films tailored for every budget and performance need.",
+      "Tennessee summers can make a vehicle unbearably hot. At Mario's Tint Shop in Murfreesboro, TN, we install premium 3M™ Ceramic IR window film engineered to reject infrared heat, block up to 99% of harmful UV rays, and give you a cooler, more comfortable drive. Whether you're commuting across Murfreesboro, running I-24, or parked in the summer sun, ceramic tint cuts heat and glare and protects your interior from fading. As an Authorized 3M Platinum Dealer we serve Murfreesboro, Smyrna, Lebanon, Franklin, Nashville and the surrounding Middle Tennessee area, with films tailored to every budget and performance need.",
     features: [
-      { title: 'Increased Comfort', body: "Window tinting significantly reduces solar heat and harsh glare entering your car's cabin, keeping your vehicle cooler and easing the load on your A/C." },
-      { title: 'Up to 99% UV Protection', body: 'Our premium ceramic and carbon films block up to 99% of damaging UVA and UVB rays, protecting you and preventing interior fading and cracking.' },
+      { title: 'Infrared Heat Rejection', body: '3M™ Ceramic IR rejects up to 90% of infrared heat — the part of sunlight you actually feel — so the cabin stays cooler and your A/C works less.' },
+      { title: 'Up to 99% UV Protection', body: 'Our premium ceramic and carbon films block up to 99% of damaging UVA and UVB rays, protecting leather, vinyl, dashboards, and upholstery from fading and cracking.' },
+      { title: 'No Signal Interference', body: "Non-metallized ceramic construction won't interfere with GPS, Bluetooth, cell phone, or satellite radio signals — unlike older metallic films." },
+      { title: 'Reduced Glare, Safer Driving', body: 'Cutting harsh glare from low sun and oncoming headlights makes for a more comfortable, less fatiguing drive, day or night.' },
       { title: 'Safety & Privacy', body: 'The film helps hold shattered glass together on impact, and reduced visibility into your car deters break-ins by keeping valuables out of sight.' },
-      { title: '3M Tiered Packages', body: 'Choose Silver (3M Obsidian carbon), Gold (3M CS IR nano ceramic), or Platinum (3M Ceramic IR with up to 90% infrared heat rejection).' },
+      { title: '3M Tiered Packages', body: 'Choose Silver (3M Obsidian carbon), Gold (3M CS IR nano ceramic), or Platinum (3M Ceramic IR) — multiple shades, excellent visibility, manufacturer-backed limited warranty.' },
     ],
     process: [
       'Free consultation to choose the right shade and film grade',
@@ -280,6 +282,9 @@ export const SERVICES: Service[] = [
       { q: 'How dark can I legally tint in Tennessee?', a: 'Tennessee allows a minimum of 35% VLT on front side, rear side, and rear windows. We help you choose a legal shade that still delivers strong heat and UV protection.' },
       { q: 'How long does the tint take to cure?', a: 'Most tint fully cures within 3–5 days depending on weather. We ask you to keep windows rolled up during that time for the best result.' },
       { q: 'Will the tint turn purple over time?', a: 'No. Our premium ceramic and carbon films are dyed and constructed to never fade to purple, unlike low-cost dyed films.' },
+      { q: 'Is ceramic window tint worth it over standard film?', a: "If heat is what bothers you, yes. Standard dyed film mainly darkens the glass, while 3M™ Ceramic IR is built to reject infrared — up to 90% of it — so the cabin actually feels cooler rather than just looking darker. It also keeps GPS, Bluetooth, and cell signals clear, and carries a manufacturer's limited warranty." },
+      { q: 'Which areas do you serve?', a: 'We are based in Murfreesboro and regularly tint vehicles from Smyrna, Lebanon, Franklin, La Vergne, Brentwood, Nashville, and across Rutherford County and Middle Tennessee.' },
+      { q: 'Do you offer more than window tint?', a: 'We do — paint protection film (PPF), ceramic coatings, windshield protection film, and full vehicle appearance protection. Many customers pair ceramic tint with PPF on the front end.' },
     ],
     image: 'tinting',
     pageImage: 'tinting1',
