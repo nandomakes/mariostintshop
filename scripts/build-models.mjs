@@ -24,12 +24,13 @@
 //   ppf_side          — door skins (full-wrap only)
 //   ppf_rear          — everything aft of the cabin (full-wrap only)
 //
-// Unlike glass, PPF zones are split PER-TRIANGLE rather than per connected
-// component: a "partial hood" really is a straight cut across the middle of
-// one panel, which is exactly how the film is laid in the real world.
+// Unlike glass, PPF zones are cut by CLIPPING triangles against each zone
+// plane rather than sorting whole triangles into buckets: a "partial hood"
+// really is a straight cut across the middle of one panel, and bucketing
+// leaves the edge following the mesh topology instead of a line.
 //
-// Debug: COLOR_ZONES=1 node scripts/build-models.mjs paints each zone a
-// loud color so the split can be verified visually.
+// Debug: COLOR_ZONES=1 paints the glass zones, PPF_ZONES=1 paints the body
+// zones (and greys the glass out) so each split can be checked visually.
 //
 // Run: node scripts/build-models.mjs
 
@@ -79,7 +80,7 @@ const MODELS = {
     lampFrontFrac: 0.15, lampRearFrac: 0.12,
     // hoodR sits just behind the windshield base (glass_visor starts at
     // 0.311) so the front end ends on the door shut line, not across it.
-    ppfCuts: { bumper: 0.09, hoodF: 0.21, hoodR: 0.355, rear: 0.76, high: 0.74, low: 0.42 },
+    ppfCuts: { bumper: 0.09, hoodF: 0.21, hoodR: 0.355, rear: 0.76, high: 0.74, low: 0.50 },
   },
   suv: {
     src: '2023-lamborghini-urus-performante/source/2023_lamborghini_urus_performante.glb',
@@ -95,7 +96,7 @@ const MODELS = {
     // rear hatch→rearwin.
     zoneCuts: { ws: 0.33, front: 0.5, rearside: 0.83 },
     lampFrontFrac: 0.16, lampRearFrac: 0.08,
-    ppfCuts: { bumper: 0.10, hoodF: 0.22, hoodR: 0.36, rear: 0.80, high: 0.76, low: 0.46 },
+    ppfCuts: { bumper: 0.10, hoodF: 0.22, hoodR: 0.36, rear: 0.80, high: 0.76, low: 0.54 },
   },
   sport: {
     src: '2020-porsche-718-cayman-gt4/source/2020_porsche_718_cayman_gt4.glb',
@@ -112,7 +113,7 @@ const MODELS = {
     zoneCuts: { ws: 0.4, front: 0.6, rearside: 0.88 },
     lampFrontFrac: 0.18, lampRearFrac: 0.13,
     // Mid-engine: short frunk up front, engine deck from ~0.66 back.
-    ppfCuts: { bumper: 0.10, hoodF: 0.20, hoodR: 0.32, rear: 0.66, high: 0.78, low: 0.42 },
+    ppfCuts: { bumper: 0.10, hoodF: 0.20, hoodR: 0.32, rear: 0.66, high: 0.78, low: 0.50 },
   },
   truck: {
     src: '2021-ram-1500-trx/source/ram1500trx.glb',
@@ -130,7 +131,7 @@ const MODELS = {
     zoneCuts: { ws: 0.15, front: 0.33, rearside: 0.52 },
     lampFrontFrac: 0, lampRearFrac: 0,
     // Crew cab: short hood, cab to ~0.60, bed + tailgate behind that.
-    ppfCuts: { bumper: 0.07, hoodF: 0.16, hoodR: 0.29, rear: 0.60, high: 0.80, low: 0.48 },
+    ppfCuts: { bumper: 0.07, hoodF: 0.16, hoodR: 0.29, rear: 0.60, high: 0.80, low: 0.56 },
   },
 };
 
