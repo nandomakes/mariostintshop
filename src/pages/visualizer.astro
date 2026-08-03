@@ -60,7 +60,7 @@ const PPF_PACKAGES = [
     label: 'Partial front',
     blurb: 'The high-impact leading edges.',
     panels: 'Front bumper · leading edge of the hood & fenders · mirrors',
-    zones: ['ppf_bumper_f', 'ppf_hood_f'],
+    zones: ['ppf_bumper_f', 'ppf_hood_f', 'ppf_mirror'],
   },
   {
     id: 'full-front',
@@ -68,21 +68,24 @@ const PPF_PACKAGES = [
     tag: 'Very popular',
     blurb: 'No cut line across the hood.',
     panels: 'Front bumper · full hood · full fenders · mirrors',
-    zones: ['ppf_bumper_f', 'ppf_hood_f', 'ppf_hood_r'],
+    zones: ['ppf_bumper_f', 'ppf_hood_f', 'ppf_hood_r', 'ppf_mirror'],
   },
   {
     id: 'track-pack',
     label: 'Track pack',
     blurb: 'Full front plus the panels that catch road debris.',
-    panels: 'Full front · rocker panels & lower doors · door cups and edges',
-    zones: ['ppf_bumper_f', 'ppf_hood_f', 'ppf_hood_r', 'ppf_rocker'],
+    panels: 'Full front · full rocker sill & lower doors · rear wheel arches · door cups and edges',
+    zones: ['ppf_bumper_f', 'ppf_hood_f', 'ppf_hood_r', 'ppf_mirror', 'ppf_rocker'],
   },
   {
     id: 'full-wrap',
     label: 'Full wrap',
     blurb: 'Every painted panel on the vehicle.',
     panels: 'Every painted surface, front to back',
-    zones: ['ppf_bumper_f', 'ppf_hood_f', 'ppf_hood_r', 'ppf_rocker', 'ppf_roof', 'ppf_side', 'ppf_rear'],
+    zones: [
+      'ppf_bumper_f', 'ppf_hood_f', 'ppf_hood_r', 'ppf_mirror',
+      'ppf_rocker', 'ppf_roof', 'ppf_side', 'ppf_rear',
+    ],
   },
 ];
 ---
@@ -612,7 +615,7 @@ const PPF_PACKAGES = [
       covered: [0.0065, 0.4621, 0.0595, 1], // #13b545
     };
     const PPF_ZONES = [
-      'ppf_bumper_f', 'ppf_hood_f', 'ppf_hood_r',
+      'ppf_bumper_f', 'ppf_hood_f', 'ppf_hood_r', 'ppf_mirror',
       'ppf_roof', 'ppf_rocker', 'ppf_side', 'ppf_rear',
     ];
 

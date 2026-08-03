@@ -19,8 +19,9 @@
 //   ppf_bumper_f      — front bumper
 //   ppf_hood_f        — leading section of hood + fender fronts (partial)
 //   ppf_hood_r        — remainder of hood/fenders up to the windshield
+//   ppf_mirror        — mirror caps (wrapped from partial front up)
 //   ppf_roof          — roof + A-pillars / roofline
-//   ppf_rocker        — rockers + lower doors
+//   ppf_rocker        — sill + lower doors, wrapping the rear wheel arch
 //   ppf_side          — door skins (full-wrap only)
 //   ppf_rear          — everything aft of the cabin (full-wrap only)
 //
@@ -78,9 +79,14 @@ const MODELS = {
     // rescaled to keep every real window's zone identical.
     zoneCuts: { ws: 0.38, front: 0.55, rearside: 0.89 },
     lampFrontFrac: 0.15, lampRearFrac: 0.12,
-    // hoodR sits just behind the windshield base (glass_visor starts at
-    // 0.311) so the front end ends on the door shut line, not across it.
-    ppfCuts: { bumper: 0.09, hoodF: 0.21, hoodR: 0.355, rear: 0.76, high: 0.74, low: 0.50 },
+    // hoodR stops short of the front door shut line so the front end never
+    // laps onto the door. roofStart is the windshield base (glass_visor
+    // starts at 0.311), keeping the roof zone off the hood bulges.
+    // rockerEnd carries the sill past the rear wheel arch.
+    ppfCuts: {
+      bumper: 0.09, hoodF: 0.21, hoodR: 0.33, rear: 0.76,
+      high: 0.74, low: 0.50, roofStart: 0.31, rockerEnd: 0.88,
+    },
   },
   suv: {
     src: '2023-lamborghini-urus-performante/source/2023_lamborghini_urus_performante.glb',
@@ -96,7 +102,7 @@ const MODELS = {
     // rear hatch→rearwin.
     zoneCuts: { ws: 0.33, front: 0.5, rearside: 0.83 },
     lampFrontFrac: 0.16, lampRearFrac: 0.08,
-    ppfCuts: { bumper: 0.10, hoodF: 0.22, hoodR: 0.36, rear: 0.80, high: 0.76, low: 0.54 },
+    ppfCuts: { bumper: 0.10, hoodF: 0.22, hoodR: 0.36, rear: 0.80, high: 0.76, low: 0.54, roofStart: 0.29 },
   },
   sport: {
     src: '2020-porsche-718-cayman-gt4/source/2020_porsche_718_cayman_gt4.glb',
@@ -113,7 +119,7 @@ const MODELS = {
     zoneCuts: { ws: 0.4, front: 0.6, rearside: 0.88 },
     lampFrontFrac: 0.18, lampRearFrac: 0.13,
     // Mid-engine: short frunk up front, engine deck from ~0.66 back.
-    ppfCuts: { bumper: 0.10, hoodF: 0.20, hoodR: 0.32, rear: 0.66, high: 0.78, low: 0.50 },
+    ppfCuts: { bumper: 0.10, hoodF: 0.20, hoodR: 0.32, rear: 0.66, high: 0.78, low: 0.50, roofStart: 0.31 },
   },
   truck: {
     src: '2021-ram-1500-trx/source/ram1500trx.glb',
@@ -131,7 +137,7 @@ const MODELS = {
     zoneCuts: { ws: 0.15, front: 0.33, rearside: 0.52 },
     lampFrontFrac: 0, lampRearFrac: 0,
     // Crew cab: short hood, cab to ~0.60, bed + tailgate behind that.
-    ppfCuts: { bumper: 0.07, hoodF: 0.16, hoodR: 0.29, rear: 0.60, high: 0.80, low: 0.56 },
+    ppfCuts: { bumper: 0.07, hoodF: 0.16, hoodR: 0.29, rear: 0.60, high: 0.80, low: 0.56, roofStart: 0.22 },
   },
 };
 
@@ -171,12 +177,24 @@ const PPF_CUTS_DEFAULT = {
   hoodF: 0.22, //  bumper → here is the "partial front" hood/fender strip
   hoodR: 0.40, //  → here is the rest of the hood, ending at the windshield
   rear: 0.78, //   from here back is rear quarters/bumper/trunk
-  high: 0.72, //   above this in the cabin band is roof + A-pillars
+  high: 0.72, //   above this, from roofStart back, is roof + A-pillars
   low: 0.30, //    below this is rockers + lower doors
-  // The rocker strip runs past the cabin and up around the front of the rear
-  // wheel arch, so it ends slightly behind `rear`. Defaults to rear + 0.06.
+  // Nothing ahead of this can be "roof". Without it a raised hood bulge
+  // clears the `high` line and gets taken by the roof zone, which puts a
+  // stray patch in the middle of the hood and breaks the straight cut.
+  // Set it at the base of the windshield.
+  roofStart: 0.32,
+  // The sill runs the length of the body and wraps the rear wheel arch, so
+  // it ends well behind `rear`. Defaults to rear + 0.06.
   rockerEnd: undefined,
 };
+
+// Mirror caps are not part of the paint mesh on these models (they're carbon
+// or trim), but they are wrapped in every package from partial front up. They
+// are reliably the widest thing on the car: the paint tops out around 0.89 of
+// the half-width while the caps reach ~1.0, so a lateral threshold isolates
+// them cleanly. Bounds keep the test off the door skins and wheel arches.
+const MIRROR = { lat: 0.93, nfLo: 0.30, nfHi: 0.58, hfLo: 0.55, hfHi: 0.85 };
 
 // Paint zone colors: silver body, green where film is applied. The green
 // matches the accent used across the site's tint previews.
@@ -199,6 +217,7 @@ const ZONE_DEBUG_COLORS = {
   ppf_rocker: [0.6, 0, 1, 1],
   ppf_side: [0, 1, 0.3, 1],
   ppf_rear: [1, 0, 0.8, 1],
+  ppf_mirror: [0, 0, 1, 1],
 };
 
 // ── PPF zone carving ────────────────────────────────────────────────
@@ -277,8 +296,9 @@ function splitPpfZones(doc, cfg) {
   const zoneOf = (nf, hf) => {
     // Roof first: the A-pillars sit directly above the cowl, so testing the
     // hood by length alone would sweep them into the front-end zones and a
-    // "full front" would run up the pillar to the roof.
-    if (hf > c.high) return 'ppf_roof';
+    // "full front" would run up the pillar to the roof. Gated on roofStart
+    // so a raised hood bulge can't be mistaken for roof.
+    if (hf > c.high && nf > c.roofStart) return 'ppf_roof';
     if (nf < c.bumper) return 'ppf_bumper_f';
     if (nf < c.hoodF) return 'ppf_hood_f';
     if (nf < c.hoodR) return 'ppf_hood_r';
@@ -291,7 +311,7 @@ function splitPpfZones(doc, cfg) {
 
   // Every plane any zone boundary can lie on.
   const planes = [
-    ...[c.bumper, c.hoodF, c.hoodR, c.rear, rockerEnd].map((f) => ({ axis: L, value: noseToWorld(f) })),
+    ...[c.bumper, c.hoodF, c.hoodR, c.rear, rockerEnd, c.roofStart].map((f) => ({ axis: L, value: noseToWorld(f) })),
     ...[c.low, c.high].map((f) => ({ axis: V, value: highToWorld(f) })),
   ];
 
@@ -360,6 +380,73 @@ function splitPpfZones(doc, cfg) {
     host.addPrimitive(prim);
   }
   console.log('  ppf:  ', Object.entries(counts).map(([z, n]) => `${z.replace('ppf_', '')}=${n}`).join(' '));
+
+  // ── Mirror caps ───────────────────────────────────────────────────
+  // Not paint, so they survived the split above with their original trim
+  // material. Pull the two cap components out onto their own zone so they
+  // wrap along with the front end.
+  const A = [0, 1, 2].find((i) => i !== L && i !== V);
+  const latMid = mn[A] + ext[A] / 2;
+  const halfW = (ext[A] / 2) || 1;
+  const mirrorMat = basePaint.clone().setName('ppf_mirror');
+  let mirrorTris = 0;
+
+  for (const mesh of root.listMeshes()) {
+    for (const prim of [...mesh.listPrimitives()]) {
+      const name = prim.getMaterial()?.getName() || '';
+      // Skip glass (the mirror's own reflective face) and anything already zoned.
+      if (name.startsWith('glass_') || name.startsWith('ppf_')) continue;
+      const pos = prim.getAttribute('POSITION');
+      const idx = prim.getIndices();
+      if (!pos || !idx) continue;
+      const triCount = idx.getCount() / 3;
+
+      // Union-find over triangles sharing vertices → connected components.
+      const parent = new Int32Array(triCount).fill(-1);
+      const find = (a) => { while (parent[a] >= 0) a = parent[a]; return a; };
+      const owner = new Map();
+      for (let t = 0; t < triCount; t++) {
+        for (let k = 0; k < 3; k++) {
+          const vi = idx.getScalar(t * 3 + k);
+          if (owner.has(vi)) { const a = find(owner.get(vi)), b = find(t); if (a !== b) parent[b] = a; }
+          else owner.set(vi, t);
+        }
+      }
+      const stats = new Map();
+      for (let t = 0; t < triCount; t++) {
+        const c2 = find(t);
+        const o = stats.get(c2) ?? (stats.set(c2, { n: 0, nf: 0, hf: 0, lat: 0 }), stats.get(c2));
+        for (let k = 0; k < 3; k++) {
+          const v = pos.getElement(idx.getScalar(t * 3 + k), [0, 0, 0]);
+          o.nf += noseOf(v[L]);
+          o.hf += highOf(v[V]);
+          o.lat = Math.max(o.lat, Math.abs(v[A] - latMid) / halfW);
+        }
+        o.n += 3;
+      }
+      const isMirror = new Set();
+      for (const [c2, o] of stats) {
+        const nf = o.nf / o.n, hf = o.hf / o.n;
+        if (o.lat >= MIRROR.lat && nf >= MIRROR.nfLo && nf <= MIRROR.nfHi && hf >= MIRROR.hfLo && hf <= MIRROR.hfHi) {
+          isMirror.add(c2);
+        }
+      }
+      if (!isMirror.size) continue;
+
+      const keep = [], take = [];
+      for (let t = 0; t < triCount; t++) {
+        (isMirror.has(find(t)) ? take : keep).push(idx.getScalar(t * 3), idx.getScalar(t * 3 + 1), idx.getScalar(t * 3 + 2));
+      }
+      if (!take.length) continue;
+      mirrorTris += take.length / 3;
+      const mk = (arr) => doc.createAccessor().setType('SCALAR').setArray(new Uint32Array(arr)).setBuffer(buffer);
+      mesh.addPrimitive(prim.clone().setIndices(mk(take)).setMaterial(mirrorMat));
+      if (keep.length) prim.setIndices(mk(keep));
+      else mesh.removePrimitive(prim);
+    }
+  }
+  if (mirrorTris) console.log(`  mirror: ${mirrorTris} tris`);
+  else console.log('  mirror: none found');
 }
 
 const io = new NodeIO()

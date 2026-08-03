@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <title>PPF body zone debug</title>
+    <script type="module" src="https://unpkg.com/@google/model-viewer@4/dist/model-viewer.min.js"></script>
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; background: #fff; font: 13px/1.4 system-ui, sans-serif; color: #111; }
+      .stage { position: relative; width: 100vw; height: 100vh; }
+      model-viewer { width: 100%; height: 100%; background: #fff; }
+      .legend {
+        position: absolute; top: 16px; left: 16px; z-index: 5;
+        background: rgba(255,255,255,0.96); border: 1px solid #e3e3e3;
+        padding: 12px 14px; min-width: 250px;
+      }
+      .legend h1 { margin: 0 0 8px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
+      .legend ul { margin: 0; padding: 0; list-style: none; }
+      .legend li { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+      .sw { width: 15px; height: 15px; border: 1px solid rgba(0,0,0,.25); flex: none; }
+      .z { font-weight: 700; }
+      .d { color: #666; }
+      .views { position: absolute; bottom: 16px; left: 16px; z-index: 5; display: flex; gap: 6px; flex-wrap: wrap; }
+      .views a, .views button {
+        font: inherit; background: #fff; border: 1px solid #ccc; padding: 5px 10px;
+        text-decoration: none; color: #111; cursor: pointer;
+      }
+      .views a.on { background: #111; color: #fff; border-color: #111; }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <div class="legend">
+        <h1>Body zones — <span id="veh">sedan</span></h1>
+        <ul>
+          <li><span class="sw" style="background:#ff0000"></span><span class="z">Front bumper</span></li>
+          <li><span class="sw" style="background:#ff8c00"></span><span class="z">Hood — front</span><span class="d">partial</span></li>
+          <li><span class="sw" style="background:#ffff00"></span><span class="z">Hood — rest</span><span class="d">+ fenders</span></li>
+          <li><span class="sw" style="background:#00ccff"></span><span class="z">Roof</span><span class="d">+ pillars</span></li>
+          <li><span class="sw" style="background:#9900ff"></span><span class="z">Rocker</span><span class="d">lower doors</span></li>
+          <li><span class="sw" style="background:#00ff4d"></span><span class="z">Doors</span></li>
+          <li><span class="sw" style="background:#ff00cc"></span><span class="z">Rear</span></li>
+          <li><span class="sw" style="background:#0000ff"></span><span class="z">Mirrors</span></li>
+        </ul>
+      </div>
+      <model-viewer
+        id="mv"
+        src="/models3d/sedan.glb"
+        bounds="tight"
+        shadow-intensity="0.5"
+        exposure="1.15"
+        tone-mapping="neutral"
+        camera-orbit="-35deg 84deg 70%"
+        field-of-view="22deg"
+        interaction-prompt="none"
+        camera-controls
+      ></model-viewer>
+      <div class="views" id="views"></div>
+    </div>
+    <script>
+      const mv = document.getElementById('mv');
+      const q = new URLSearchParams(location.search);
+      const v = q.get('v') || 'sedan';
+      document.getElementById('veh').textContent = v;
+      mv.src = `/models3d/${v}.glb`;
+      const VIEWS = {
+        'front 3/4': '-35deg 84deg 70%',
+        side: '-90deg 90deg 105%',
+        'rear 3/4': '145deg 84deg 70%',
+        front: '0deg 90deg 105%',
+        top: '-90deg 5deg 105%',
+      };
+      const box = document.getElementById('views');
+      for (const [name, orbit] of Object.entries(VIEWS)) {
+        const a = document.createElement('a');
+        a.textContent = name;
+        a.href = '#';
+        a.onclick = (e) => {
+          e.preventDefault();
+          mv.cameraOrbit = orbit;
+          mv.fieldOfView = name === 'side' || name === 'front' || name === 'top' ? '14deg' : '22deg';
+          [...box.children].forEach((c) => c.classList.toggle('on', c === a));
+        };
+        box.appendChild(a);
+      }
+      for (const id of ['sedan', 'suv', 'sport', 'truck']) {
+        const a = document.createElement('a');
+        a.textContent = id;
+        a.href = `?v=${id}`;
+        if (id === v) a.classList.add('on');
+        box.appendChild(a);
+      }
+      if (q.get('orbit')) mv.cameraOrbit = q.get('orbit');
+      if (q.get('fov')) mv.fieldOfView = q.get('fov');
+    </script>
+  </body>
+</html>
