@@ -103,7 +103,12 @@ const MODELS = {
     // rear hatch→rearwin.
     zoneCuts: { ws: 0.33, front: 0.5, rearside: 0.83 },
     lampFrontFrac: 0.16, lampRearFrac: 0.08,
-    ppfCuts: { bumper: 0.10, hoodF: 0.22, hoodR: 0.36, rear: 0.80, high: 0.76, low: 0.54, roofStart: 0.29 },
+    // hoodR/roofStart sit at the windshield base (glass_visor starts 0.295).
+    ppfCuts: {
+      bumper: 0.10, hoodF: 0.22, hoodR: 0.295, rear: 0.80,
+      high: 0.76, low: 0.54, roofStart: 0.295,
+      rockerStart: 0.24, rockerEnd: 0.88,
+    },
   },
   sport: {
     src: '2020-porsche-718-cayman-gt4/source/2020_porsche_718_cayman_gt4.glb',
@@ -120,7 +125,12 @@ const MODELS = {
     zoneCuts: { ws: 0.4, front: 0.6, rearside: 0.88 },
     lampFrontFrac: 0.18, lampRearFrac: 0.13,
     // Mid-engine: short frunk up front, engine deck from ~0.66 back.
-    ppfCuts: { bumper: 0.10, hoodF: 0.20, hoodR: 0.32, rear: 0.66, high: 0.78, low: 0.50, roofStart: 0.31 },
+    // hoodR/roofStart sit at the windshield base (glass_visor starts 0.320).
+    ppfCuts: {
+      bumper: 0.10, hoodF: 0.20, hoodR: 0.32, rear: 0.66,
+      high: 0.78, low: 0.50, roofStart: 0.32,
+      rockerStart: 0.28, rockerEnd: 0.76,
+    },
   },
   truck: {
     src: '2021-ram-1500-trx/source/ram1500trx.glb',
@@ -138,7 +148,12 @@ const MODELS = {
     zoneCuts: { ws: 0.15, front: 0.33, rearside: 0.52 },
     lampFrontFrac: 0, lampRearFrac: 0,
     // Crew cab: short hood, cab to ~0.60, bed + tailgate behind that.
-    ppfCuts: { bumper: 0.07, hoodF: 0.16, hoodR: 0.29, rear: 0.60, high: 0.80, low: 0.56, roofStart: 0.22 },
+    // hoodR/roofStart sit at the windshield base (glass_visor starts 0.228).
+    ppfCuts: {
+      bumper: 0.07, hoodF: 0.16, hoodR: 0.235, rear: 0.60,
+      high: 0.80, low: 0.56, roofStart: 0.228,
+      rockerStart: 0.21, rockerEnd: 0.70,
+    },
   },
 };
 
