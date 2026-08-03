@@ -84,8 +84,9 @@ const MODELS = {
     // starts at 0.311), keeping the roof zone off the hood bulges.
     // rockerEnd carries the sill past the rear wheel arch.
     ppfCuts: {
-      bumper: 0.09, hoodF: 0.21, hoodR: 0.33, rear: 0.76,
-      high: 0.74, low: 0.50, roofStart: 0.31, rockerEnd: 0.88,
+      bumper: 0.09, hoodF: 0.21, hoodR: 0.31, rear: 0.76,
+      high: 0.74, low: 0.50, roofStart: 0.31,
+      rockerStart: 0.25, rockerEnd: 0.88,
     },
   },
   suv: {
@@ -184,8 +185,12 @@ const PPF_CUTS_DEFAULT = {
   // stray patch in the middle of the hood and breaks the straight cut.
   // Set it at the base of the windshield.
   roofStart: 0.32,
-  // The sill runs the length of the body and wraps the rear wheel arch, so
-  // it ends well behind `rear`. Defaults to rear + 0.06.
+  // The sill is its own panel for the whole length it runs, so it starts
+  // just behind the front wheel arch — not at the hood cut. Without this the
+  // stretch of sill between the front wheel and the door gets swallowed by
+  // the front-end zones. It ends well behind `rear`, wrapping the rear wheel
+  // arch; defaults to rear + 0.06.
+  rockerStart: 0.26,
   rockerEnd: undefined,
 };
 
@@ -299,19 +304,21 @@ function splitPpfZones(doc, cfg) {
     // "full front" would run up the pillar to the roof. Gated on roofStart
     // so a raised hood bulge can't be mistaken for roof.
     if (hf > c.high && nf > c.roofStart) return 'ppf_roof';
+    // Sill next, and before the hood zones: it is one continuous panel from
+    // behind the front wheel to the rear arch, so the front end must not
+    // claim the stretch of it that sits ahead of the door.
+    if (hf < c.low && nf > c.rockerStart && nf < rockerEnd) return 'ppf_rocker';
     if (nf < c.bumper) return 'ppf_bumper_f';
     if (nf < c.hoodF) return 'ppf_hood_f';
     if (nf < c.hoodR) return 'ppf_hood_r';
-    // Rockers are tested before the rear cut so the strip carries on past
-    // the doors and wraps the front of the rear wheel arch.
-    if (hf < c.low && nf < rockerEnd) return 'ppf_rocker';
     if (nf > c.rear) return 'ppf_rear';
     return 'ppf_side';
   };
 
   // Every plane any zone boundary can lie on.
   const planes = [
-    ...[c.bumper, c.hoodF, c.hoodR, c.rear, rockerEnd, c.roofStart].map((f) => ({ axis: L, value: noseToWorld(f) })),
+    ...[c.bumper, c.hoodF, c.hoodR, c.rear, c.rockerStart, rockerEnd, c.roofStart]
+      .map((f) => ({ axis: L, value: noseToWorld(f) })),
     ...[c.low, c.high].map((f) => ({ axis: V, value: highToWorld(f) })),
   ];
 
