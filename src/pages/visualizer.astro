@@ -633,13 +633,12 @@ const PPF_PACKAGES = [
         glass_windshield: GLASS_LOOK.clear,
         glass_lamps: GLASS_LOOK.clear,
       };
+      // Both halves of the build stay applied whichever tab is open, so
+      // switching tabs never appears to undo what you already picked.
       for (const [zone, matName] of Object.entries(ZONE_MATERIAL)) {
-        // Tint only reads as a choice in tint mode; PPF mode shows clear glass
-        // so nothing competes with the green film for attention.
-        const on = state.mode === 'tint' && state.tintZones.has(zone);
-        wanted[matName] = on ? shadeLook : GLASS_LOOK.clear;
+        wanted[matName] = state.tintZones.has(zone) ? shadeLook : GLASS_LOOK.clear;
       }
-      const covered = state.mode === 'ppf' ? new Set(state.ppfZones) : new Set<string>();
+      const covered = new Set(state.ppfZones);
       for (const z of PPF_ZONES) wanted[z] = covered.has(z) ? PPF_LOOK.covered : PPF_LOOK.bare;
       for (const mat of materials) {
         const target = wanted[mat.name];
@@ -724,20 +723,31 @@ const PPF_PACKAGES = [
     function render() {
       applyTint3D();
 
-      if (state.mode === 'ppf') {
-        summary.textContent = `${state.vehicleLabel} · ${state.ppfLabel} · ${state.ppfPanels}`;
-        badge.textContent = state.ppf === 'none' ? 'Pick a coverage' : 'Self-healing 3M film';
-        badge.className = okBadge;
+      // The summary describes the whole build, not just the open tab, since
+      // both halves are applied to the model at once.
+      const parts = [state.vehicleLabel];
+      if (state.tintZones.size) {
+        const zones = [...state.tintZones].map((z) => ZONE_LABELS[z]).join(', ');
+        parts.push(`${state.shadeLabel} tint (${SHADE_META[state.shade].vlt}) · ${zones}`);
+      }
+      if (state.ppf !== 'none') parts.push(`PPF: ${state.ppfLabel}`);
+      if (parts.length === 1) {
+        parts.push(state.mode === 'ppf' ? 'no film selected yet' : 'no tint zones yet');
+      }
+      summary.textContent = parts.join(' · ');
+
+      // A front-side tint that breaks the TN limit outranks anything else.
+      const frontTinted = state.tintZones.has('front-side');
+      const illegal = frontTinted && !SHADE_META[state.shade].frontLegal;
+      if (illegal) {
+        badge.textContent = 'TN: 35%+ required on front sides';
+        badge.className = warnBadge;
         return;
       }
-
-      const zones = [...state.tintZones].map((z) => ZONE_LABELS[z]).join(', ') || 'no zones yet';
-      summary.textContent = `${state.vehicleLabel} · ${state.shadeLabel} (${SHADE_META[state.shade].vlt}) · ${zones}`;
-
-      const frontTinted = state.tintZones.has('front-side');
-      const legal = !frontTinted || SHADE_META[state.shade].frontLegal;
-      badge.textContent = legal ? 'TN legal · selected zones' : 'TN: 35%+ required on front sides';
-      badge.className = legal ? okBadge : warnBadge;
+      badge.className = okBadge;
+      if (state.ppf !== 'none') badge.textContent = 'Self-healing 3M film';
+      else if (state.tintZones.size) badge.textContent = 'TN legal · selected zones';
+      else badge.textContent = state.mode === 'ppf' ? 'Pick a coverage' : 'Pick a coverage zone';
     }
 
     // ══ Mode tabs: window tint ⇄ paint protection ═════════════════════
@@ -936,7 +946,13 @@ const PPF_PACKAGES = [
         doc.setFont(bodyFont, 'normal');
         doc.setTextColor(...ACCENT);
         doc.text(
-          `${state.mode === 'ppf' ? 'Paint Protection' : 'Window Tint'} Configuration · Murfreesboro, TN`,
+          `${
+            state.tintZones.size && state.ppf !== 'none'
+              ? 'Window Tint & Paint Protection'
+              : state.ppf !== 'none'
+                ? 'Paint Protection'
+                : 'Window Tint'
+          } Configuration · Murfreesboro, TN`,
           headerTextX,
           20
         );
@@ -991,17 +1007,22 @@ const PPF_PACKAGES = [
           doc.line(14, y - 4.5, W - 14, y - 4.5);
         };
         row('Vehicle type', state.vehicleLabel);
-        if (state.mode === 'ppf') {
-          row('Film type', 'Paint Protection Film (3M)');
-          row('Coverage', state.ppfLabel);
-          row('Panels covered', state.ppfPanels);
-        } else {
-          row('Film type', 'Window Tint (3M)');
+        // Both halves of the build go on the sheet when both are configured.
+        if (state.tintZones.size) {
+          row('Window tint', '3M window film');
           row('Coverage zones', zones);
           row('Tint shade', `${state.shadeLabel} (${SHADE_META[state.shade].vlt})`);
-          row('Priorities', prio);
           row('TN legality', legal ? 'Legal for the selected zones' : 'Tennessee requires 35%+ VLT on front side windows');
         }
+        if (state.ppf !== 'none') {
+          row('Paint protection', '3M paint protection film');
+          row('Coverage', state.ppfLabel);
+          row('Panels covered', state.ppfPanels);
+        }
+        if (!state.tintZones.size && state.ppf === 'none') {
+          row('Build', 'No coverage selected yet');
+        }
+        row('Priorities', prio);
 
         // Footer
         y = 272;

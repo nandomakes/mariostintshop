@@ -105,65 +105,69 @@ const initials = (name: string) =>
 </section>
 
 <script>
-  // Auto-advance one card every 4s; wraps back to the start with an instant
-  // (non-animated) jump — no duplicated slides needed. Pauses on
-  // hover/touch/focus, arrow-nav, or under reduced motion; manual arrow use
-  // turns off the autoplay for good.
+  // Endless carousel: advances one card every 4s and never reaches an end.
+  // Pauses on hover/touch and while the tab is hidden.
   const track = document.getElementById('testimonial-track');
   const progress = document.getElementById('testimonial-progress');
   if (track) {
-    const slides = Array.from(track.children) as HTMLElement[];
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const arrows = Array.from(document.querySelectorAll<HTMLButtonElement>('.testimonial-arrow'));
+    const real = track.children.length;
+
+    // Clone the leading cards onto the end so the track can run past the last
+    // review into what looks like the first one, then snap back invisibly.
+    // The clones are added here rather than in the markup so the page still
+    // ships exactly one copy of each review to crawlers.
+    const CLONES = Math.min(real, 4);
+    for (let i = 0; i < CLONES; i++) {
+      const clone = track.children[i].cloneNode(true) as HTMLElement;
+      clone.setAttribute('aria-hidden', 'true');
+      track.appendChild(clone);
+    }
+    const slides = Array.from(track.children) as HTMLElement[];
+
     let idx = 0;
     let paused = false;
-    let autoplay: ReturnType<typeof setInterval> | null = null;
 
-    const go = (i: number, smooth: boolean) => {
-      track.scrollTo({
-        left: slides[i].offsetLeft - slides[0].offsetLeft,
-        behavior: smooth ? 'smooth' : 'auto',
-      });
-    };
-
-    // Which slide is currently leading the viewport — used so arrow clicks
-    // snap to an exact card boundary instead of scrolling by a fixed pixel
-    // amount. A fixed-pixel step drifts against the cards' fractional
-    // (calc()) widths over repeated clicks, leaving a sliver of the next
-    // card's photo peeking out past the arrow's fade zone — that sliver is
-    // the "blink" the fade doesn't fully cover.
-    const currentIndex = () => {
-      const left = track.scrollLeft;
-      let closest = 0;
-      let closestDist = Infinity;
-      slides.forEach((s, i) => {
-        const dist = Math.abs(s.offsetLeft - slides[0].offsetLeft - left);
-        if (dist < closestDist) {
-          closestDist = dist;
-          closest = i;
-        }
-      });
-      return closest;
-    };
-
-    const maxScroll = () => track.scrollWidth - track.clientWidth;
-    const EPS = 4;
-    const syncArrows = () => {
-      const max = maxScroll();
-      const prev = arrows.find((a) => a.dataset.dir === 'prev');
-      const next = arrows.find((a) => a.dataset.dir === 'next');
-      if (prev) prev.disabled = track.scrollLeft <= EPS;
-      if (next) next.disabled = track.scrollLeft >= max - EPS || max <= EPS;
-    };
     const syncProgress = () => {
-      const max = maxScroll();
-      if (progress) progress.style.width = `${max <= EPS ? 100 : Math.min(100, (track.scrollLeft / max) * 100)}%`;
+      if (progress) progress.style.width = `${(((idx % real) + 1) / real) * 100}%`;
     };
-    track.addEventListener('scroll', () => {
-      syncArrows();
+    const go = (i: number, smooth: boolean) => {
+      idx = Math.max(0, Math.min(i, slides.length - 1));
+      track.scrollTo({
+        left: slides[idx].offsetLeft - slides[0].offsetLeft,
+        behavior: smooth && !reduce ? 'smooth' : 'auto',
+      });
       syncProgress();
-    });
-    syncArrows();
+    };
+
+    // Once parked on a clone, the scroll position is rewound by one full set.
+    // It looks identical either side of the rewind, so nothing is visible.
+    let wrapTimer = 0;
+    const rewind = () => {
+      if (!wrapTimer) return;
+      clearTimeout(wrapTimer);
+      wrapTimer = 0;
+      go(idx - real, false);
+    };
+
+    const next = () => {
+      rewind(); // settle any pending rewind before stepping on
+      go(idx + 1, true);
+      // Let the animation land first, otherwise the rewind cuts it short.
+      if (idx >= real) wrapTimer = window.setTimeout(rewind, 700);
+    };
+    const prev = () => {
+      rewind();
+      if (idx <= 0) {
+        // Jump forward to the matching clone first; it looks the same, so
+        // easing back from there reads as a normal backwards step.
+        go(idx + real, false);
+      }
+      const target = idx - 1;
+      requestAnimationFrame(() => go(target, true));
+    };
+
     syncProgress();
 
     track.addEventListener('mouseenter', () => (paused = true));
@@ -171,31 +175,20 @@ const initials = (name: string) =>
     track.addEventListener('touchstart', () => (paused = true), { passive: true });
     track.addEventListener('touchend', () => setTimeout(() => (paused = false), 4000), { passive: true });
 
+    // There is no start or end any more, so the arrows are never disabled.
     arrows.forEach((btn) => {
+      btn.disabled = false;
       btn.addEventListener('pointerdown', (e) => e.preventDefault());
       btn.addEventListener('click', () => {
-        if (autoplay) {
-          clearInterval(autoplay);
-          autoplay = null;
-        }
-        const dir = btn.dataset.dir === 'next' ? 1 : -1;
-        const target = Math.min(Math.max(currentIndex() + dir, 0), slides.length - 1);
-        idx = target;
-        go(target, true);
+        if (btn.dataset.dir === 'next') next();
+        else prev();
       });
     });
 
     if (!reduce) {
-      autoplay = setInterval(() => {
+      setInterval(() => {
         if (paused || document.hidden) return;
-        if (idx >= slides.length - 1) {
-          // Wrap to the start instantly — no duplicate slides to ease into.
-          idx = 0;
-          go(idx, false);
-        } else {
-          idx += 1;
-          go(idx, true);
-        }
+        next();
       }, 4000);
     }
   }

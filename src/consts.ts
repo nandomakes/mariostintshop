@@ -64,10 +64,10 @@ export const IMAGES = {
   },
   // Satisfaction-badge image in the "Our services" section.
   preview: {
-    src: '/images/preview.jpg',
-    alt: 'Freshly tinted vehicle at Mario\'s Tint Shop',
-    width: 1000,
-    height: 1241,
+    src: '/images/our-services.webp',
+    alt: 'Red Lexus IS with freshly installed window tint at Mario\'s Tint Shop',
+    width: 688,
+    height: 918,
   },
   // Per-service imagery (card preview + service page).
   tinting1: {

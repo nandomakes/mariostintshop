@@ -1,77 +1,140 @@
 ---
-import { ABOUT, IMAGES } from '../consts';
+import { ABOUT } from '../consts';
 
-// Words for the band that runs behind the lambo artwork.
+const VIDEO = { id: 'ElI529-OuGs', title: "Meet Mario Rodriguez — Mario's Tint Shop" };
+
+// Words for the band that runs behind the row.
 const bandItems = ['Window Tint', 'PPF', 'Ceramic Coating', 'Tesla', 'Commercial Film'];
 const bandSeq = [...bandItems, ...bandItems, ...bandItems, ...bandItems];
 ---
 
 <section id="about" class="hex-bg relative overflow-hidden bg-paper">
-  <div class="mx-auto max-w-6xl px-5 py-20 md:py-28">
-    <!-- Two-column intro: title + CTA left, copy right -->
-    <div class="grid gap-10 md:grid-cols-2 md:items-start">
+  <div class="mx-auto max-w-6xl px-5 pt-20 md:pt-24">
+    <!-- Copy and video sit side by side so the section stays compact —
+         stacking them left a tall column of mostly empty space. -->
+    <div class="grid gap-10 md:grid-cols-2 md:items-center md:gap-12">
       <div class="reveal">
         <p class="kicker text-accentDk">About us</p>
         <h2 class="headline mt-3 text-[clamp(1.4rem,2.8vw,2.2rem)] text-ink">
           Crafting excellence in surface protection & style
         </h2>
+        <div class="mt-5 space-y-4 text-[15px] leading-relaxed text-char">
+          <p>{ABOUT.lead}</p>
+          <p>{ABOUT.body1}</p>
+        </div>
         <a
           href="/visualizer"
-          class="pressable sticker mt-8 inline-block bg-accent px-8 py-3.5 text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
+          class="pressable sticker mt-7 inline-block bg-accent px-8 py-3.5 text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
         >
           Try the Film Visualizer <span class="ml-0.5 font-black">&gt;</span>
         </a>
       </div>
-      <div class="reveal space-y-4 text-[15px] leading-relaxed text-char md:pt-8">
-        <p>{ABOUT.lead}</p>
-        <p>{ABOUT.body1}</p>
-        <p>{ABOUT.body2}</p>
+
+      <div class="reveal">
+        <!-- Shop intro video. Only the poster loads up front; the YouTube
+             player is injected on click so the page isn't paying for its
+             ~1MB of script on every visit. The frame is dark so the player's
+             own letterboxing reads as part of it rather than a stray edge. -->
+        <div class="border border-ink/10 bg-ink p-1.5 shadow-[0_30px_60px_-30px_rgba(0,0,0,0.45)]">
+          <div id="about-video" class="relative aspect-video w-full overflow-hidden">
+            <button
+              type="button"
+              class="group absolute inset-0 h-full w-full"
+              aria-label={`Play video: ${VIDEO.title}`}
+            >
+              <img
+                src="/images/about-video-poster.webp"
+                alt="Mario Rodriguez at Mario's Tint Shop"
+                width="1280"
+                height="720"
+                loading="lazy"
+                class="absolute inset-0 h-full w-full scale-[1.02] object-cover"
+              />
+              <span
+                class="absolute inset-0 grid place-items-center bg-ink/20 transition-colors duration-300 group-hover:bg-ink/5"
+                aria-hidden="true"
+              >
+                <span class="flex h-16 w-16 items-center justify-center rounded-full bg-accent text-ink shadow-xl transition-transform duration-300 ease-out group-hover:scale-110">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="ml-1">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </span>
+              </span>
+            </button>
+          </div>
+        </div>
+        <p class="mt-5 text-[15px] leading-relaxed text-char">{ABOUT.body2}</p>
       </div>
     </div>
+  </div>
 
-    <!-- Centered artwork with a light-blue band running behind it -->
-    <div class="reveal relative mx-auto mt-12 max-w-5xl">
-      <!-- Hex fade-out: a white gradient rotated to match the band's angle,
-           so the hex pattern dissolves gently just above the band and is
-           fully gone from the band downward (no hard cut, no leftover trace). -->
-      <div
-        class="pointer-events-none absolute left-1/2 top-1/2 h-screen w-[200vw] -translate-x-1/2 -translate-y-1/2 -rotate-2"
-        style="background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 33%, #ffffff 49%, #ffffff 100%);"
-        aria-hidden="true"
-      ></div>
-
-      <!-- Light-blue marquee band, vertically centered behind the image -->
-      <div
-        class="marquee absolute left-1/2 top-1/2 w-screen -translate-x-1/2 -translate-y-1/2 -rotate-2 bg-[#5FC2FF] py-1.5 sm:py-2 md:py-3"
-        aria-hidden="true"
-      >
-        <div class="marquee-track">
-          {
-            bandSeq.map((label, i) => (
-              <span class="mx-3 flex items-center gap-6 whitespace-nowrap sm:mx-4 sm:gap-8 md:mx-5 md:gap-10">
-                <span
-                  class:list={[
-                    'headline text-sm tracking-[0.06em] sm:text-base sm:tracking-[0.08em] md:text-xl',
-                    i % 2 === 0 ? 'text-paper' : 'text-ink/70',
-                  ]}
-                >
-                  {label}
-                </span>
-                <span class="text-paper">✦</span>
+  <!-- The services marquee runs full-bleed under the row, doubling as the
+       hand-off into the Services section. It used to sit behind the artwork,
+       but with copy in that space it cut straight through the paragraphs. -->
+  <div class="relative mt-16 h-24 md:mt-20 md:h-28" aria-hidden="true">
+    <!-- Hex fade-out: a white gradient rotated to match the band's angle, so
+         the hex pattern dissolves just above the band and is fully gone from
+         the band downward (no hard cut, no leftover trace). -->
+    <div
+      class="pointer-events-none absolute left-1/2 top-1/2 h-screen w-[200vw] -translate-x-1/2 -translate-y-1/2 -rotate-2"
+      style="background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 33%, #ffffff 49%, #ffffff 100%);"
+    ></div>
+    <div
+      class="marquee absolute left-1/2 top-1/2 w-screen -translate-x-1/2 -translate-y-1/2 -rotate-2 bg-[#5FC2FF] py-1.5 sm:py-2 md:py-3"
+    >
+      <div class="marquee-track">
+        {
+          bandSeq.map((label, i) => (
+            <span class="mx-3 flex items-center gap-6 whitespace-nowrap sm:mx-4 sm:gap-8 md:mx-5 md:gap-10">
+              <span
+                class:list={[
+                  'headline text-sm tracking-[0.06em] sm:text-base sm:tracking-[0.08em] md:text-xl',
+                  i % 2 === 0 ? 'text-paper' : 'text-ink/70',
+                ]}
+              >
+                {label}
               </span>
-            ))
-          }
-        </div>
+              <span class="text-paper">✦</span>
+            </span>
+          ))
+        }
       </div>
-
-      <img
-        src={IMAGES.install.src}
-        alt={IMAGES.install.alt}
-        width={IMAGES.install.width}
-        height={IMAGES.install.height}
-        loading="lazy"
-        class="relative mx-auto w-full object-contain sm:w-[90%]"
-      />
     </div>
   </div>
 </section>
+
+<script is:inline define:vars={{ VIDEO }}>
+  (() => {
+    const box = document.getElementById('about-video');
+    const btn = box?.querySelector('button');
+    if (!btn) return;
+
+    btn.addEventListener('click', () => {
+      const frame = document.createElement('iframe');
+      // enablejsapi lets us pause it over postMessage when it scrolls away.
+      frame.src = `https://www.youtube-nocookie.com/embed/${VIDEO.id}?autoplay=1&rel=0&enablejsapi=1`;
+      frame.title = VIDEO.title;
+      frame.allow =
+        'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      frame.allowFullscreen = true;
+      // Slightly oversized and clipped, so the player's own letterbox edge
+      // doesn't show as a black line down the side.
+      frame.className = 'absolute left-1/2 top-1/2 h-[calc(100%+4px)] w-[calc(100%+4px)] -translate-x-1/2 -translate-y-1/2 border-0';
+      box.replaceChildren(frame);
+
+      // Stop playback once it leaves the viewport — nobody wants audio
+      // following them down the page.
+      const io = new IntersectionObserver(
+        ([e]) => {
+          if (e.isIntersecting) return;
+          frame.contentWindow?.postMessage(
+            JSON.stringify({ event: 'command', func: 'pauseVideo', args: '' }),
+            '*'
+          );
+        },
+        { threshold: 0 }
+      );
+      io.observe(box);
+    });
+  })();
+</script>

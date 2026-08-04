@@ -85,8 +85,8 @@ const MODELS = {
     // rockerEnd carries the sill past the rear wheel arch.
     ppfCuts: {
       bumper: 0.09, hoodF: 0.21, hoodR: 0.31, rear: 0.76,
-      high: 0.74, low: 0.50, roofStart: 0.31,
-      rockerStart: 0.25, rockerEnd: 0.88,
+      high: 0.74, low: 0.36, roofStart: 0.31,
+      rockerEnd: 0.88,
     },
   },
   suv: {
@@ -106,8 +106,8 @@ const MODELS = {
     // hoodR/roofStart sit at the windshield base (glass_visor starts 0.295).
     ppfCuts: {
       bumper: 0.10, hoodF: 0.22, hoodR: 0.295, rear: 0.80,
-      high: 0.76, low: 0.54, roofStart: 0.295,
-      rockerStart: 0.24, rockerEnd: 0.88,
+      high: 0.76, low: 0.40, roofStart: 0.295,
+      rockerEnd: 0.88,
     },
   },
   sport: {
@@ -128,8 +128,8 @@ const MODELS = {
     // hoodR/roofStart sit at the windshield base (glass_visor starts 0.320).
     ppfCuts: {
       bumper: 0.10, hoodF: 0.20, hoodR: 0.32, rear: 0.66,
-      high: 0.78, low: 0.50, roofStart: 0.32,
-      rockerStart: 0.28, rockerEnd: 0.76,
+      high: 0.78, low: 0.36, roofStart: 0.32,
+      rockerEnd: 0.76,
     },
   },
   truck: {
@@ -151,8 +151,8 @@ const MODELS = {
     // hoodR/roofStart sit at the windshield base (glass_visor starts 0.228).
     ppfCuts: {
       bumper: 0.07, hoodF: 0.16, hoodR: 0.235, rear: 0.60,
-      high: 0.80, low: 0.56, roofStart: 0.228,
-      rockerStart: 0.21, rockerEnd: 0.70,
+      high: 0.80, low: 0.42, roofStart: 0.228,
+      rockerEnd: 0.70,
     },
   },
 };
@@ -200,12 +200,11 @@ const PPF_CUTS_DEFAULT = {
   // stray patch in the middle of the hood and breaks the straight cut.
   // Set it at the base of the windshield.
   roofStart: 0.32,
-  // The sill is its own panel for the whole length it runs, so it starts
-  // just behind the front wheel arch — not at the hood cut. Without this the
-  // stretch of sill between the front wheel and the door gets swallowed by
-  // the front-end zones. It ends well behind `rear`, wrapping the rear wheel
-  // arch; defaults to rear + 0.06.
-  rockerStart: 0.26,
+  // The rocker panel begins at the front door, so the fender keeps its own
+  // lower rear corner instead of losing it to the sill. Defaults to hoodR.
+  // It ends well behind `rear`, wrapping the rear wheel arch; defaults to
+  // rear + 0.06.
+  rockerStart: undefined,
   rockerEnd: undefined,
 };
 
@@ -303,6 +302,7 @@ function splitPpfZones(doc, cfg) {
   if (!paintPrims.length) return;
 
   const c = { ...PPF_CUTS_DEFAULT, ...(cfg.ppfCuts ?? {}) };
+  const rockerStart = c.rockerStart ?? c.hoodR;
   const rockerEnd = c.rockerEnd ?? c.rear + 0.06;
   const noseUp = cfg.noseSign > 0;
   const upPos = (cfg.upSign ?? 1) > 0;
@@ -319,10 +319,9 @@ function splitPpfZones(doc, cfg) {
     // "full front" would run up the pillar to the roof. Gated on roofStart
     // so a raised hood bulge can't be mistaken for roof.
     if (hf > c.high && nf > c.roofStart) return 'ppf_roof';
-    // Sill next, and before the hood zones: it is one continuous panel from
-    // behind the front wheel to the rear arch, so the front end must not
-    // claim the stretch of it that sits ahead of the door.
-    if (hf < c.low && nf > c.rockerStart && nf < rockerEnd) return 'ppf_rocker';
+    // Sill next, and before the rear cut, so the strip carries on past the
+    // doors and wraps the front of the rear wheel arch.
+    if (hf < c.low && nf > rockerStart && nf < rockerEnd) return 'ppf_rocker';
     if (nf < c.bumper) return 'ppf_bumper_f';
     if (nf < c.hoodF) return 'ppf_hood_f';
     if (nf < c.hoodR) return 'ppf_hood_r';
@@ -332,7 +331,7 @@ function splitPpfZones(doc, cfg) {
 
   // Every plane any zone boundary can lie on.
   const planes = [
-    ...[c.bumper, c.hoodF, c.hoodR, c.rear, c.rockerStart, rockerEnd, c.roofStart]
+    ...[c.bumper, c.hoodF, c.hoodR, c.rear, rockerStart, rockerEnd, c.roofStart]
       .map((f) => ({ axis: L, value: noseToWorld(f) })),
     ...[c.low, c.high].map((f) => ({ axis: V, value: highToWorld(f) })),
   ];
