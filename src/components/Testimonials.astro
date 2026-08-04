@@ -74,32 +74,31 @@ const initials = (name: string) =>
       }
     </div>
 
-    <!-- Prev/next arrows: same treatment as the Instagram strip. -->
-    <button
-      type="button"
-      data-dir="prev"
-      class="testimonial-arrow absolute inset-y-0 left-0 z-10 hidden w-16 items-center justify-start bg-gradient-to-r from-paper via-paper/70 to-transparent pl-1 transition-opacity duration-200 disabled:pointer-events-none disabled:opacity-0 md:flex sm:w-20"
-      aria-label="Previous reviews"
-    >
-      <span class="pressable flex h-11 w-11 items-center justify-center border border-sand bg-paper text-ink shadow-lg transition-colors duration-200 hover:border-accent hover:text-accentDk">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
-      </span>
-    </button>
-    <button
-      type="button"
-      data-dir="next"
-      class="testimonial-arrow absolute inset-y-0 right-0 z-10 hidden w-16 items-center justify-end bg-gradient-to-l from-paper via-paper/70 to-transparent pr-1 transition-opacity duration-200 disabled:pointer-events-none disabled:opacity-0 md:flex sm:w-20"
-      aria-label="Next reviews"
-    >
-      <span class="pressable flex h-11 w-11 items-center justify-center border border-sand bg-paper text-ink shadow-lg transition-colors duration-200 hover:border-accent hover:text-accentDk">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
-      </span>
-    </button>
     </div>
 
     <!-- Scroll progress bar: fills to show position in the review list. -->
-    <div class="mx-auto mt-4 h-1 w-full max-w-xs bg-sand" aria-hidden="true">
+    <div class="mx-auto mt-6 h-1 w-full max-w-xs bg-sand" aria-hidden="true">
       <div id="testimonial-progress" class="h-full w-0 bg-accent transition-[width] duration-150"></div>
+    </div>
+
+    <!-- Prev/next arrows, centered below the carousel. -->
+    <div class="mt-5 flex items-center justify-center gap-3">
+      <button
+        type="button"
+        data-dir="prev"
+        class="testimonial-arrow pressable flex h-11 w-11 items-center justify-center bg-accent text-ink shadow-lg transition-colors duration-200 hover:bg-accentDk disabled:pointer-events-none disabled:opacity-0"
+        aria-label="Previous reviews"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
+      </button>
+      <button
+        type="button"
+        data-dir="next"
+        class="testimonial-arrow pressable flex h-11 w-11 items-center justify-center bg-accent text-ink shadow-lg transition-colors duration-200 hover:bg-accentDk disabled:pointer-events-none disabled:opacity-0"
+        aria-label="Next reviews"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+      </button>
     </div>
   </div>
 </section>

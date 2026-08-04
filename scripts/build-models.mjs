@@ -148,9 +148,12 @@ const MODELS = {
     zoneCuts: { ws: 0.15, front: 0.33, rearside: 0.52 },
     lampFrontFrac: 0, lampRearFrac: 0,
     // Crew cab: short hood, cab to ~0.60, bed + tailgate behind that.
-    // hoodR/roofStart sit at the windshield base (glass_visor starts 0.228).
+    // roofStart sits at the windshield base (glass_visor starts 0.228), but
+    // hoodR (full-front cutoff) must stop short of the front door, which
+    // starts at ~0.18 — 0.235 used to land inside the door's own glass span
+    // and let "full front" bleed onto the door skin.
     ppfCuts: {
-      bumper: 0.07, hoodF: 0.16, hoodR: 0.235, rear: 0.60,
+      bumper: 0.07, hoodF: 0.16, hoodR: 0.175, rear: 0.60,
       high: 0.80, low: 0.50, roofStart: 0.228,
       rockerEnd: 0.70,
     },

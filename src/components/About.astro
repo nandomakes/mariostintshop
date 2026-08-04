@@ -63,42 +63,31 @@ const bandSeq = [...bandItems, ...bandItems, ...bandItems, ...bandItems];
             </button>
           </div>
         </div>
-        <p class="mt-5 text-[15px] leading-relaxed text-char">{ABOUT.body2}</p>
+        <p class="mt-4 text-sm italic leading-relaxed text-ash">{ABOUT.body2}</p>
       </div>
     </div>
   </div>
 
-  <!-- The services marquee runs full-bleed under the row, doubling as the
-       hand-off into the Services section. It used to sit behind the artwork,
-       but with copy in that space it cut straight through the paragraphs. -->
-  <div class="relative mt-8 h-24 md:mt-10 md:h-28" aria-hidden="true">
-    <!-- Hex fade-out: a white gradient rotated to match the band's angle, so
-         the hex pattern dissolves just above the band and is fully gone from
-         the band downward (no hard cut, no leftover trace). -->
-    <div
-      class="pointer-events-none absolute left-1/2 top-1/2 h-screen w-[200vw] -translate-x-1/2 -translate-y-1/2 -rotate-2"
-      style="background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 33%, #ffffff 49%, #ffffff 100%);"
-    ></div>
-    <div
-      class="marquee absolute left-1/2 top-1/2 w-screen -translate-x-1/2 -translate-y-1/2 -rotate-2 bg-[#5FC2FF] py-1.5 sm:py-2 md:py-3"
-    >
-      <div class="marquee-track">
-        {
-          bandSeq.map((label, i) => (
-            <span class="mx-3 flex items-center gap-6 whitespace-nowrap sm:mx-4 sm:gap-8 md:mx-5 md:gap-10">
-              <span
-                class:list={[
-                  'headline text-sm tracking-[0.06em] sm:text-base sm:tracking-[0.08em] md:text-xl',
-                  i % 2 === 0 ? 'text-paper' : 'text-ink/70',
-                ]}
-              >
-                {label}
-              </span>
-              <span class="text-paper">✦</span>
+  <!-- The services marquee runs full-bleed under the row as a straight
+       section divider, doubling as the hand-off into the Services section.
+       Sized to match the hero's Ticker band so the two read as one system. -->
+  <div class="marquee mt-20 bg-[#5FC2FF] py-3.5 [mask-image:none] md:mt-24 [-webkit-mask-image:none]" aria-hidden="true">
+    <div class="marquee-track">
+      {
+        bandSeq.map((label, i) => (
+          <span class="mx-5 flex items-center gap-10 whitespace-nowrap">
+            <span
+              class:list={[
+                'headline text-xl tracking-[0.08em]',
+                i % 2 === 0 ? 'text-paper' : 'text-ink/70',
+              ]}
+            >
+              {label}
             </span>
-          ))
-        }
-      </div>
+            <span class="text-paper">✦</span>
+          </span>
+        ))
+      }
     </div>
   </div>
 </section>
