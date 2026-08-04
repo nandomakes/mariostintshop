@@ -106,7 +106,7 @@ const MODELS = {
     // hoodR/roofStart sit at the windshield base (glass_visor starts 0.295).
     ppfCuts: {
       bumper: 0.10, hoodF: 0.22, hoodR: 0.295, rear: 0.80,
-      high: 0.76, low: 0.40, roofStart: 0.295,
+      high: 0.76, low: 0.47, roofStart: 0.295,
       rockerEnd: 0.88,
     },
   },
@@ -151,7 +151,7 @@ const MODELS = {
     // hoodR/roofStart sit at the windshield base (glass_visor starts 0.228).
     ppfCuts: {
       bumper: 0.07, hoodF: 0.16, hoodR: 0.235, rear: 0.60,
-      high: 0.80, low: 0.42, roofStart: 0.228,
+      high: 0.80, low: 0.50, roofStart: 0.228,
       rockerEnd: 0.70,
     },
   },
