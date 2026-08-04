@@ -81,8 +81,9 @@ const initials = (name: string) =>
       <div id="testimonial-progress" class="h-full w-0 bg-accent transition-[width] duration-150"></div>
     </div>
 
-    <!-- Prev/next arrows, centered below the carousel. -->
-    <div class="mt-5 flex items-center justify-center gap-3">
+    <!-- Prev/next arrows, centered below the carousel. Mobile relies on
+         touch swipe alone — the arrows only appear from sm up. -->
+    <div class="mt-5 hidden items-center justify-center gap-3 sm:flex">
       <button
         type="button"
         data-dir="prev"

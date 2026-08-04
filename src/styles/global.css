@@ -74,6 +74,15 @@
     filter: none;
   }
 
+  /* Certification seal: pops in with a scale + rotate instead of the plain
+     reveal slide, so it reads as a stamp landing rather than just fading. */
+  html[data-reveal] .reveal.seal-badge {
+    transform: scale(0.5) rotate(-16deg);
+  }
+  html[data-reveal] .reveal.seal-badge.in {
+    transform: none;
+  }
+
   .pressable {
     transition: transform 160ms var(--ease-out);
   }
