@@ -16,7 +16,7 @@ export const SITE = {
     "Mario's Tint Shop | 3M Window Tinting, PPF & Ceramic Coating in Murfreesboro, TN",
   // Kept under ~155 chars so Google doesn't truncate it in search results.
   description:
-    '3M window tinting, paint protection film & ceramic coating in Murfreesboro, TN. 25+ years experience, BBB A+ rated, 5.0-star Google reviews.',
+    "Mario's Tint Shop in Murfreesboro, TN provides top-notch automotive window tinting, paint protection film & ceramic coating. 25+ years, BBB A+ rated.",
   // Must match `site` in astro.config.mjs. www, because Vercel 308-redirects
   // the apex to www — a non-www canonical would point at a redirect.
   url: 'https://www.mariostintshop.com',
