@@ -1,6 +1,15 @@
 ---
 import { NAV_LINKS, CONTACT, SOCIALS } from '../consts';
 import Logo from './Logo.astro';
+
+// Most nav links are same-page anchors (/#about); only the standalone routes
+// can be "the current page". Compare on pathname so /visualizer matches
+// whether or not the URL carries a trailing slash.
+const here = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const isCurrent = (href: string) => {
+  if (href.includes('#')) return false;
+  return (href.replace(/\/+$/, '') || '/') === here;
+};
 ---
 
 <!-- Top bar: contact info left, hours + socials right -->
@@ -49,7 +58,11 @@ import Logo from './Logo.astro';
       {
         NAV_LINKS.map((link) => (
           <li>
-            <a href={link.href} class="nav-link py-3 transition-colors duration-200 hover:text-accent">
+            <a
+              href={link.href}
+              aria-current={isCurrent(link.href) ? 'page' : undefined}
+              class="nav-link py-3 transition-colors duration-200 hover:text-accent aria-[current=page]:text-accent"
+            >
               {link.label}
             </a>
           </li>
@@ -85,7 +98,7 @@ import Logo from './Logo.astro';
         href="/#contact"
         class="pressable sticker hidden bg-accent px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.1em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk sm:inline-block"
       >
-        Get Free Quote <span class="ml-0.5 font-black">&gt;</span>
+        Get Free Quote <span class="ml-0.5 font-black" aria-hidden="true">&gt;</span>
       </a>
     </div>
   </nav>
@@ -101,7 +114,8 @@ import Logo from './Logo.astro';
             <li>
               <a
                 href={link.href}
-                class="block border-b border-line py-3.5 text-sm font-bold uppercase tracking-[0.16em] text-smoke transition-colors duration-200 hover:text-accent"
+                aria-current={isCurrent(link.href) ? 'page' : undefined}
+                class="block border-b border-line py-3.5 text-sm font-bold uppercase tracking-[0.16em] text-smoke transition-colors duration-200 hover:text-accent aria-[current=page]:text-accent"
               >
                 {link.label}
               </a>
@@ -113,7 +127,7 @@ import Logo from './Logo.astro';
             href="/#contact"
             class="sticker block bg-accent px-6 py-3 text-center text-xs font-bold uppercase tracking-[0.14em] text-ink"
           >
-            Get Free Quote <span class="ml-0.5 font-black">&gt;</span>
+            Get Free Quote <span class="ml-0.5 font-black" aria-hidden="true">&gt;</span>
           </a>
         </li>
       </ul>

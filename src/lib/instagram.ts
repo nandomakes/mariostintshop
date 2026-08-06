@@ -16,7 +16,9 @@
 import { GALLERY, INSTAGRAM } from '../consts';
 
 export interface FeedItem {
-  src: string;
+  // Local fallback tiles are imported assets (ImageMetadata) so Astro can
+  // optimize them; live API tiles are remote CDN URLs, which it cannot.
+  src: ImageMetadata | string;
   alt: string;
   href: string;
 }
@@ -60,7 +62,7 @@ export async function getInstagramFeed(limit = 8): Promise<FeedItem[]> {
           src,
           alt: caption ? caption.slice(0, 120) : 'Instagram post from Mario\'s Tint Shop',
           href: m.permalink,
-        } satisfies FeedItem;
+        } as FeedItem;
       })
       .filter((x): x is FeedItem => x !== null);
 

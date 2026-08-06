@@ -1,15 +1,17 @@
 ---
 // Reusable text + image split. Image is absolutely positioned so it never
 // dictates the row height.
+import { Image } from 'astro:assets';
+
 interface Props {
   kicker?: string;
   title: string;
   lead?: string;
   paragraphs?: string[];
-  imageSrc: string;
+  // An imported asset from src/assets — <Image> reads its intrinsic size, so
+  // callers no longer pass width/height.
+  imageSrc: ImageMetadata;
   imageAlt: string;
-  imageW?: number;
-  imageH?: number;
   reverse?: boolean; // image on the left instead of the right
   cta?: { href: string; label: string };
 }
@@ -21,8 +23,6 @@ const {
   paragraphs = [],
   imageSrc,
   imageAlt,
-  imageW = 1400,
-  imageH = 1000,
   reverse = false,
   cta,
 } = Astro.props;
@@ -49,11 +49,11 @@ const imgOrder = reverse ? 'md:order-1' : 'md:order-2';
     }
   </div>
   <div class={`zoom-parent relative order-2 min-h-[320px] overflow-hidden ${imgOrder}`}>
-    <img
+    <Image
       src={imageSrc}
       alt={imageAlt}
-      width={imageW}
-      height={imageH}
+      widths={[640, 1024, 1400]}
+      sizes="(min-width: 768px) 50vw, 100vw"
       loading="lazy"
       class="zoom-img absolute inset-0 h-full w-full object-cover"
     />

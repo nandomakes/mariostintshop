@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import { SERVICES, IMAGES, CONTACT } from '../consts';
 
 // Distinct line icon per service (inner SVG paths, 24×24 stroke grid).
@@ -28,11 +29,11 @@ const IMG_FX_DEFAULT = 'object-center';
     <div class="grid gap-14 md:grid-cols-[2fr_3fr] md:items-start">
       <!-- Left: image with badge -->
       <div class="reveal relative min-w-0">
-        <img
+        <Image
           src={IMAGES.preview.src}
           alt={IMAGES.preview.alt}
-          width={IMAGES.preview.width}
-          height={IMAGES.preview.height}
+          widths={[344, 688]}
+          sizes="(min-width: 768px) 40vw, 100vw"
           loading="lazy"
           class="aspect-[4/5] w-full object-cover"
         />
@@ -89,10 +90,12 @@ const IMG_FX_DEFAULT = 'object-center';
                 class="lift group relative flex items-center gap-4 overflow-hidden bg-paper p-5 shadow-[0_2px_10px_rgba(0,0,0,0.05)] md:p-6"
               >
                 <span class="pointer-events-none absolute inset-y-0 right-0 h-full w-28 overflow-hidden [mask-image:linear-gradient(to_left,#000_22%,transparent)] sm:w-40 md:w-48">
-                  <img
+                  <Image
                     src={IMAGES[service.image].src}
                     alt=""
                     aria-hidden="true"
+                    widths={[192, 384]}
+                    sizes="(min-width: 768px) 192px, 160px"
                     loading="lazy"
                     class:list={[
                       'h-full w-full object-cover opacity-[0.34] transition-opacity duration-500 group-hover:opacity-[0.55]',
@@ -123,7 +126,7 @@ const IMG_FX_DEFAULT = 'object-center';
             href="/#contact"
             class="pressable sticker bg-accent px-8 py-3.5 text-center text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
           >
-            Get Free Quote <span class="ml-0.5 font-black">&gt;</span>
+            Get Free Quote <span class="ml-0.5 font-black" aria-hidden="true">&gt;</span>
           </a>
           <a
             href={`tel:${CONTACT.phoneTel}`}

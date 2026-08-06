@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import { TESTIMONIALS } from '../consts';
 import GoogleRatingBadge from './GoogleRatingBadge.astro';
 
@@ -26,8 +27,10 @@ const initials = (name: string) =>
     <div class="relative mt-12">
     <div
       id="testimonial-track"
-      class="no-scrollbar flex gap-6 overflow-x-auto scroll-smooth outline-none"
+      class="no-scrollbar flex gap-6 overflow-x-auto scroll-smooth"
       style="overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; -webkit-tap-highlight-color: transparent;"
+      role="region"
+      tabindex="0"
       aria-label="Customer reviews carousel"
     >
       {
@@ -36,14 +39,14 @@ const initials = (name: string) =>
             class="flex w-full shrink-0 flex-col bg-mint sm:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-3rem)/3)]"
           >
             {t.photo ? (
-              <img
+              <Image
                 src={t.photo.src}
                 alt={t.photo.alt}
-                width="800"
-                height="500"
+                widths={[400, 800]}
+                sizes="(min-width: 1024px) 384px, (min-width: 640px) 50vw, 100vw"
                 loading="lazy"
-                draggable="false"
-                class="aspect-[8/5] w-full select-none object-cover outline-none"
+                draggable={false}
+                class="aspect-[8/5] w-full select-none object-cover"
               />
             ) : (
               <div class="flex aspect-[8/5] w-full items-center justify-center bg-accent/10">
@@ -82,12 +85,24 @@ const initials = (name: string) =>
     </div>
 
     <!-- Prev/next arrows, centered below the carousel. Mobile relies on
-         touch swipe alone — the arrows only appear from sm up. -->
-    <div class="mt-5 hidden items-center justify-center gap-3 sm:flex">
+         touch swipe alone — the arrows only appear from sm up. The pause
+         control shows at every width, since the autoplay runs at every width. -->
+    <div class="mt-5 flex items-center justify-center gap-3">
+      <!-- WCAG 2.2.2 (Pause, Stop, Hide): the carousel auto-advances, so it
+           needs a control that is reachable by keyboard, not just hover. -->
+      <button
+        type="button"
+        id="testimonial-playpause"
+        class="pressable flex h-11 w-11 items-center justify-center bg-ink text-paper shadow-lg transition-colors duration-200 hover:bg-char"
+        aria-label="Pause reviews carousel"
+      >
+        <svg id="testimonial-icon-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z" /></svg>
+        <svg id="testimonial-icon-play" class="hidden" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+      </button>
       <button
         type="button"
         data-dir="prev"
-        class="testimonial-arrow pressable flex h-11 w-11 items-center justify-center bg-accent text-ink shadow-lg transition-colors duration-200 hover:bg-accentDk disabled:pointer-events-none disabled:opacity-0"
+        class="testimonial-arrow pressable hidden h-11 w-11 sm:flex items-center justify-center bg-accent text-ink shadow-lg transition-colors duration-200 hover:bg-accentDk disabled:pointer-events-none disabled:opacity-0"
         aria-label="Previous reviews"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
@@ -95,7 +110,7 @@ const initials = (name: string) =>
       <button
         type="button"
         data-dir="next"
-        class="testimonial-arrow pressable flex h-11 w-11 items-center justify-center bg-accent text-ink shadow-lg transition-colors duration-200 hover:bg-accentDk disabled:pointer-events-none disabled:opacity-0"
+        class="testimonial-arrow pressable hidden h-11 w-11 sm:flex items-center justify-center bg-accent text-ink shadow-lg transition-colors duration-200 hover:bg-accentDk disabled:pointer-events-none disabled:opacity-0"
         aria-label="Next reviews"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
@@ -185,9 +200,37 @@ const initials = (name: string) =>
       });
     });
 
+    // Explicit user pause, kept separate from the transient hover/touch pause
+    // so hovering can't silently resume a carousel the user chose to stop.
+    let stopped = reduce;
+    const playPause = document.getElementById('testimonial-playpause');
+    const iconPause = document.getElementById('testimonial-icon-pause');
+    const iconPlay = document.getElementById('testimonial-icon-play');
+
+    const renderPlayState = () => {
+      if (!playPause) return;
+      playPause.setAttribute(
+        'aria-label',
+        stopped ? 'Play reviews carousel' : 'Pause reviews carousel'
+      );
+      iconPause?.classList.toggle('hidden', stopped);
+      iconPlay?.classList.toggle('hidden', !stopped);
+    };
+
+    if (playPause) {
+      // With reduced motion the carousel never auto-advances, so the control
+      // would be a lie — hide it rather than offer a no-op.
+      if (reduce) playPause.classList.add('hidden');
+      renderPlayState();
+      playPause.addEventListener('click', () => {
+        stopped = !stopped;
+        renderPlayState();
+      });
+    }
+
     if (!reduce) {
       setInterval(() => {
-        if (paused || document.hidden) return;
+        if (stopped || paused || document.hidden) return;
         next();
       }, 4000);
     }

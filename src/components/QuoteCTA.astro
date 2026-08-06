@@ -41,7 +41,7 @@ const { defaultService } = Astro.props;
         <p class="mt-8 text-sm text-smoke">
           Prefer to talk? Call us at
           <a
-            href={CONTACT.phoneTel}
+            href={`tel:${CONTACT.phoneTel}`}
             class="font-bold text-accent underline underline-offset-4 hover:text-accentDk"
           >
             {CONTACT.phoneDisplay}

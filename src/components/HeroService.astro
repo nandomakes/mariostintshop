@@ -1,9 +1,11 @@
 ---
+import { Picture } from 'astro:assets';
+
 interface Props {
   kicker: string;
   title: string;
   subcopy: string;
-  imageSrc?: string;
+  imageSrc?: ImageMetadata;
 }
 const { kicker, title, subcopy, imageSrc } = Astro.props;
 ---
@@ -12,7 +14,17 @@ const { kicker, title, subcopy, imageSrc } = Astro.props;
   {
     imageSrc && (
       <div class="absolute inset-0" aria-hidden="true">
-        <img src={imageSrc} alt="" class="h-full w-full object-cover opacity-50" />
+        {/* Service-page LCP element — eager, and sized so it can't shift layout. */}
+        <Picture
+          src={imageSrc}
+          alt=""
+          formats={['avif', 'webp']}
+          widths={[640, 1024, 1600]}
+          sizes="100vw"
+          loading="eager"
+          fetchpriority="high"
+          class="h-full w-full object-cover opacity-50"
+        />
         <div class="absolute inset-0 bg-black/60" />
         <div class="absolute inset-0 bg-gradient-to-t from-ink via-transparent to-ink/60" />
       </div>
@@ -34,7 +46,7 @@ const { kicker, title, subcopy, imageSrc } = Astro.props;
         href="/#contact"
         class="pressable sticker w-full bg-accent px-8 py-3.5 text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk sm:w-auto"
       >
-        Get Free Quote <span class="ml-0.5 font-black">&gt;</span>
+        Get Free Quote <span class="ml-0.5 font-black" aria-hidden="true">&gt;</span>
       </a>
     </div>
   </div>
