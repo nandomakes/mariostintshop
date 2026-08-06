@@ -14,8 +14,9 @@ export const SITE = {
   license: 'BBB A+ Accredited · Authorized 3M Platinum Dealer',
   title:
     "Mario's Tint Shop | 3M Window Tinting, PPF & Ceramic Coating in Murfreesboro, TN",
+  // Kept under ~155 chars so Google doesn't truncate it in search results.
   description:
-    "Murfreesboro's elite tint shop and leading 3M dealer. Professional automotive window tinting, paint protection film (PPF), and ceramic coating serving Murfreesboro, Nashville & Middle Tennessee. 25+ years of experience, BBB A+ rated, 5.0-star Google rating.",
+    '3M window tinting, paint protection film & ceramic coating in Murfreesboro, TN. 25+ years experience, BBB A+ rated, 5.0-star Google reviews.',
   // Must match `site` in astro.config.mjs. www, because Vercel 308-redirects
   // the apex to www — a non-www canonical would point at a redirect.
   url: 'https://www.mariostintshop.com',
@@ -59,7 +60,8 @@ export const CONTACT = {
   geo: { lat: 35.8470688, lng: -86.3974265 },
   googleBusinessUrl:
     "https://maps.app.goo.gl/ChC6iGfAj8wzBpwk6",
-  bbbUrl: '#',
+  bbbUrl:
+    'https://www.bbb.org/us/tn/murfreesboro/profile/car-window-tinting/marios-tint-shop-0573-37192075',
 };
 
 // ── Hero copy ───────────────────────────────────────────────────────

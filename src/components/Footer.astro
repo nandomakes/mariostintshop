@@ -26,7 +26,16 @@ const SOCIAL_ICONS: Record<string, string> = {
       <div class="inline-block"><Logo loading="lazy" /></div>
       <p class="mt-5 max-w-[36ch] leading-relaxed">
         Premium window tint, paint protection film, and ceramic coating in
-        Murfreesboro, TN. BBB A+ accredited · {SITE.yearsInBusiness} years.
+        Murfreesboro, TN.{' '}
+        <a
+          href={CONTACT.bbbUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="underline decoration-smoke/40 underline-offset-2 transition-colors hover:text-accent hover:decoration-accent"
+        >
+          BBB A+ accredited
+        </a>{' '}
+        · {SITE.yearsInBusiness} years.
       </p>
       <div class="mt-6 flex items-center gap-3">
         {
