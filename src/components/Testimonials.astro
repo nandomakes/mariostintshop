@@ -65,7 +65,7 @@ const initials = (name: string) =>
               </div>
               <blockquote class="mt-4 flex-1 text-[15px] leading-relaxed text-char">“{t.quote}”</blockquote>
               <hr class="my-5 border-accentDk/15" />
-              <figcaption>
+              <figcaption class="pr-12">
                 <p class="headline text-base tracking-[0.06em] text-ink">{t.author}</p>
               </figcaption>
               <span class="pointer-events-none absolute bottom-6 right-7 text-accentDk/30" aria-hidden="true">
@@ -85,20 +85,8 @@ const initials = (name: string) =>
     </div>
 
     <!-- Prev/next arrows, centered below the carousel. Mobile relies on
-         touch swipe alone — the arrows only appear from sm up. The pause
-         control shows at every width, since the autoplay runs at every width. -->
+         touch swipe alone — the arrows only appear from sm up. -->
     <div class="mt-5 flex items-center justify-center gap-3">
-      <!-- WCAG 2.2.2 (Pause, Stop, Hide): the carousel auto-advances, so it
-           needs a control that is reachable by keyboard, not just hover. -->
-      <button
-        type="button"
-        id="testimonial-playpause"
-        class="pressable flex h-11 w-11 items-center justify-center bg-ink text-paper shadow-lg transition-colors duration-200 hover:bg-char"
-        aria-label="Pause reviews carousel"
-      >
-        <svg id="testimonial-icon-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z" /></svg>
-        <svg id="testimonial-icon-play" class="hidden" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
-      </button>
       <button
         type="button"
         data-dir="prev"
@@ -200,37 +188,9 @@ const initials = (name: string) =>
       });
     });
 
-    // Explicit user pause, kept separate from the transient hover/touch pause
-    // so hovering can't silently resume a carousel the user chose to stop.
-    let stopped = reduce;
-    const playPause = document.getElementById('testimonial-playpause');
-    const iconPause = document.getElementById('testimonial-icon-pause');
-    const iconPlay = document.getElementById('testimonial-icon-play');
-
-    const renderPlayState = () => {
-      if (!playPause) return;
-      playPause.setAttribute(
-        'aria-label',
-        stopped ? 'Play reviews carousel' : 'Pause reviews carousel'
-      );
-      iconPause?.classList.toggle('hidden', stopped);
-      iconPlay?.classList.toggle('hidden', !stopped);
-    };
-
-    if (playPause) {
-      // With reduced motion the carousel never auto-advances, so the control
-      // would be a lie — hide it rather than offer a no-op.
-      if (reduce) playPause.classList.add('hidden');
-      renderPlayState();
-      playPause.addEventListener('click', () => {
-        stopped = !stopped;
-        renderPlayState();
-      });
-    }
-
     if (!reduce) {
       setInterval(() => {
-        if (stopped || paused || document.hidden) return;
+        if (paused || document.hidden) return;
         next();
       }, 4000);
     }
