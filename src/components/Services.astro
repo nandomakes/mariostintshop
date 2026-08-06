@@ -39,8 +39,12 @@ const IMG_FX_DEFAULT = 'object-center';
         />
         <!-- Certification seal: 100% satisfaction guarantee -->
         <!-- Mobile: centered on the bottom edge of the image. From sm up: tucked
-             into the bottom-right corner, unchanged from before. -->
-        <div class="reveal seal-badge absolute left-1/2 -bottom-3 h-20 w-20 -translate-x-1/2 drop-shadow-[0_8px_16px_rgba(0,0,0,0.3)] sm:left-auto sm:-right-4 sm:-bottom-4 sm:h-24 sm:w-24 sm:translate-x-0 md:-right-5 md:-bottom-5 md:h-28 md:w-28 lg:-right-6 lg:h-32 lg:w-32">
+             into the bottom-right corner, unchanged from before.
+             Centered with `left: calc(50% - half-width)` rather than a
+             -translate-x-1/2 transform: the .seal-badge reveal animation
+             below sets `transform: none` once it settles, which would wipe
+             out a translate-based centering. -->
+        <div class="reveal seal-badge absolute bottom-[-0.75rem] left-[calc(50%-2.5rem)] h-20 w-20 drop-shadow-[0_8px_16px_rgba(0,0,0,0.3)] sm:left-auto sm:-right-4 sm:-bottom-4 sm:h-24 sm:w-24 md:-right-5 md:-bottom-5 md:h-28 md:w-28 lg:-right-6 lg:h-32 lg:w-32">
           <svg viewBox="-12 -12 224 224" class="h-full w-full" aria-hidden="true">
             <defs>
               <linearGradient id="seal-grad" x1="0" y1="0" x2="0" y2="1">
