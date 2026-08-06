@@ -1,25 +1,49 @@
 ---
+// All four families are self-hosted: no render-blocking request to
+// fonts.googleapis.com, no third-party DNS/TLS handshake on first paint, and
+// no visitor IPs sent to Google. Latin subsets only — the site is English.
 import '@fontsource-variable/inter';
+import '@fontsource/special-gothic-expanded-one/latin-400.css';
+import '@fontsource/sedgwick-ave/latin-400.css';
+import '@fontsource/gabarito/latin-400.css';
+// Imported (not a literal path) so the preload URL below always matches the
+// hashed file Vite actually emits.
+import specialGothicWoff2 from '@fontsource/special-gothic-expanded-one/files/special-gothic-expanded-one-latin-400-normal.woff2?url';
 import '../styles/global.css';
-import { SITE, CONTACT, PHONE_TEL, SERVICES } from '../consts';
+import { SITE, CONTACT, PHONE_TEL, SERVICES, SOCIALS, TESTIMONIALS } from '../consts';
 
 interface Props {
   title?: string;
   description?: string;
+  /** Keep this page out of the index (used by 404). */
+  noindex?: boolean;
+  /** Extra JSON-LD nodes for this page (BreadcrumbList, FAQPage, …). */
+  schema?: unknown[];
 }
 
-const { title = SITE.title, description = SITE.description } = Astro.props;
-const canonical = new URL(Astro.url.pathname, Astro.site ?? SITE.url).href;
-const ogImage = new URL('/og-image.svg', Astro.site ?? SITE.url).href;
+const {
+  title = SITE.title,
+  description = SITE.description,
+  noindex = false,
+  schema = [],
+} = Astro.props;
+
+const site = Astro.site ?? new URL(SITE.url);
+const canonical = new URL(Astro.url.pathname, site).href;
+// A real 1200×630 raster. SVG og:images are not rendered by any social
+// platform, and Google rejects them for rich results.
+const ogImage = new URL('/og-image.png', site).href;
 
 // JSON-LD: local automotive business for SEO in Murfreesboro, TN
-const jsonLd = {
+const business = {
   '@context': 'https://schema.org',
   '@type': 'AutoRepair',
+  '@id': `${SITE.url}/#business`,
   name: SITE.brand,
   description: SITE.description,
   url: SITE.url,
   image: ogImage,
+  logo: new URL('/favicon-512.png', site).href,
   telephone: PHONE_TEL,
   email: CONTACT.email,
   priceRange: '$$$',
@@ -36,7 +60,13 @@ const jsonLd = {
     latitude: CONTACT.geo.lat,
     longitude: CONTACT.geo.lng,
   },
-  openingHours: 'Mo-Fr 08:00-17:00',
+  openingHoursSpecification: CONTACT.hoursSpec.map((h) => ({
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: h.days,
+    opens: h.opens,
+    closes: h.closes,
+    ...(h.byAppointment ? { description: 'By appointment only' } : {}),
+  })),
   areaServed:
     'Murfreesboro, Nashville, Smyrna, Lebanon, La Vergne, Franklin, Brentwood, Rutherford County, and Middle Tennessee',
   aggregateRating: {
@@ -44,7 +74,15 @@ const jsonLd = {
     ratingValue: '5.0',
     reviewCount: '390',
   },
-  sameAs: ['https://www.instagram.com/mariostintshop/'],
+  // Real reviews backing the aggregateRating above — Google discounts (and can
+  // flag) a self-serving rating with no reviews attached to it.
+  review: TESTIMONIALS.slice(0, 6).map((t) => ({
+    '@type': 'Review',
+    author: { '@type': 'Person', name: t.author },
+    reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
+    reviewBody: t.quote,
+  })),
+  sameAs: SOCIALS.map((s) => s.href),
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
     name: 'Services',
@@ -54,6 +92,18 @@ const jsonLd = {
     })),
   },
 };
+
+const website = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': `${SITE.url}/#website`,
+  url: SITE.url,
+  name: SITE.brand,
+  publisher: { '@id': `${SITE.url}/#business` },
+  inLanguage: 'en-US',
+};
+
+const jsonLdNodes = [business, website, ...schema];
 ---
 
 <!doctype html>
@@ -61,20 +111,26 @@ const jsonLd = {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Display face: used by the H1 and every .headline, so it is on the
+         critical path and worth preloading ahead of CSS discovery. -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Sedgwick+Ave&family=Special+Gothic+Expanded+One&family=Gabarito:wght@400&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href={specialGothicWoff2}
+      crossorigin="anonymous"
     />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="canonical" href={canonical} />
     <meta name="generator" content={Astro.generator} />
 
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="author" content={SITE.brand} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
     <meta name="theme-color" content={SITE.themeColor} />
     <meta name="geo.region" content="US-TN" />
     <meta name="geo.placename" content="Murfreesboro" />
@@ -88,14 +144,22 @@ const jsonLd = {
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${SITE.brand} — ${SITE.role} in ${SITE.city}`} />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={`${SITE.brand} — ${SITE.role} in ${SITE.city}`} />
 
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    {
+      jsonLdNodes.map((node) => (
+        <script is:inline type="application/ld+json" set:html={JSON.stringify(node)} />
+      ))
+    }
 
     <!-- Enable "reveal" mode only when JS is present; without JS everything is visible -->
     <script is:inline>

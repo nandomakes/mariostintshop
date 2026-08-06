@@ -3,7 +3,7 @@ import { CONTACT } from '../consts';
 ---
 
 <a
-  href={CONTACT.phoneTel}
+  href={`tel:${CONTACT.phoneTel}`}
   aria-label={`Call Mario's Tint Shop at ${CONTACT.phoneDisplay}`}
   class="pressable fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-accent text-ink shadow-lg shadow-accent/30 transition-[transform,background-color,box-shadow] duration-200 ease-out hover:scale-105 hover:bg-accentDk active:scale-95"
 >

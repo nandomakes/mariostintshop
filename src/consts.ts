@@ -16,7 +16,9 @@ export const SITE = {
     "Mario's Tint Shop | 3M Window Tinting, PPF & Ceramic Coating in Murfreesboro, TN",
   description:
     "Murfreesboro's elite tint shop and leading 3M dealer. Professional automotive window tinting, paint protection film (PPF), and ceramic coating serving Murfreesboro, Nashville & Middle Tennessee. 25+ years of experience, BBB A+ rated, 5.0-star Google rating.",
-  url: 'https://mariostintshop.com',
+  // Must match `site` in astro.config.mjs. www, because Vercel 308-redirects
+  // the apex to www — a non-www canonical would point at a redirect.
+  url: 'https://www.mariostintshop.com',
   themeColor: '#111111',
 };
 
@@ -36,6 +38,24 @@ export const CONTACT = {
   email: 'mario@mariostintshop.com',
   schedule: 'Mon–Fri, 8:00 a.m. to 5:00 p.m. · Sat by appointment',
   scheduleShort: 'Mon–Fri 8–5',
+  // Single source of truth for opening hours: the footer list and the
+  // JSON-LD openingHoursSpecification are both derived from this, so the
+  // three can no longer drift apart.
+  hours: [
+    { label: 'Mon–Fri', value: '8:00 a.m. – 5:00 p.m.' },
+    { label: 'Saturday', value: 'By appointment' },
+    { label: 'Sunday', value: 'Closed' },
+  ],
+  hoursSpec: [
+    {
+      days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      opens: '08:00',
+      closes: '17:00',
+    },
+    // Saturday is appointment-only; marked as such rather than omitted, so
+    // Google doesn't show the shop as closed on Saturdays.
+    { days: ['Saturday'], opens: '09:00', closes: '15:00', byAppointment: true },
+  ],
   geo: { lat: 35.8470688, lng: -86.3974265 },
   googleBusinessUrl:
     "https://maps.app.goo.gl/ChC6iGfAj8wzBpwk6",
@@ -52,101 +72,65 @@ export const HERO = {
   addressPlace: '515 NW Broad St, Murfreesboro, TN 37130',
 };
 
-// ── Images (paths under /public/images) ─────────────────────────────
-// ⚠️ REPLACE each placeholder (Unsplash) with real high-contrast shop
-// photography. Keep the same keys or update the paths here.
+// ── Images ──────────────────────────────────────────────────────────
+// These live in src/assets/images (NOT public/) so Astro processes them:
+// each one is emitted as hashed, responsive AVIF/WebP under /_astro/ and
+// served with a one-year immutable cache. `src` is an ImageMetadata object
+// carrying intrinsic width/height — render it with <Image>/<Picture> from
+// `astro:assets` and never hand-write width/height at the call site.
+import heroBgImg from './assets/images/hero-4.png';
+import previewImg from './assets/images/our-services.webp';
+import tinting1Img from './assets/images/tinting-1.webp';
+import tintingImg from './assets/images/tinting-2.webp';
+import paintImg from './assets/images/paint-1.webp';
+import coatingImg from './assets/images/coating-1.webp';
+import teslaSvcImg from './assets/images/tesla-1.webp';
+import officeImg from './assets/images/office.webp';
+import office2Img from './assets/images/office-2.webp';
+import installImg from './assets/images/lambo-hero.webp';
+
 export const IMAGES = {
   heroBg: {
-    src: '/images/hero-4.png',
+    src: heroBgImg,
     alt: '',
-    width: 2752,
-    height: 1536,
   },
   // Satisfaction-badge image in the "Our services" section.
   preview: {
-    src: '/images/our-services.webp',
-    alt: 'Red Lexus IS with freshly installed window tint at Mario\'s Tint Shop',
-    width: 688,
-    height: 918,
+    src: previewImg,
+    alt: "Red Lexus IS with freshly installed window tint at Mario's Tint Shop",
   },
   // Per-service imagery (card preview + service page).
   tinting1: {
-    src: '/images/tinting-1.webp',
+    src: tinting1Img,
     alt: 'White SUV with freshly installed window tint in the shop',
-    width: 1600,
-    height: 893,
   },
   tinting: {
-    src: '/images/tinting-2.webp',
+    src: tintingImg,
     alt: 'Car window tinting installation',
-    width: 1400,
-    height: 781,
   },
   paint: {
-    src: '/images/paint-1.webp',
+    src: paintImg,
     alt: 'Paint protection film application',
-    width: 1400,
-    height: 781,
   },
   coating: {
-    src: '/images/coating-1.webp',
+    src: coatingImg,
     alt: 'Ceramic coating finish on a vehicle',
-    width: 1400,
-    height: 781,
   },
   teslaSvc: {
-    src: '/images/tesla-1.webp',
+    src: teslaSvcImg,
     alt: 'Tesla with premium tint and protection',
-    width: 1400,
-    height: 933,
   },
   office: {
-    src: '/images/office.webp',
+    src: officeImg,
     alt: 'Office and commercial window film',
-    width: 1400,
-    height: 639,
   },
   office2: {
-    src: '/images/office-2.webp',
+    src: office2Img,
     alt: 'Commercial building with window film installed',
-    width: 1400,
-    height: 1400,
-  },
-  hero: {
-    src: 'https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=1200&h=1400&q=80',
-    alt: 'Detailer working on a vehicle in a professional studio',
-    width: 1200,
-    height: 1400,
   },
   install: {
-    src: '/images/lambo-hero.webp',
+    src: installImg,
     alt: 'Lamborghini with premium tint and paint protection',
-    width: 1400,
-    height: 438,
-  },
-  detail: {
-    src: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1400&h=1000&q=80',
-    alt: 'Close detail of a glossy dark luxury car surface',
-    width: 1400,
-    height: 1000,
-  },
-  garage: {
-    src: 'https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=1400&h=1000&q=80',
-    alt: 'Clean professional detailing studio interior',
-    width: 1400,
-    height: 1000,
-  },
-  tesla: {
-    src: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&w=1400&h=900&q=80',
-    alt: 'Tesla parked in a modern setting',
-    width: 1400,
-    height: 900,
-  },
-  fleet: {
-    src: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=1600&h=800&q=80',
-    alt: 'Row of premium vehicles ready for service',
-    width: 1600,
-    height: 800,
   },
 };
 
@@ -451,14 +435,26 @@ export const getService = (slug: string) =>
 // ── Testimonials ────────────────────────────────────────────────────
 // Real 5-star Google reviews from the shop's Google Business profile
 // (5.0 rating, on our way to 400+ reviews). Photos are the customers' own review photos,
-// pulled from Google Maps and self-hosted under /public/images/reviews.
+// pulled from Google Maps and self-hosted under src/assets/images/reviews.
+// Globbed rather than imported one-by-one; `review()` throws at build time if
+// a file is renamed or missing, so a broken photo can't reach production.
+const reviewPhotos = import.meta.glob<{ default: ImageMetadata }>(
+  './assets/images/reviews/*.{webp,jpg}',
+  { eager: true }
+);
+function review(file: string): ImageMetadata {
+  const mod = reviewPhotos[`./assets/images/reviews/${file}`];
+  if (!mod) throw new Error(`Missing review photo: src/assets/images/reviews/${file}`);
+  return mod.default;
+}
+
 export const TESTIMONIALS = [
   {
     quote:
       "Mario and his team are the best. They got my new Honda Passport Trailsport looking super clean. Thank you guys for always giving us the best tint money can buy and top-notch professionalism. I'm a customer for life.",
     author: 'Christopher Moers',
     photo: {
-      src: '/images/reviews/review-1.webp',
+      src: review('review-1.webp'),
       alt: "Christopher's black Honda Passport with fresh window tint",
     },
   },
@@ -467,7 +463,7 @@ export const TESTIMONIALS = [
       'Place is awesome. Super cheap prices and got all 4 windows on my F250 done in 30 minutes. They take care of you and anything else wrong with the tint in the future — lifetime warranty available.',
     author: 'Ethan Stoquert',
     photo: {
-      src: '/images/reviews/review-2.webp',
+      src: review('review-2.webp'),
       alt: "Ethan's truck after window tinting",
     },
   },
@@ -476,7 +472,7 @@ export const TESTIMONIALS = [
       "Mario has done 4 vehicles for me, from peeling off old tint on my truck to a complete ceramic tint on my 2 brand-new SUVs fresh off the lot. Shops like this always make things smooth.",
     author: 'Nathan Fair',
     photo: {
-      src: '/images/reviews/review-3.webp',
+      src: review('review-3.webp'),
       alt: "Nathan's SUV with ceramic window tint",
     },
   },
@@ -485,7 +481,7 @@ export const TESTIMONIALS = [
       "Highly recommended. The work performed at Mario's Tint Shop is outstanding. The staff is very knowledgeable and friendly, they use high-quality materials, and they keep your car clean during the install.",
     author: 'Chase Ramos',
     photo: {
-      src: '/images/reviews/review-4.webp',
+      src: review('review-4.webp'),
       alt: "Chase's silver Honda Civic with tinted windows",
     },
   },
@@ -494,7 +490,7 @@ export const TESTIMONIALS = [
       'Has tinted two of my vehicles — a 4Runner and a Tacoma. Customer service is amazing, super nice guys who explain all the options and do an amazing job. The 4Runner tint is over 2 years old and still looks incredible.',
     author: 'Tyler Johnston',
     photo: {
-      src: '/images/reviews/review-5.webp',
+      src: review('review-5.webp'),
       alt: "Tyler's Toyota after professional tint installation",
     },
   },
@@ -503,7 +499,7 @@ export const TESTIMONIALS = [
       "Mario's tint is the best in Tennessee — great service, great people, and great business. Very professional and knowledgeable. They've done my headlights and tail lights, which isn't easy, but they got me right.",
     author: 'Damone Pledger Jr',
     photo: {
-      src: '/images/reviews/review-6.webp',
+      src: review('review-6.webp'),
       alt: "Damone's white sedan tinted in Mario's Tint Shop",
     },
   },
@@ -511,54 +507,54 @@ export const TESTIMONIALS = [
     quote:
       "This place is incredible. Don't go anywhere else. Save your money and get the best professional tint you've ever had in your life! I've been here twice already and they do incredible work.",
     author: 'Jody Locke',
-    photo: { src: '/images/reviews/review-jody.jpg', alt: "Jody Locke's vehicle after tint installation" },
+    photo: { src: review('review-jody.jpg'), alt: "Jody Locke's vehicle after tint installation" },
   },
   {
     quote:
       "Amazing work, attention to detail, very professional and friendly! I highly recommend Mario's tint shop!",
     author: 'Whitney Stanbrough',
-    photo: { src: '/images/reviews/review-whitney.jpg', alt: "Whitney Stanbrough's vehicle after tint installation" },
+    photo: { src: review('review-whitney.jpg'), alt: "Whitney Stanbrough's vehicle after tint installation" },
   },
   {
     quote:
       'I have experienced excellent service twice so far. They always complete my request with high quality. I recommend this shop because the work time is fast and the price is fair.',
     author: 'H N',
-    photo: { src: '/images/reviews/review-hn.jpg', alt: "H N's vehicle after tint installation" },
+    photo: { src: review('review-hn.jpg'), alt: "H N's vehicle after tint installation" },
   },
   {
     quote:
       'Mario is very professional and does an amazing job. He has actually tinted three of my cars. I would definitely recommend him, so go and check him out!',
     author: 'Reshonda Goins',
-    photo: { src: '/images/reviews/review-reshonda.jpg', alt: "Reshonda Goins's vehicle after tint installation" },
+    photo: { src: review('review-reshonda.jpg'), alt: "Reshonda Goins's vehicle after tint installation" },
   },
   {
     quote:
       'These guys are professionals and treated my brand-new IS with care and respect. Their work is outstanding and exceeded my expectations, money well spent!',
     author: 'Erik Allerup',
-    photo: { src: '/images/reviews/review-erik.jpg', alt: "Erik Allerup's Lexus IS after tint installation" },
+    photo: { src: review('review-erik.jpg'), alt: "Erik Allerup's Lexus IS after tint installation" },
   },
   {
     quote:
       'Mario greeted me when I walked into his shop. Very nice guy and hard worker. I was in and out within an hour of arrival with great-looking tint at a great price. I would highly recommend his shop for tint.',
     author: 'Daniel Bess',
-    photo: { src: '/images/reviews/review-daniel.jpg', alt: "Daniel Bess's vehicle after tint installation" },
+    photo: { src: review('review-daniel.jpg'), alt: "Daniel Bess's vehicle after tint installation" },
   },
   {
     quote:
       'Very professional tint job. Very informative and knowledgeable staff. Recommend to anyone needing automobile tint done.',
     author: 'Justin',
-    photo: { src: '/images/reviews/review-justin.jpg', alt: "Justin's vehicle after tint installation" },
+    photo: { src: review('review-justin.jpg'), alt: "Justin's vehicle after tint installation" },
   },
   {
     quote:
       'Mario is extremely professional and a pleasure to work with. He tinted my new 2500 and it looks awesome.',
     author: 'James Perrigo',
-    photo: { src: '/images/reviews/review-james.jpg', alt: "James Perrigo's RAM 2500 after tint installation" },
+    photo: { src: review('review-james.jpg'), alt: "James Perrigo's RAM 2500 after tint installation" },
   },
   {
     quote: 'They did an excellent job on my F-150. I highly recommend.',
     author: 'Scott Hammers',
-    photo: { src: '/images/reviews/review-scott.jpg', alt: "Scott Hammers's F-150 after tint installation" },
+    photo: { src: review('review-scott.jpg'), alt: "Scott Hammers's F-150 after tint installation" },
   },
 ];
 
@@ -572,14 +568,22 @@ export const GOOGLE_RATING = {
 
 // ── Instagram gallery (real posts from @mariostintshop) ─────────────
 // Order matters: Gallery.astro maps these by index onto its bento layout.
+import ig1 from './assets/images/instagram/ig-1.webp';
+import igColumna1 from './assets/images/instagram/columna-1.jpg';
+import igColumna2 from './assets/images/instagram/columna2.jpeg';
+import ig4 from './assets/images/instagram/ig-4.webp';
+import igColumna31 from './assets/images/instagram/columna3-1.jpeg';
+import ig6 from './assets/images/instagram/ig-6.webp';
+import igColumna32 from './assets/images/instagram/columna3-2.jpg';
+
 export const GALLERY = [
-  { src: '/images/instagram/ig-1.webp', alt: "Window tint work by Mario's Tint Shop" },
-  { src: '/images/instagram/columna-1.jpg', alt: "Red sedan with freshly tinted windows at Mario's Tint Shop" },
-  { src: '/images/instagram/columna2.jpeg', alt: "White Cadillac Escalade with tinted windows at Mario's Tint Shop" },
-  { src: '/images/instagram/ig-4.webp', alt: "Detail work by Mario's Tint Shop" },
-  { src: '/images/instagram/columna3-1.jpeg', alt: "Paint protection film being applied to a red Corvette at Mario's Tint Shop" },
-  { src: '/images/instagram/ig-6.webp', alt: "Finished vehicle by Mario's Tint Shop" },
-  { src: '/images/instagram/columna3-2.jpg', alt: "Tesla Model Y in the bay at Mario's Tint Shop" },
+  { src: ig1, alt: "Window tint work by Mario's Tint Shop" },
+  { src: igColumna1, alt: "Red sedan with freshly tinted windows at Mario's Tint Shop" },
+  { src: igColumna2, alt: "White Cadillac Escalade with tinted windows at Mario's Tint Shop" },
+  { src: ig4, alt: "Detail work by Mario's Tint Shop" },
+  { src: igColumna31, alt: "Paint protection film being applied to a red Corvette at Mario's Tint Shop" },
+  { src: ig6, alt: "Finished vehicle by Mario's Tint Shop" },
+  { src: igColumna32, alt: "Tesla Model Y in the bay at Mario's Tint Shop" },
 ];
 
 // ── Navigation ──────────────────────────────────────────────────────

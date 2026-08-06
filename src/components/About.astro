@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+import videoPoster from '../assets/images/about-video-poster.webp';
 import { ABOUT } from '../consts';
 
 const VIDEO = { id: 'ElI529-OuGs', title: "Meet Mario Rodriguez — Mario's Tint Shop" };
@@ -26,7 +28,7 @@ const bandSeq = [...bandItems, ...bandItems, ...bandItems, ...bandItems];
           href="/visualizer"
           class="pressable sticker mt-7 inline-block bg-accent px-8 py-3.5 text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
         >
-          Try the Film Visualizer <span class="ml-0.5 font-black">&gt;</span>
+          Try the Film Visualizer <span class="ml-0.5 font-black" aria-hidden="true">&gt;</span>
         </a>
       </div>
 
@@ -42,11 +44,11 @@ const bandSeq = [...bandItems, ...bandItems, ...bandItems, ...bandItems];
               class="group absolute inset-0 h-full w-full"
               aria-label={`Play video: ${VIDEO.title}`}
             >
-              <img
-                src="/images/about-video-poster.webp"
+              <Image
+                src={videoPoster}
                 alt="Mario Rodriguez at Mario's Tint Shop"
-                width="1280"
-                height="720"
+                widths={[640, 1280]}
+                sizes="(min-width: 768px) 50vw, 100vw"
                 loading="lazy"
                 class="absolute inset-0 h-full w-full scale-[1.02] object-cover"
               />

@@ -1,15 +1,20 @@
 ---
 // Official Mario's Tint Shop logo (used in header/footer on dark surfaces).
+// Rasterized from the original SVG, which was a 336 KB base64 PNG in an SVG
+// wrapper. Rendered at 48–56px, so 256px covers even 4x displays.
+import { Image } from 'astro:assets';
+import logo from '../assets/images/logo-mario.webp';
+
 interface Props {
   class?: string;
+  loading?: 'eager' | 'lazy';
 }
-const { class: className = 'h-12 w-auto md:h-14' } = Astro.props;
+const { class: className = 'h-12 w-auto md:h-14', loading = 'eager' } = Astro.props;
 ---
 
-<img
-  src="/images/logo-mario.svg"
+<Image
+  src={logo}
   alt="Mario's Tint Shop"
-  width="1500"
-  height="1500"
+  loading={loading}
   class:list={['block', className]}
 />

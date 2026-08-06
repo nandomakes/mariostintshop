@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import { INSTAGRAM } from '../consts';
 import { getInstagramFeed } from '../lib/instagram';
 
@@ -57,16 +58,31 @@ const layoutMobile = [
               class="group relative overflow-hidden"
               style={`--col:${spot.col}; --row:${spot.row}; --mcol:${m.col}; --mrow:${m.row};`}
             >
-              <img
-                src={img.src}
-                alt={img.alt}
-                width="600"
-                height="600"
-                loading="lazy"
-                decoding="async"
-                draggable="false"
-                class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
-              />
+              {typeof img.src === 'string' ? (
+                // Live Instagram CDN URL — Astro can't process remote images at
+                // build time, so this path stays a plain <img>.
+                <img
+                  src={img.src}
+                  alt={img.alt}
+                  width="600"
+                  height="600"
+                  loading="lazy"
+                  decoding="async"
+                  draggable="false"
+                  class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+                />
+              ) : (
+                <Image
+                  src={img.src}
+                  alt={img.alt}
+                  widths={[300, 600]}
+                  sizes="(min-width: 640px) 25vw, 50vw"
+                  loading="lazy"
+                  decoding="async"
+                  draggable={false}
+                  class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+                />
+              )}
             </div>
           );
         })

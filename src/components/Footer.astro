@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+import clicksrunLogo from '../assets/images/logo-clicksrun.webp';
 import { SITE, CONTACT, SERVICES, SOCIALS } from '../consts';
 import Logo from './Logo.astro';
 
@@ -21,7 +23,7 @@ const SOCIAL_ICONS: Record<string, string> = {
   <div class="mx-auto grid max-w-6xl gap-x-8 gap-y-12 px-5 py-16 text-sm sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
     <!-- Brand + socials -->
     <div>
-      <div class="inline-block"><Logo /></div>
+      <div class="inline-block"><Logo loading="lazy" /></div>
       <p class="mt-5 max-w-[36ch] leading-relaxed">
         Premium window tint, paint protection film, and ceramic coating in
         Murfreesboro, TN. BBB A+ accredited · {SITE.yearsInBusiness} years.
@@ -81,15 +83,13 @@ const SOCIAL_ICONS: Record<string, string> = {
     <div>
       <p class="headline mb-4 text-base tracking-[0.08em] text-paper">Store Hours</p>
       <ul class="space-y-2.5">
-        <li>Mon–Fri · 8:00 a.m. – 5:00 p.m.</li>
-        <li>Saturday · By appointment</li>
-        <li>Sunday · Closed</li>
+        {CONTACT.hours.map((h) => <li>{h.label} · {h.value}</li>)}
         <li class="pt-3">
           <a
             href="/#contact"
             class="pressable sticker inline-block bg-accent px-6 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
           >
-            Get Free Quote <span class="ml-0.5 font-black">&gt;</span>
+            Get Free Quote <span class="ml-0.5 font-black" aria-hidden="true">&gt;</span>
           </a>
         </li>
       </ul>
@@ -110,13 +110,7 @@ const SOCIAL_ICONS: Record<string, string> = {
         aria-label="Designed by ClicksRun"
       >
         <span class="text-[10px] uppercase tracking-[0.25em] text-smoke/60">Designed by</span>
-        <img
-          src="/logos-clicksrun/logo-claro.svg"
-          alt="ClicksRun"
-          height="40"
-          class="h-10 w-auto"
-          loading="lazy"
-        />
+        <Image src={clicksrunLogo} alt="ClicksRun" class="h-10 w-auto" loading="lazy" />
       </a>
     </div>
   </div>

@@ -1,4 +1,5 @@
 ---
+import { Picture } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import QuoteCTA from '../components/QuoteCTA.astro';
@@ -14,6 +15,23 @@ const VEHICLES = PHOTO_VEHICLES.filter((v) => VEHICLE_IDS.includes(v.id));
 const title = `Window Tint & PPF Visualizer | ${SITE.brand}`;
 const description =
   "See 3M window tint and paint protection film on a 3D car. Pick a vehicle type, choose your tint shade or PPF coverage, and preview the look — then send your build to Mario's Tint Shop in Murfreesboro, TN for a free quote.";
+
+// Mirrors the visual breadcrumb below.
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE.url },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Tint visualizer',
+        item: `${SITE.url}/visualizer/`,
+      },
+    ],
+  },
+];
 
 // ── Control data ─────────────────────────────────────────────────────
 const TINT_ZONES = [
@@ -90,17 +108,22 @@ const PPF_PACKAGES = [
 ];
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} schema={schema}>
   <Header />
   <main id="content">
     <!-- Hero image band -->
     <section class="relative overflow-hidden border-b border-line bg-ink">
       <div class="absolute inset-0" aria-hidden="true">
-        <img
+        <!-- Decorative only here (the 3D viewer is the real content), so this
+             one is lazy — unlike the homepage hero, it is not the LCP. -->
+        <Picture
           src={IMAGES.heroBg.src}
           alt=""
-          width={IMAGES.heroBg.width}
-          height={IMAGES.heroBg.height}
+          formats={['avif', 'webp']}
+          fallbackFormat="webp"
+          widths={[640, 1024, 1536]}
+          sizes="100vw"
+          loading="lazy"
           class="h-full w-full object-cover object-[center_62%] opacity-60"
         />
         <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-ink/70"></div>
@@ -173,6 +196,7 @@ const PPF_PACKAGES = [
           <div class="flex items-center border-b border-sand pr-3" role="tablist" aria-label="Simulator mode">
             <button
               type="button" role="tab" data-mode="tint" aria-selected="true"
+              id="mode-tab-tint" aria-controls="mode-panel-tint"
               class="mode-tab pressable relative px-4 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-ash transition-colors duration-200 aria-selected:text-accentDk"
             >
               Window Tint
@@ -180,6 +204,7 @@ const PPF_PACKAGES = [
             </button>
             <button
               type="button" role="tab" data-mode="ppf" aria-selected="false"
+              id="mode-tab-ppf" aria-controls="mode-panel-ppf"
               class="mode-tab pressable relative px-4 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-ash transition-colors duration-200 aria-selected:text-accentDk"
             >
               Paint Protection
@@ -195,12 +220,12 @@ const PPF_PACKAGES = [
           </div>
 
           <!-- ══ Window-tint panel ══ -->
-          <div data-panel="tint">
+          <div data-panel="tint" id="mode-panel-tint" role="tabpanel" aria-labelledby="mode-tab-tint" tabindex="0">
           <!-- Accordion: coverage -->
           <div class="acc border-b border-sand px-6" data-open="true">
             <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
               <span>
-                <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the coverage</span>
+                <h2 class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the coverage</h2>
                 <span class="mt-0.5 block text-xs text-ash">Select a coverage zone to get started.</span>
               </span>
               <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
@@ -239,7 +264,7 @@ const PPF_PACKAGES = [
           <div class="acc border-b border-sand px-6" data-open="true">
             <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
               <span>
-                <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the tint</span>
+                <h2 class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the tint</h2>
                 <span class="mt-0.5 block text-xs text-ash">The shade applies live to the 3D model's glass.</span>
               </span>
               <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
@@ -279,7 +304,7 @@ const PPF_PACKAGES = [
           <div class="acc px-6" data-open="true">
             <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
               <span>
-                <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">What matters most?</span>
+                <h2 class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">What matters most?</h2>
                 <span class="mt-0.5 block text-xs text-ash">Prioritize these benefits to help us find the right tint for you.</span>
               </span>
               <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
@@ -308,11 +333,11 @@ const PPF_PACKAGES = [
           </div>
 
           <!-- ══ Paint-protection panel ══ -->
-          <div data-panel="ppf" hidden>
+          <div data-panel="ppf" id="mode-panel-ppf" role="tabpanel" aria-labelledby="mode-tab-ppf" tabindex="0" hidden>
             <div class="acc border-b border-sand px-6" data-open="true">
               <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
                 <span>
-                  <span class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the coverage</span>
+                  <h2 class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the coverage</h2>
                   <span class="mt-0.5 block text-xs text-ash">Protected panels are highlighted in green on the model.</span>
                 </span>
                 <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
@@ -361,7 +386,9 @@ const PPF_PACKAGES = [
           <div class="border border-sand bg-whisper p-4 sm:p-6">
             <!-- Toolbar: angle toggle left · PDF download top-right -->
             <div class="mb-3 flex items-center justify-between gap-2">
-              <div class="flex items-center gap-1" role="tablist" aria-label="Vehicle angle">
+              <!-- Toggle buttons, not tabs: they carry aria-pressed and control
+                   no tabpanels, so role="tablist" would be an invalid contract. -->
+              <div class="flex items-center gap-1" role="group" aria-label="Vehicle angle">
                 <button
                   type="button" data-angle="front" aria-pressed="true"
                   class="angle-btn pressable border border-sand bg-paper px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-200 aria-pressed:border-accent aria-pressed:bg-accent"
@@ -428,7 +455,7 @@ const PPF_PACKAGES = [
             href="#contact"
             class="pressable sticker mx-auto mt-6 block max-w-md bg-accent px-8 py-4 text-center text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
           >
-            Get Free Quote <span class="ml-0.5 font-black">&gt;</span>
+            Get Free Quote <span class="ml-0.5 font-black" aria-hidden="true">&gt;</span>
           </a>
           <p class="mt-2.5 text-center text-[11px] text-ash">
             Jumps to our quote form below — we reply with a free quote.
@@ -517,6 +544,10 @@ const PPF_PACKAGES = [
     // model-viewer registers <model-viewer> as a custom element on import.
     // Dynamic chunk: it loads after the page shell renders.
     import('@google/model-viewer');
+
+    // Logo for the PDF export. Imported (not hardcoded) so it resolves to the
+    // hashed /_astro/ URL — a literal path would 404 after any asset change.
+    import logoUrl from '../assets/images/logo-mario.webp';
 
     const $$ = <T extends HTMLElement = HTMLElement>(sel: string) =>
       Array.from(document.querySelectorAll<T>(sel));
@@ -832,15 +863,63 @@ const PPF_PACKAGES = [
       })
     );
 
-    // Accordions
-    $$('.acc-toggle').forEach((btn) =>
+    // Accordions. aria-controls is wired here rather than in the markup so the
+    // id and the reference can never drift apart.
+    $$('.acc-toggle').forEach((btn, i) => {
+      const acc = btn.closest('.acc') as HTMLElement;
+      const body = acc.querySelector<HTMLElement>('.acc-body');
+      if (body) {
+        body.id = body.id || `acc-panel-${i}`;
+        btn.setAttribute('aria-controls', body.id);
+      }
       btn.addEventListener('click', () => {
-        const acc = btn.closest('.acc') as HTMLElement;
         const open = acc.dataset.open === 'true';
         acc.dataset.open = String(!open);
         btn.setAttribute('aria-expanded', String(!open));
-      })
-    );
+      });
+    });
+
+    // role="radiogroup" carries a keyboard contract: arrow keys move between
+    // options and only the checked one is a tab stop (roving tabindex). The
+    // markup declared the roles without it, so screen-reader and keyboard
+    // users got an interaction that did not behave like the radios it claimed
+    // to be. One handler covers all three groups (vehicle, shade, PPF).
+    $$('[role="radiogroup"]').forEach((group) => {
+      const radios = Array.from(group.querySelectorAll<HTMLElement>('[role="radio"]'));
+      if (!radios.length) return;
+
+      const syncTabStops = () => {
+        const checked = radios.find((r) => r.getAttribute('aria-checked') === 'true');
+        radios.forEach((r) => {
+          r.tabIndex = r === (checked ?? radios[0]) ? 0 : -1;
+        });
+      };
+      syncTabStops();
+      // Selection is driven by the existing click handlers, so re-derive the
+      // roving tab stop whenever aria-checked changes anywhere in the group.
+      new MutationObserver(syncTabStops).observe(group, {
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['aria-checked'],
+      });
+
+      group.addEventListener('keydown', (e) => {
+        const key = (e as KeyboardEvent).key;
+        const dir =
+          key === 'ArrowRight' || key === 'ArrowDown'
+            ? 1
+            : key === 'ArrowLeft' || key === 'ArrowUp'
+              ? -1
+              : 0;
+        if (!dir) return;
+        const current = radios.indexOf(document.activeElement as HTMLElement);
+        if (current === -1) return;
+        e.preventDefault();
+        const nextEl = radios[(current + dir + radios.length) % radios.length];
+        nextEl.focus();
+        nextEl.click(); // radios select on arrow, per the APG pattern
+      });
+    });
 
     // Start over
     document.getElementById('reset-btn')!.addEventListener('click', () => {
@@ -914,7 +993,7 @@ const PPF_PACKAGES = [
           await new Promise<void>((resolve, reject) => {
             img.onload = () => resolve();
             img.onerror = () => reject(new Error('logo load failed'));
-            img.src = '/images/logo-mario.svg';
+            img.src = logoUrl.src;
           });
           const canvas = document.createElement('canvas');
           const size = 256;
