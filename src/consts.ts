@@ -600,7 +600,7 @@ export const NAV_LINKS = [
 // ── Social profiles ─────────────────────────────────────────────────
 export const SOCIALS = [
   { name: 'Instagram', href: INSTAGRAM.url },
-  { name: 'TikTok', href: 'https://www.tiktok.com/@mariostintshop' },
+  { name: 'TikTok', href: 'https://www.tiktok.com/@murfreesboro.window.tint' },
   { name: 'Facebook', href: 'https://www.facebook.com/mariostintshop' },
   { name: 'Google', href: CONTACT.googleBusinessUrl },
 ];
