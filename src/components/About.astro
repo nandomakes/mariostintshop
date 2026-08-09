@@ -30,19 +30,9 @@ const bandSeq = [...bandItems, ...bandItems, ...bandItems, ...bandItems];
       </div>
     </div>
 
-    <!-- Centered artwork: a blurred copy of the same photo sits behind
-         everything as an atmospheric glow, then the semi-transparent diagonal
-         band, then the sharp Lamborghini on top. -->
+    <!-- Centered artwork: the semi-transparent diagonal band, with the sharp
+         Lamborghini on top. -->
     <div class="reveal relative mx-auto mt-12 max-w-5xl">
-      <Image
-        src={IMAGES.install.src}
-        alt=""
-        aria-hidden="true"
-        widths={[800]}
-        loading="lazy"
-        class="pointer-events-none absolute left-1/2 top-1/2 h-[140%] w-[140%] -translate-x-1/2 -translate-y-1/2 scale-110 object-contain opacity-40 blur-2xl"
-      />
-
       <!-- Hex fade-out: a white gradient rotated to match the band's angle,
            so the hex pattern dissolves gently just above the band and is
            fully gone from the band downward (no hard cut, no leftover trace). -->

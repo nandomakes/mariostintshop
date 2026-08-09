@@ -5,6 +5,11 @@
 // bg-ink, so a dark block here merged the two into a single black mass with no
 // separation between the cards and the form.
 //
+// On the card image: the fade strip is only ~128px wide but runs the full card
+// height, and object-cover crops the source to that tall box. Sizing it to
+// 128px meant the browser fetched a 128x71 file that then had to be upscaled
+// ~4x to cover — visibly blurry. It needs roughly 4x the strip width.
+//
 // Service pages previously linked to no other service page at all — the only
 // way across the cluster was the global footer, so the pages had no lateral
 // internal linking. The card markup is deliberately the same shape as the
@@ -68,8 +73,8 @@ const ICONS: Record<string, string> = {
                   src={IMAGES[svc.image].src}
                   alt=""
                   aria-hidden="true"
-                  widths={[128, 256]}
-                  sizes="128px"
+                  widths={[512, 1024]}
+                  sizes="512px"
                   loading="lazy"
                   class="h-full w-full object-cover object-center opacity-[0.34] transition-opacity duration-500 group-hover:opacity-[0.55]"
                 />
