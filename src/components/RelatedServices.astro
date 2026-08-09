@@ -1,6 +1,10 @@
 ---
 // Cross-sell block for the bottom of a service page.
 //
+// Styled light (hex-bg) rather than dark: QuoteCTA sits directly below and is
+// bg-ink, so a dark block here merged the two into a single black mass with no
+// separation between the cards and the form.
+//
 // Service pages previously linked to no other service page at all — the only
 // way across the cluster was the global footer, so the pages had no lateral
 // internal linking. The card markup is deliberately the same shape as the
@@ -44,10 +48,10 @@ const ICONS: Record<string, string> = {
 
 {
   picked.length > 0 && (
-    <section class="border-t border-line bg-ink">
+    <section class="hex-bg border-t border-sand bg-paper">
       <div class="mx-auto max-w-6xl px-5 py-16 md:py-24">
-        <p class="reveal kicker text-center text-accent">Keep going</p>
-        <h2 class="reveal headline mt-3 mb-12 text-center text-[clamp(1.8rem,4vw,2.75rem)] text-paper">
+        <p class="reveal kicker text-center text-accentDk">Keep going</p>
+        <h2 class="reveal headline mt-3 mb-12 text-center text-[clamp(1.8rem,4vw,2.75rem)] text-ink">
           Pairs well with
         </h2>
 
@@ -55,7 +59,7 @@ const ICONS: Record<string, string> = {
           {picked.map((svc) => (
             <a
               href={`/services/${svc.slug}`}
-              class="lift group relative flex flex-col overflow-hidden border border-line bg-coal p-7"
+              class="lift group relative flex flex-col overflow-hidden border border-sand bg-paper p-7 shadow-[0_2px_10px_rgba(0,0,0,0.05)]"
             >
               {/* Faded photo bleeding in from the right, same treatment as the
                   homepage cards. Decorative — the link text carries the label. */}
@@ -67,7 +71,7 @@ const ICONS: Record<string, string> = {
                   widths={[128, 256]}
                   sizes="128px"
                   loading="lazy"
-                  class="h-full w-full object-cover object-center opacity-[0.28] transition-opacity duration-500 group-hover:opacity-[0.5]"
+                  class="h-full w-full object-cover object-center opacity-[0.34] transition-opacity duration-500 group-hover:opacity-[0.55]"
                 />
               </span>
 
@@ -87,11 +91,11 @@ const ICONS: Record<string, string> = {
               </span>
 
               <span class="relative mt-5 flex-1">
-                <h3 class="headline text-base tracking-[0.06em] text-paper">{svc.name}</h3>
-                <p class="mt-2 text-sm leading-relaxed text-smoke">{svc.short}</p>
+                <h3 class="headline text-base tracking-[0.06em] text-ink">{svc.name}</h3>
+                <p class="mt-2 text-sm leading-relaxed text-char">{svc.short}</p>
               </span>
 
-              <span class="relative mt-5 inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-accent">
+              <span class="relative mt-5 inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-accentDk">
                 Learn more
                 <svg
                   width="16"
