@@ -1,0 +1,117 @@
+---
+// Cross-sell block for the bottom of a service page.
+//
+// Service pages previously linked to no other service page at all — the only
+// way across the cluster was the global footer, so the pages had no lateral
+// internal linking. The card markup is deliberately the same shape as the
+// homepage grid in Services.astro so the two read as one system.
+import { Image } from 'astro:assets';
+import { SERVICES, IMAGES } from '../consts';
+
+interface Props {
+  currentId: string;
+}
+const { currentId } = Astro.props;
+
+const current = SERVICES.find((s) => s.id === currentId);
+
+// Curated pairings when the service defines them, otherwise just the next
+// three in SERVICES. Either way the current service is filtered out, so a
+// page can never link to itself.
+const picked = (current?.related ?? SERVICES.map((s) => s.id))
+  .filter((id) => id !== currentId)
+  .map((id) => {
+    const svc = SERVICES.find((s) => s.id === id);
+    // Fail the build rather than silently rendering a dead card — a typo in a
+    // `related` array is otherwise invisible until someone clicks it.
+    if (!svc) throw new Error(`RelatedServices: unknown service id "${id}" (from "${currentId}")`);
+    return svc;
+  })
+  .slice(0, 3);
+
+// Same icon set as the homepage grid, keyed by service id.
+const ICONS: Record<string, string> = {
+  'window-tinting':
+    '<path d="M3 12l2-5.5A2.5 2.5 0 0 1 7.4 5h9.2a2.5 2.5 0 0 1 2.4 1.5L21 12"/><path d="M3 12h18v4.5a1 1 0 0 1-1 1h-1.2a2 2 0 0 1-3.9 0H9.1a2 2 0 0 1-3.9 0H4a1 1 0 0 1-1-1z"/><path d="M12 6v6"/>',
+  ppf: '<path d="M12 3l7 3v5c0 4.6-3 7.7-7 9-4-1.3-7-4.4-7-9V6z"/><path d="M9.2 12l2 2 3.6-3.7"/>',
+  'ceramic-coating':
+    '<path d="M12 3.5s5.5 5.6 5.5 9.5a5.5 5.5 0 0 1-11 0C6.5 9.1 12 3.5 12 3.5z"/><path d="M9.5 13a2.5 2.5 0 0 0 2.5 2.5"/>',
+  tesla: '<path d="M13 3L5 13h5l-1 8 8-11h-5z"/>',
+  'commercial-films':
+    '<path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16"/><path d="M14 9h5a1 1 0 0 1 1 1v11"/><path d="M7.5 8h3M7.5 12h3M7.5 16h3M17 13h0M17 17h0"/>',
+};
+---
+
+{
+  picked.length > 0 && (
+    <section class="border-t border-line bg-ink">
+      <div class="mx-auto max-w-6xl px-5 py-16 md:py-24">
+        <p class="reveal kicker text-center text-accent">Keep going</p>
+        <h2 class="reveal headline mt-3 mb-12 text-center text-[clamp(1.8rem,4vw,2.75rem)] text-paper">
+          Pairs well with
+        </h2>
+
+        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {picked.map((svc) => (
+            <a
+              href={`/services/${svc.slug}`}
+              class="lift group relative flex flex-col overflow-hidden border border-line bg-coal p-7"
+            >
+              {/* Faded photo bleeding in from the right, same treatment as the
+                  homepage cards. Decorative — the link text carries the label. */}
+              <span class="pointer-events-none absolute inset-y-0 right-0 h-full w-32 overflow-hidden [mask-image:linear-gradient(to_left,#000_22%,transparent)]">
+                <Image
+                  src={IMAGES[svc.image].src}
+                  alt=""
+                  aria-hidden="true"
+                  widths={[128, 256]}
+                  sizes="128px"
+                  loading="lazy"
+                  class="h-full w-full object-cover object-center opacity-[0.28] transition-opacity duration-500 group-hover:opacity-[0.5]"
+                />
+              </span>
+
+              <span class="relative flex h-11 w-11 items-center justify-center bg-accent text-ink">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                  set:html={ICONS[svc.id]}
+                />
+              </span>
+
+              <span class="relative mt-5 flex-1">
+                <h3 class="headline text-base tracking-[0.06em] text-paper">{svc.name}</h3>
+                <p class="mt-2 text-sm leading-relaxed text-smoke">{svc.short}</p>
+              </span>
+
+              <span class="relative mt-5 inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-accent">
+                Learn more
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                  class="transition-transform duration-300 ease-out group-hover:translate-x-1"
+                >
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}

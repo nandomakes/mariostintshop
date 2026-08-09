@@ -4,6 +4,8 @@ import Header from '../../components/Header.astro';
 import HeroService from '../../components/HeroService.astro';
 import FeatureSplit from '../../components/FeatureSplit.astro';
 import Faq from '../../components/Faq.astro';
+import WarrantyBand from '../../components/WarrantyBand.astro';
+import RelatedServices from '../../components/RelatedServices.astro';
 import QuoteCTA from '../../components/QuoteCTA.astro';
 import Footer from '../../components/Footer.astro';
 import CallFab from '../../components/CallFab.astro';
@@ -18,6 +20,10 @@ export function getStaticPaths() {
 
 const { service } = Astro.props;
 const img = IMAGES[service.pageImage ?? service.image];
+// Second photo for the "Why …" split. Falls back to the hero image, but every
+// service sets splitImage so the same picture no longer appears twice within
+// one screen of scrolling.
+const splitImg = IMAGES[service.splitImage ?? service.pageImage ?? service.image];
 const title = `${service.name} in Murfreesboro, TN | ${SITE.brand}`;
 const description = service.heroSubcopy;
 
@@ -52,13 +58,26 @@ const schema = [
     '@type': 'Service',
     name: service.name,
     description: service.heroSubcopy,
+    // Absolute URL to the hashed, optimized asset Astro emits for this page.
+    image: new URL(img.src.src, SITE.url).href,
     serviceType: service.kicker,
     provider: { '@id': `${SITE.url}/#business` },
-    areaServed: {
+    // The real service area, not just the home city — these are the towns the
+    // page copy and FAQs already name.
+    areaServed: [
+      'Murfreesboro',
+      'Smyrna',
+      'La Vergne',
+      'Lebanon',
+      'Franklin',
+      'Brentwood',
+      'Nashville',
+      'Rutherford County',
+    ].map((name) => ({
       '@type': 'City',
-      name: 'Murfreesboro',
+      name,
       containedInPlace: { '@type': 'State', name: 'Tennessee' },
-    },
+    })),
     url: `${SITE.url}/services/${service.slug}/`,
   },
 ];
@@ -75,20 +94,24 @@ const schema = [
     />
 
     <FeatureSplit
+      kicker="About the service"
       title={`Why ${service.name}?`}
       paragraphs={[service.intro]}
-      imageSrc={img.src}
-      imageAlt={img.alt}
+      imageSrc={splitImg.src}
+      imageAlt={splitImg.alt}
+      cta={{ href: '#contact', label: 'Get Free Quote' }}
     />
 
-    <!-- Feature highlights -->
+    <!-- Feature highlights. Headings come from the service so each page targets
+         its own keywords instead of all five sharing "Built to protect". -->
     <section class="bg-ink">
       <div class="mx-auto max-w-6xl px-5 py-16 md:py-24">
-        <p class="kicker text-center text-accent">What you get</p>
+        <p class="kicker text-center text-accent">{service.featuresKicker ?? 'What you get'}</p>
         <h2 class="mt-3 mb-12 text-center headline text-[clamp(1.8rem,4vw,2.75rem)] text-paper">
-          Built to protect
+          {service.featuresTitle ?? 'Built to protect'}
         </h2>
-        <div class="grid gap-5 sm:grid-cols-2">
+        <!-- 3-up so six features read as two balanced rows; still fine at four. -->
+        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {
             service.features.map((f) => (
               <div class="lift border border-line bg-coal p-7">
@@ -102,16 +125,16 @@ const schema = [
     </section>
 
     <!-- Process -->
-    <section class="border-y border-sand bg-whisper">
+    <section class="bg-paper">
       <div class="mx-auto max-w-6xl px-5 py-16 md:py-24">
-        <p class="kicker text-center text-accentDk">Our process</p>
+        <p class="kicker text-center text-accentDk">{service.processKicker ?? 'Our process'}</p>
         <h2 class="mt-3 mb-12 text-center headline text-[clamp(1.8rem,4vw,2.75rem)] text-ink">
-          How it works
+          {service.processTitle ?? 'How it works'}
         </h2>
         <ol class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {
             service.process.map((step, i) => (
-              <li class="border border-sand bg-paper p-6 shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
+              <li class="lift border border-sand bg-paper p-6 shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
                 <span class="headline text-3xl text-accentDk">{String(i + 1).padStart(2, '0')}</span>
                 <p class="mt-3 text-sm leading-relaxed text-char">{step}</p>
               </li>
@@ -121,7 +144,12 @@ const schema = [
       </div>
     </section>
 
+    <WarrantyBand turnaround={service.turnaround} />
+
     <Faq items={service.faqs} />
+
+    <RelatedServices currentId={service.id} />
+
     <QuoteCTA defaultService={service.name} />
   </main>
   <Footer />

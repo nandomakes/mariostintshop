@@ -6,6 +6,11 @@ import Logo from './Logo.astro';
 
 const year = new Date().getFullYear();
 
+// Same reasoning as Header: every page except 404 has QuoteCTA's id="contact"
+// on it, so scroll to the form instead of reloading the homepage.
+const quoteHref =
+  (Astro.url.pathname.replace(/\/+$/, '') || '/') === '/404' ? '/#contact' : '#contact';
+
 // Monochrome brand glyphs (site blue via currentColor) on black chips.
 const SOCIAL_ICONS: Record<string, string> = {
   Google:
@@ -95,7 +100,7 @@ const SOCIAL_ICONS: Record<string, string> = {
         {CONTACT.hours.map((h) => <li>{h.label} · {h.value}</li>)}
         <li class="pt-3">
           <a
-            href="/#contact"
+            href={quoteHref}
             class="pressable sticker inline-block bg-accent px-6 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
           >
             Get Free Quote <span class="ml-0.5 font-black" aria-hidden="true">&gt;</span>

@@ -6,6 +6,12 @@ import Logo from './Logo.astro';
 // can be "the current page". Compare on pathname so /visualizer matches
 // whether or not the URL carries a trailing slash.
 const here = Astro.url.pathname.replace(/\/+$/, '') || '/';
+
+// Every page renders QuoteCTA (which owns id="contact") except 404, so the
+// quote CTA should scroll down rather than reload the homepage. On a service
+// page that matters twice over: the on-page form is pre-labelled with that
+// service, and the homepage one isn't.
+const quoteHref = here === '/404' ? '/#contact' : '#contact';
 const isCurrent = (href: string) => {
   if (href.includes('#')) return false;
   return (href.replace(/\/+$/, '') || '/') === here;
@@ -95,7 +101,7 @@ const isCurrent = (href: string) => {
         {CONTACT.phoneDisplay}
       </a>
       <a
-        href="/#contact"
+        href={quoteHref}
         class="pressable sticker hidden bg-accent px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.1em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk sm:inline-block"
       >
         Get Free Quote <span class="ml-0.5 font-black" aria-hidden="true">&gt;</span>
@@ -124,7 +130,7 @@ const isCurrent = (href: string) => {
         }
         <li class="py-4">
           <a
-            href="/#contact"
+            href={quoteHref}
             class="sticker block bg-accent px-6 py-3 text-center text-xs font-bold uppercase tracking-[0.14em] text-ink"
           >
             Get Free Quote <span class="ml-0.5 font-black" aria-hidden="true">&gt;</span>

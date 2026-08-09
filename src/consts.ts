@@ -228,6 +228,21 @@ export interface Service {
   faqs: { q: string; a: string }[];
   image: keyof typeof IMAGES; // card preview (and service page unless pageImage is set)
   pageImage?: keyof typeof IMAGES; // overrides the service-page image when it differs from the card
+  // Second photo for the "Why {name}?" split. Without it the split reuses the
+  // hero image, which shows the same picture twice within one screen of scroll.
+  splitImage?: keyof typeof IMAGES;
+  // Per-service section headings. Every service used to share one hardcoded
+  // pair ("Built to protect" / "How it works"), which read as a template and
+  // gave the H2s no keyword differentiation. Optional — falls back below.
+  featuresKicker?: string;
+  featuresTitle?: string;
+  processKicker?: string;
+  processTitle?: string;
+  // ⚠️ UNSET ON PURPOSE — fill in with the real shop times. The warranty band
+  // hides the turnaround line entirely while this is undefined.
+  turnaround?: string;
+  // Cross-sell service ids. Falls back to the next three in SERVICES.
+  related?: string[];
 }
 
 export const SERVICES: Service[] = [
@@ -274,6 +289,12 @@ export const SERVICES: Service[] = [
     ],
     image: 'tinting',
     pageImage: 'tinting1',
+    splitImage: 'tinting',
+    featuresKicker: 'Why ceramic tint',
+    featuresTitle: 'Cooler, clearer, protected',
+    processKicker: 'Our process',
+    processTitle: 'How your tint gets installed',
+    related: ['ppf', 'ceramic-coating', 'tesla'],
   },
   {
     id: 'ppf',
@@ -299,6 +320,8 @@ export const SERVICES: Service[] = [
       { title: 'Self-Healing Technology', body: "Minor scratches and swirl marks on the film's surface vanish when exposed to heat — warm water or sunlight — keeping your vehicle looking new." },
       { title: 'Enhanced Resale Value', body: 'A vehicle protected with PPF retains its appearance and value over time, and the film is virtually invisible once applied.' },
       { title: '10-Year 3M Warranty', body: "Every installation is backed by 3M's comprehensive manufacturer warranty against yellowing, cracking, and delamination." },
+      { title: 'Wrapped, Invisible Edges', body: 'We wrap the film around panel edges wherever the panel allows, so there are no visible seams or lifted lines — the protection disappears into the paint.' },
+      { title: 'Coverage Built Around You', body: 'From a partial front for daily commuting to full-body coverage for a show car, we match the package to the panels that actually take impact on the roads you drive.' },
     ],
     process: [
       'Walk-around to map high-impact zones and coverage options',
@@ -310,8 +333,17 @@ export const SERVICES: Service[] = [
       { q: 'What areas should I protect with PPF?', a: 'Popular options are a full-front package (bumper, hood, fenders, mirrors) for rock-chip zones, or full-body coverage for complete protection. We tailor coverage to how and where you drive.' },
       { q: 'How long does PPF last?', a: 'Quality PPF lasts 8–10 years and is backed by a manufacturer warranty against yellowing, cracking, and delamination.' },
       { q: 'Can PPF and ceramic coating be combined?', a: 'Yes — many clients add a ceramic coating over PPF for the easiest cleaning and maximum gloss. We can bundle both.' },
+      { q: 'Does PPF go on before or after ceramic coating?', a: 'PPF always goes on first, with the ceramic coating applied over the film afterward. A coating is designed to repel everything that touches it, so putting one down first would stop the film from bonding to the paint.' },
+      { q: 'Will removing PPF damage my paint?', a: 'No. Professionally installed 3M film is made to be removed by a trained installer without harming the factory paint. While it is on the car, that paint is shielded from the UV exposure and road debris the uncovered panels are taking.' },
+      { q: 'Which areas do you serve?', a: 'We are based in Murfreesboro and regularly install PPF for customers from Smyrna, Lebanon, Franklin, La Vergne, Brentwood, Nashville, and across Rutherford County and Middle Tennessee.' },
     ],
     image: 'paint',
+    splitImage: 'install',
+    featuresKicker: 'Why clear bra',
+    featuresTitle: 'Protection you never see',
+    processKicker: 'Our process',
+    processTitle: 'How your PPF gets installed',
+    related: ['ceramic-coating', 'window-tinting', 'tesla'],
   },
   {
     id: 'ceramic-coating',
@@ -337,6 +369,8 @@ export const SERVICES: Service[] = [
       { title: 'Long-Lasting Durability', body: 'A single layer protects for up to three years; a dual-layer application lasts up to five years with proper maintenance.' },
       { title: 'Hydrophobic Easy Cleaning', body: 'Excellent water beading sheds water quickly and makes cleaning off dirt, bugs, and droppings much easier — with a lasting "wet look" finish.' },
       { title: 'Chemical Resistance', body: 'Resistant to harsh chemicals like road salt and high/low pH cleaners, preserving your paint and boosting resale value.' },
+      { title: 'Bonds To More Than Paint', body: 'The 3M formula bonds to paint, PPF, glass, trim, and vinyl wraps — so the whole vehicle can carry the same hydrophobic, easy-clean finish.' },
+      { title: 'Corrected Before It Is Coated', body: 'A coating locks in whatever sits under it. We decontaminate and run multi-stage paint correction first, so swirls are removed rather than sealed in.' },
     ],
     process: [
       'Full decontamination wash and clay treatment',
@@ -348,8 +382,17 @@ export const SERVICES: Service[] = [
       { q: 'How long does ceramic coating last?', a: 'Depending on the package, our coatings last from 2 to 5+ years with proper maintenance. We offer tiered options to match your goals and budget.' },
       { q: 'Does ceramic coating replace PPF?', a: 'No. Ceramic coating resists swirls, chemicals, and water spots but does not stop rock chips. For impact protection, pair it with PPF.' },
       { q: 'Do I still need to wash my car?', a: 'Yes, but far less often and much more easily. Dirt releases with a simple rinse and gentle wash — no waxing required.' },
+      { q: 'Can you coat a car that already has swirls or scratches?', a: 'Yes, and it is the reason we correct the paint first. Because the coating seals in whatever is underneath it, we decontaminate and run multi-stage paint correction before a drop of coating goes on.' },
+      { q: 'How do I look after a ceramic-coated car?', a: 'Wash with a pH-neutral soap and a clean wash mitt, and skip automatic brush washes — those cause most of the swirl marks we correct. No waxing is needed; the coating is the protection.' },
+      { q: 'Which areas do you serve?', a: 'We are based in Murfreesboro and coat vehicles for customers from Smyrna, Lebanon, Franklin, La Vergne, Brentwood, Nashville, and across Rutherford County and Middle Tennessee.' },
     ],
     image: 'coating',
+    splitImage: 'teslaSvc',
+    featuresKicker: 'Why ceramic',
+    featuresTitle: 'A finish that fights back',
+    processKicker: 'Our process',
+    processTitle: 'How your coating is applied',
+    related: ['ppf', 'window-tinting', 'tesla'],
   },
   {
     id: 'tesla',
@@ -375,6 +418,8 @@ export const SERVICES: Service[] = [
       { title: 'Zero Signal Interference', body: "The non-metallized ceramic construction won't interfere with your Tesla's GPS, cell phone signals, or radio reception." },
       { title: 'Tesla Glass Expertise', body: 'Our installers understand the unique glass features of Tesla cars, including the large rear windows and panoramic roofs.' },
       { title: '3M PPF Protection', body: "Durable 3M clear bra guards against road debris and minor abrasions, backed by 3M's comprehensive 10-year warranty." },
+      { title: 'Every Model Covered', body: 'Model 3, Model Y, Model S, Model X, and Cybertruck — each installed from patterns cut for that specific model rather than trimmed by hand on the glass.' },
+      { title: 'One Shop, One Appointment', body: 'Tint, paint protection film, and ceramic coating all happen under one roof and can be scheduled together, so your Tesla makes one trip instead of three.' },
     ],
     process: [
       'Model-specific consultation on tint, PPF, and ceramic options',
@@ -386,8 +431,17 @@ export const SERVICES: Service[] = [
       { q: 'Do you work on all Tesla models?', a: 'Yes — Model 3, Model Y, Model S, Model X, and Cybertruck. We use model-specific patterns for each.' },
       { q: 'Can you tint the Tesla glass roof?', a: 'Yes. We offer ceramic film for the panoramic roof that significantly reduces heat and glare while keeping visibility clear.' },
       { q: 'What protects Tesla paint best?', a: 'A full-front or full-body PPF package handles rock chips, and a ceramic coating on top keeps it glossy and easy to clean. We commonly do both together on Teslas.' },
+      { q: 'Is tinting a Tesla different from tinting other cars?', a: 'The glass is what makes it different. Teslas use large one-piece rear windows and panoramic roofs that take more film and more care to lay down without creasing, so we work from patterns cut for your exact model instead of trimming film on the car.' },
+      { q: 'Will tint or PPF interfere with my Tesla?', a: 'No. Our films are non-metallized, so they do not interfere with GPS, cell signal, or radio reception, and nothing we install goes near the charge port or the vehicle electronics.' },
+      { q: 'Which areas do you serve?', a: 'We are based in Murfreesboro and see Tesla owners from Smyrna, Lebanon, Franklin, La Vergne, Brentwood, Nashville, and across Rutherford County and Middle Tennessee.' },
     ],
     image: 'teslaSvc',
+    splitImage: 'tinting1',
+    featuresKicker: 'Built for Tesla',
+    featuresTitle: 'Made to fit your model',
+    processKicker: 'Our process',
+    processTitle: 'How we handle your Tesla',
+    related: ['window-tinting', 'ppf', 'ceramic-coating'],
   },
   {
     id: 'commercial-films',
@@ -413,6 +467,8 @@ export const SERVICES: Service[] = [
       { title: 'Significant Energy Savings', body: 'By rejecting solar heat, the films reduce HVAC strain and lower air conditioning costs, with potential paybacks in as little as three years.' },
       { title: '99% UV Protection', body: 'All 3M films block up to 99% of harmful UV rays, preventing fading of interior furnishings, flooring, and merchandise.' },
       { title: 'Preserved Views & Comfort', body: 'Non-metallized options offer high optical clarity without a mirrored look or interference with cell phone and GPS signals.' },
+      { title: 'Low-E Film Works Both Ways', body: '3M All Season (Low-E) film rejects solar heat in summer and reflects interior heat back inside in winter, so the same glass helps in both seasons.' },
+      { title: 'Safety, Security & Privacy', body: 'Beyond solar control we install safety and security film for storefronts, plus decorative and frost films where you need privacy without losing daylight.' },
     ],
     process: [
       'On-site assessment and film recommendation',
@@ -424,9 +480,18 @@ export const SERVICES: Service[] = [
       { q: 'Do you install after business hours?', a: 'Yes. We schedule commercial installs around your operations, including evenings and weekends, to minimize disruption.' },
       { q: 'What kinds of commercial film do you offer?', a: 'Solar/heat-control, glare-reduction, decorative and privacy frost, reflective, and safety/security films for storefronts and office buildings.' },
       { q: 'Can film really lower our energy bills?', a: 'Yes. By rejecting solar heat gain, quality window film reduces cooling load and can deliver a meaningful return on energy costs.' },
+      { q: 'Will window film make our offices dark?', a: 'It does not have to. 3M Prestige stays virtually clear while still rejecting up to 97% of infrared light, so you keep the daylight and the view and lose the heat and glare.' },
+      { q: 'Can we get privacy without blocking the light?', a: 'Yes. Decorative and frost films give you privacy on conference rooms, glass partitions, and street-facing panes while still letting daylight through.' },
+      { q: 'Which areas do you serve?', a: 'We are based in Murfreesboro and handle commercial and office glass across Smyrna, Lebanon, Franklin, La Vergne, Brentwood, Nashville, Rutherford County, and Middle Tennessee.' },
     ],
     image: 'office2',
     pageImage: 'office',
+    splitImage: 'office2',
+    featuresKicker: 'Why 3M architectural film',
+    featuresTitle: 'Comfort, savings & security',
+    processKicker: 'Our process',
+    processTitle: 'How a commercial install works',
+    related: ['window-tinting', 'ppf', 'ceramic-coating'],
   },
 ];
 
