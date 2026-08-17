@@ -12,8 +12,10 @@ export const SITE = {
   city: 'Murfreesboro, TN',
   yearsInBusiness: '25+',
   license: 'BBB A+ Accredited · Authorized 3M Platinum Dealer',
-  title:
-    "Mario's Tint Shop | 3M Window Tinting, PPF & Ceramic Coating in Murfreesboro, TN",
+  // Kept under ~60 chars so Google shows it whole. The full service list
+  // ("PPF & Ceramic Coating") lives in the description and the H1 instead —
+  // the old 81-char title was truncated mid-phrase in the SERP.
+  title: "Window Tinting & PPF in Murfreesboro, TN | Mario's Tint Shop",
   // Kept under ~155 chars so Google doesn't truncate it in search results.
   description:
     "Mario's Tint Shop in Murfreesboro, TN provides top-notch automotive window tinting, paint protection film & ceramic coating. 25+ years, BBB A+ rated.",
@@ -22,6 +24,13 @@ export const SITE = {
   url: 'https://www.mariostintshop.com',
   themeColor: '#111111',
 };
+
+// ── Analytics ───────────────────────────────────────────────────────
+// GA4 Measurement ID for this property. Hardcoded rather than env-only so a
+// deploy can't silently lose analytics — PUBLIC_GA4_ID still overrides it,
+// which is how you'd point a staging deploy at a separate property (or set it
+// to an empty string to switch the tag off entirely).
+export const GA4_ID = 'G-L5RB0B2JTL';
 
 // ── Contact / Phone ─────────────────────────────────────────────────
 export const PHONE_DISPLAY = '(615) 410-7170';
@@ -67,8 +76,13 @@ export const CONTACT = {
 // ── Hero copy ───────────────────────────────────────────────────────
 export const HERO = {
   kicker: "Murfreesboro's Elite Tint Shop",
-  line1: 'Leading 3M Dealer',
-  line2: 'in Middle Tennessee',
+  // The H1. Carries the service + city that search intent is actually built on,
+  // and is worded differently from SITE.title so the two don't duplicate.
+  // Keep both lines SHORT (~20 chars): the headline face is very wide and the
+  // hero column is narrow, so "Paint Protection" spelled out wrapped to six
+  // lines on mobile. "PPF" is the term customers search anyway.
+  line1: '3M Window Tint & PPF',
+  line2: 'in Murfreesboro, TN',
   sub: "Mario's Tint Shop is the premier provider of 3M automotive and architectural window tinting, paint protection film, and ceramic coating services to customers in Middle Tennessee.",
   address: 'We are ready for you at: ',
   addressPlace: '515 NW Broad St, Murfreesboro, TN 37130',
@@ -80,16 +94,20 @@ export const HERO = {
 // served with a one-year immutable cache. `src` is an ImageMetadata object
 // carrying intrinsic width/height — render it with <Image>/<Picture> from
 // `astro:assets` and never hand-write width/height at the call site.
-import heroBgImg from './assets/images/hero-4.png';
-import previewImg from './assets/images/our-services.webp';
-import tinting1Img from './assets/images/tinting-1.webp';
-import tintingImg from './assets/images/tinting-2.webp';
-import paintImg from './assets/images/paint-1.webp';
-import coatingImg from './assets/images/coating-1.webp';
-import teslaSvcImg from './assets/images/tesla-1.webp';
-import officeImg from './assets/images/office.webp';
-import office2Img from './assets/images/office-2.webp';
-import installImg from './assets/images/lambo-hero.webp';
+// Filenames are descriptive (and lowercase-hyphenated) rather than sequential:
+// Astro hashes them into /_astro/<name>.<hash>.webp, so the source name is what
+// Google Images actually sees. Renaming one means renaming the file on disk too
+// — the deploy host is case- and path-sensitive, so verify with `git ls-files`.
+import heroBgImg from './assets/images/window-tint-shop-murfreesboro-hero.png';
+import previewImg from './assets/images/lexus-window-tint-murfreesboro.webp';
+import tinting1Img from './assets/images/suv-window-tinting-murfreesboro.webp';
+import tintingImg from './assets/images/car-window-tinting-installation.webp';
+import paintImg from './assets/images/paint-protection-film-installation.webp';
+import coatingImg from './assets/images/ceramic-coating-finish.webp';
+import teslaSvcImg from './assets/images/tesla-window-tint-ppf.webp';
+import officeImg from './assets/images/office-window-film-murfreesboro.webp';
+import office2Img from './assets/images/commercial-window-film-building.webp';
+import installImg from './assets/images/lamborghini-paint-protection-film.webp';
 
 export const IMAGES = {
   heroBg: {
@@ -222,10 +240,13 @@ export interface Service {
   includes: string[]; // "what's included" rows for the packages section
   // Per-service page content:
   heroSubcopy: string;
+  /** Overrides heroSubcopy as the <meta description>. Set it when the hero
+   *  copy reads well on the page but runs past the ~155 chars Google shows. */
+  metaDescription?: string;
   intro: string;
   features: Feature[];
   process: string[];
-  faqs: { q: string; a: string }[];
+  faqs: Faq[];
   image: keyof typeof IMAGES; // card preview (and service page unless pageImage is set)
   pageImage?: keyof typeof IMAGES; // overrides the service-page image when it differs from the card
   // Second photo for the "Why {name}?" split. Without it the split reuses the
@@ -243,6 +264,10 @@ export interface Service {
   turnaround?: string;
   // Cross-sell service ids. Falls back to the next three in SERVICES.
   related?: string[];
+  // Per-service warranty band copy. Without these, every page claimed a
+  // "lifetime warranty on our window films" — wrong on PPF and ceramic.
+  warrantyHeadline?: string;
+  warrantyBody?: string;
 }
 
 export const SERVICES: Service[] = [
@@ -263,6 +288,8 @@ export const SERVICES: Service[] = [
     ],
     heroSubcopy:
       'Premium 3M™ Ceramic IR window tint in Murfreesboro — infrared heat rejection, up to 99% UV protection, less glare, and a stylish custom look for any vehicle.',
+    metaDescription:
+      'Premium 3M™ Ceramic IR window tint in Murfreesboro, TN — up to 90% infrared heat rejection, 99% UV protection, and less glare on every drive.',
     intro:
       "Tennessee summers can make a vehicle unbearably hot. At Mario's Tint Shop in Murfreesboro, TN, we install premium 3M™ Ceramic IR window film engineered to reject infrared heat, block up to 99% of harmful UV rays, and give you a cooler, more comfortable drive. Whether you're commuting across Murfreesboro, running I-24, or parked in the summer sun, ceramic tint cuts heat and glare and protects your interior from fading. As an Authorized 3M Platinum Dealer we serve Murfreesboro, Smyrna, Lebanon, Franklin, Nashville and the surrounding Middle Tennessee area, with films tailored to every budget and performance need.",
     features: [
@@ -294,7 +321,10 @@ export const SERVICES: Service[] = [
     featuresTitle: 'Cooler, clearer, protected',
     processKicker: 'Our process',
     processTitle: 'How your tint gets installed',
-    related: ['ppf', 'ceramic-coating', 'tesla'],
+    // commercial-films was previously in no `related` array at all, so the only
+    // route to it was the footer. Tint → architectural film is the natural
+    // pairing, and tesla still gets inbound links from ppf and ceramic-coating.
+    related: ['ppf', 'ceramic-coating', 'commercial-films'],
   },
   {
     id: 'ppf',
@@ -343,6 +373,9 @@ export const SERVICES: Service[] = [
     featuresTitle: 'Protection you never see',
     processKicker: 'Our process',
     processTitle: 'How your PPF gets installed',
+    warrantyHeadline: '10-year 3M warranty on every paint protection film install',
+    warrantyBody:
+      "We stand behind our work with manufacturer-backed warranties. Every 3M paint protection film install carries 3M's comprehensive 10-year warranty against yellowing, cracking, and delamination. If an issue ever comes up, bring the vehicle back and we'll make it right.",
     related: ['ceramic-coating', 'window-tinting', 'tesla'],
   },
   {
@@ -362,6 +395,9 @@ export const SERVICES: Service[] = [
     ],
     heroSubcopy:
       "A leading-industry 3M ceramic formula that safeguards your car's paint against environmental contaminants, harsh UV rays, and damaging factors — with a durable, hydrophobic gloss.",
+    // heroSubcopy reads ~178 chars, which Google truncates. Shorter twin here.
+    metaDescription:
+      '3M ceramic coating in Murfreesboro, TN — a durable, hydrophobic gloss shielding your paint from UV, contaminants, and etching for up to 5 years.',
     intro:
       "At Mario's Tint Shop in Murfreesboro, our ceramic coating service utilizes a leading-industry 3M formula designed to safeguard your car's paint against environmental contaminants, harsh UV rays, and other damaging factors. The durable, hydrophobic layer enhances gloss and clarity while repelling dirt and water — making it easy to maintain that showroom finish.",
     features: [
@@ -392,6 +428,9 @@ export const SERVICES: Service[] = [
     featuresTitle: 'A finish that fights back',
     processKicker: 'Our process',
     processTitle: 'How your coating is applied',
+    warrantyHeadline: 'Up to 5 years of protection, backed by 3M',
+    warrantyBody:
+      "We use 3M coating products exclusively and stand behind the application. A single layer protects for up to three years and a dual layer for up to five with proper maintenance — and if an issue ever comes up, bring the vehicle back and we'll make it right.",
     related: ['ppf', 'window-tinting', 'tesla'],
   },
   {
@@ -411,6 +450,8 @@ export const SERVICES: Service[] = [
     ],
     heroSubcopy:
       'The leading 3M installer for Tesla owners in the Nashville area — precision-fit window tint, paint protection film, and ceramic coating for every Tesla model.',
+    metaDescription:
+      'Precision-fit 3M window tint, PPF, and ceramic coating for every Tesla model — Model 3, Y, S, X, and Cybertruck. Murfreesboro, TN.',
     intro:
       "As a leading installer of high-quality 3M automotive products in the Nashville area, Mario's Tint Shop offers Tesla owners a comprehensive range of services to enhance the comfort, appearance, and protection of their electric vehicles. We understand the unique specifications of all Tesla models, ensuring a precision fit and flawless finish for every installation.",
     features: [
@@ -441,6 +482,9 @@ export const SERVICES: Service[] = [
     featuresTitle: 'Made to fit your model',
     processKicker: 'Our process',
     processTitle: 'How we handle your Tesla',
+    warrantyHeadline: 'Every film on your Tesla is warranted by 3M',
+    warrantyBody:
+      "Lifetime warranty is available on our window films and 3M paint protection film carries a comprehensive 10-year warranty against yellowing, cracking, and delamination. If an issue ever comes up, bring the car back and we'll make it right.",
     related: ['window-tinting', 'ppf', 'ceramic-coating'],
   },
   {
@@ -460,6 +504,8 @@ export const SERVICES: Service[] = [
     ],
     heroSubcopy:
       'Enhance your business environment with 3M commercial and office window films — heat rejection up to 97% IR, 99% UV blocking, energy savings, and preserved views.',
+    metaDescription:
+      '3M office and commercial window film in Murfreesboro, TN — up to 97% IR heat rejection, 99% UV blocking, and lower energy bills.',
     intro:
       "At Mario's Tint Shop, we understand the importance of creating a comfortable, functional, and aesthetically pleasing environment for your business and employees. We install 3M architectural films that reject heat, block 99% of UV rays, and lower energy costs — with paybacks in as little as three years.",
     features: [
@@ -491,6 +537,9 @@ export const SERVICES: Service[] = [
     featuresTitle: 'Comfort, savings & security',
     processKicker: 'Our process',
     processTitle: 'How a commercial install works',
+    warrantyHeadline: 'Manufacturer-backed warranties on every 3M architectural film',
+    warrantyBody:
+      'As an Authorized 3M Platinum Dealer, every architectural film we install — Prestige, Ceramic, Night Vision, All Season Low-E, safety and security — carries its 3M manufacturer warranty, and you leave the walk-through with the documentation in hand.',
     related: ['window-tinting', 'ppf', 'ceramic-coating'],
   },
 ];
@@ -498,6 +547,59 @@ export const SERVICES: Service[] = [
 /** Look up a service by its slug (used by the per-service pages). */
 export const getService = (slug: string) =>
   SERVICES.find((s) => s.slug === slug);
+
+// ── FAQ ─────────────────────────────────────────────────────────────
+export interface Faq {
+  q: string;
+  a: string;
+}
+
+/**
+ * FAQPage JSON-LD for a set of Q&As. Shared by the service pages and the
+ * homepage so the two can't drift into different shapes.
+ */
+export const faqPageSchema = (faqs: Faq[]) => ({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+});
+
+/**
+ * Homepage FAQ. Deliberately covers the shop-level questions (price, booking,
+ * area, warranty) rather than repeating any single service page's FAQ — those
+ * stay on their own pages so the two FAQPage blocks don't compete.
+ */
+export const HOME_FAQS: Faq[] = [
+  {
+    q: 'How much does window tinting cost in Murfreesboro?',
+    a: 'Price depends on the vehicle, how many windows you want done, and which of our three 3M tiers you pick — Silver (Obsidian carbon), Gold (CS IR nano ceramic), or Platinum (Ceramic IR). We quote every vehicle individually and for free, either over the phone at (615) 410-7170 or through the quote form on this page.',
+  },
+  {
+    q: 'Do I need an appointment, or can I walk in?',
+    a: 'We recommend booking. We are open Monday through Friday from 8:00 a.m. to 5:00 p.m., with Saturdays available by appointment. Call ahead and we will hold a bay for you rather than have you wait.',
+  },
+  {
+    q: 'What areas do you serve?',
+    a: 'Our shop is at 515 NW Broad St in Murfreesboro, TN, and we regularly serve customers from Smyrna, La Vergne, Lebanon, Franklin, Brentwood, Nashville, and across Rutherford County and Middle Tennessee.',
+  },
+  {
+    q: 'What makes an Authorized 3M Platinum Dealer different?',
+    a: 'It means we are certified by 3M to install their full automotive and architectural line, and that every film and coating we install carries its 3M manufacturer warranty. Lifetime warranty is available on our window films, and 3M paint protection film carries a 10-year warranty.',
+  },
+  {
+    q: 'Can I get tint, PPF, and ceramic coating done at the same time?',
+    a: 'Yes, and most customers do. We are a one-stop shop, so all three happen under one roof in a single appointment rather than sending your vehicle to three different places. If you are combining PPF and ceramic coating, the film goes on first and the coating is applied over it.',
+  },
+  {
+    q: 'How dark can I legally tint my windows in Tennessee?',
+    a: 'Tennessee law requires a minimum of 35% VLT on the front side, rear side, and rear windows. We will walk you through the legal shades and help you pick one that still delivers strong heat and UV rejection.',
+  },
+];
+
 
 // ── Testimonials ────────────────────────────────────────────────────
 // Real 5-star Google reviews from the shop's Google Business profile
@@ -654,10 +756,23 @@ export const GALLERY = [
 ];
 
 // ── Navigation ──────────────────────────────────────────────────────
-export const NAV_LINKS = [
+// The service pages used to be reachable only from the homepage grid, the
+// footer, and the cross-sell block — they were absent from the main nav, which
+// is the strongest site-wide internal link there is. "Services" now carries the
+// five real URLs as children, rendered as a dropdown on desktop and a nested
+// list on mobile.
+export const NAV_LINKS: {
+  href: string;
+  label: string;
+  children?: { href: string; label: string }[];
+}[] = [
   { href: '/#about', label: 'About' },
-  { href: '/#services', label: 'Services' },
-  { href: '/visualizer', label: 'Visualizer' },
+  {
+    href: '/#services',
+    label: 'Services',
+    children: SERVICES.map((s) => ({ href: `/services/${s.slug}/`, label: s.name })),
+  },
+  { href: '/visualizer/', label: 'Visualizer' },
   { href: '/#gallery', label: 'Gallery' },
   { href: '/#testimonials', label: 'Reviews' },
 ];

@@ -10,8 +10,12 @@ interface Props {
   /** Real shop turnaround, e.g. "Most tint installs: 2–3 hours". Omitted
    *  until the shop supplies real figures — the line simply doesn't render. */
   turnaround?: string;
+  /** Per-service H2. The default talks about window films, which is wrong on
+   *  the ceramic-coating and PPF pages — those pass their own. */
+  headline?: string;
+  body?: string;
 }
-const { turnaround } = Astro.props;
+const { turnaround, headline = WARRANTY.headline, body = WARRANTY.body } = Astro.props;
 ---
 
 <section class="border-y border-sand bg-whisper">
@@ -20,10 +24,10 @@ const { turnaround } = Astro.props;
       <div class="reveal">
         <p class="kicker text-accentDk">Backed in writing</p>
         <h2 class="headline mt-3 text-[clamp(1.5rem,3vw,2.25rem)] text-ink">
-          {WARRANTY.headline}
+          {headline}
         </h2>
         <p class="mt-5 max-w-[58ch] text-[15px] leading-relaxed text-char">
-          {WARRANTY.body}
+          {body}
         </p>
       </div>
 

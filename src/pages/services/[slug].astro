@@ -9,7 +9,7 @@ import RelatedServices from '../../components/RelatedServices.astro';
 import QuoteCTA from '../../components/QuoteCTA.astro';
 import Footer from '../../components/Footer.astro';
 import CallFab from '../../components/CallFab.astro';
-import { SERVICES, SITE, IMAGES } from '../../consts';
+import { SERVICES, SITE, IMAGES, faqPageSchema } from '../../consts';
 
 export function getStaticPaths() {
   return SERVICES.map((service) => ({
@@ -25,7 +25,9 @@ const img = IMAGES[service.pageImage ?? service.image];
 // one screen of scrolling.
 const splitImg = IMAGES[service.splitImage ?? service.pageImage ?? service.image];
 const title = `${service.name} in Murfreesboro, TN | ${SITE.brand}`;
-const description = service.heroSubcopy;
+// heroSubcopy doubles as page copy, so a service can override just the meta
+// when its hero paragraph runs past what Google will display.
+const description = service.metaDescription ?? service.heroSubcopy;
 
 // Mirrors the visual breadcrumb rendered by HeroService, and turns the FAQ
 // accordion into eligible rich results.
@@ -44,15 +46,7 @@ const schema = [
       },
     ],
   },
-  {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: service.faqs.map((f) => ({
-      '@type': 'Question',
-      name: f.q,
-      acceptedAnswer: { '@type': 'Answer', text: f.a },
-    })),
-  },
+  faqPageSchema(service.faqs),
   {
     '@context': 'https://schema.org',
     '@type': 'Service',
@@ -144,7 +138,11 @@ const schema = [
       </div>
     </section>
 
-    <WarrantyBand turnaround={service.turnaround} />
+    <WarrantyBand
+      turnaround={service.turnaround}
+      headline={service.warrantyHeadline}
+      body={service.warrantyBody}
+    />
 
     <Faq items={service.faqs} />
 

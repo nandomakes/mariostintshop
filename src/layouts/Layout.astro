@@ -10,7 +10,7 @@ import '@fontsource/gabarito/latin-400.css';
 // hashed file Vite actually emits.
 import specialGothicWoff2 from '@fontsource/special-gothic-expanded-one/files/special-gothic-expanded-one-latin-400-normal.woff2?url';
 import '../styles/global.css';
-import { SITE, CONTACT, PHONE_TEL, SERVICES, SOCIALS, TESTIMONIALS } from '../consts';
+import { SITE, CONTACT, PHONE_TEL, SERVICES, SOCIALS, TESTIMONIALS, GA4_ID } from '../consts';
 
 interface Props {
   title?: string;
@@ -104,6 +104,12 @@ const website = {
 };
 
 const jsonLdNodes = [business, website, ...schema];
+
+// GA4. The property ID lives in consts; PUBLIC_GA4_ID overrides it so a
+// staging deploy can point elsewhere (or set it empty to disable the tag).
+// The CSP in vercel.json already allows googletagmanager/google-analytics.
+// This is the site's ONLY Google tag — don't add a second one anywhere.
+const ga4Id = import.meta.env.PUBLIC_GA4_ID ?? GA4_ID;
 ---
 
 <!doctype html>
@@ -124,7 +130,9 @@ const jsonLdNodes = [business, website, ...schema];
     <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <link rel="canonical" href={canonical} />
+    {/* A noindex page shouldn't declare itself the canonical of anything —
+        404 used to emit rel=canonical to /404/. */}
+    {!noindex && <link rel="canonical" href={canonical} />}
     <meta name="generator" content={Astro.generator} />
 
     <title>{title}</title>
@@ -159,6 +167,34 @@ const jsonLdNodes = [business, website, ...schema];
       jsonLdNodes.map((node) => (
         <script is:inline type="application/ld+json" set:html={JSON.stringify(node)} />
       ))
+    }
+
+    {
+      ga4Id && (
+        <>
+          <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`} />
+          <script is:inline define:vars={{ ga4Id }}>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+              dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+            gtag('config', ga4Id);
+
+            // The quote form is a cross-domain Tintwiz iframe, so its submit is
+            // invisible to us. These two are the conversions we CAN measure.
+            document.addEventListener('click', (e) => {
+              const a = e.target.closest('a');
+              if (!a) return;
+              if (a.href.startsWith('tel:')) {
+                gtag('event', 'phone_call_click', { link_url: a.href });
+              } else if (a.getAttribute('href')?.includes('#contact')) {
+                gtag('event', 'quote_cta_click', { link_text: a.textContent.trim() });
+              }
+            });
+          </script>
+        </>
+      )
     }
 
     <!-- Enable "reveal" mode only when JS is present; without JS everything is visible -->

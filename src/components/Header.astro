@@ -63,14 +63,49 @@ const isCurrent = (href: string) => {
     <ul class="hidden items-center gap-7 justify-self-start text-[11px] font-bold uppercase tracking-[0.16em] text-paper lg:flex">
       {
         NAV_LINKS.map((link) => (
-          <li>
+          <li class="group relative">
             <a
               href={link.href}
               aria-current={isCurrent(link.href) ? 'page' : undefined}
-              class="nav-link py-3 transition-colors duration-200 hover:text-accent aria-[current=page]:text-accent"
+              class="nav-link inline-flex items-center gap-1 py-3 transition-colors duration-200 hover:text-accent aria-[current=page]:text-accent"
             >
               {link.label}
+              {link.children && (
+                <svg
+                  width="11"
+                  height="11"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                  class="mt-px transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180"
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              )}
             </a>
+
+            {/* CSS-only dropdown: opens on hover and on keyboard focus, so the
+                five service URLs are real site-wide links rather than a JS
+                widget a crawler has to execute. */}
+            {link.children && (
+              <ul class="pointer-events-none invisible absolute left-0 top-full z-50 w-64 border border-line bg-ink opacity-0 shadow-xl transition-opacity duration-200 group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:opacity-100">
+                {link.children.map((child) => (
+                  <li>
+                    <a
+                      href={child.href}
+                      aria-current={isCurrent(child.href) ? 'page' : undefined}
+                      class="block border-b border-line px-4 py-3 text-[10px] leading-snug tracking-[0.14em] text-smoke transition-colors duration-200 last:border-b-0 hover:bg-coal hover:text-accent aria-[current=page]:text-accent"
+                    >
+                      {child.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
           </li>
         ))
       }
@@ -125,6 +160,21 @@ const isCurrent = (href: string) => {
               >
                 {link.label}
               </a>
+              {link.children && (
+                <ul class="border-b border-line pb-1 pl-4">
+                  {link.children.map((child) => (
+                    <li>
+                      <a
+                        href={child.href}
+                        aria-current={isCurrent(child.href) ? 'page' : undefined}
+                        class="block py-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-smoke/70 transition-colors duration-200 hover:text-accent aria-[current=page]:text-accent"
+                      >
+                        {child.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </li>
           ))
         }

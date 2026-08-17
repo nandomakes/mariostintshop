@@ -13,8 +13,10 @@ const VEHICLE_IDS = ['sedan', 'suv', 'sport', 'truck'];
 const VEHICLES = PHOTO_VEHICLES.filter((v) => VEHICLE_IDS.includes(v.id));
 
 const title = `Window Tint & PPF Visualizer | ${SITE.brand}`;
+// ≤155 chars so Google shows it whole — the previous copy ran to ~218 and was
+// truncated mid-sentence in the SERP.
 const description =
-  "See 3M window tint and paint protection film on a 3D car. Pick a vehicle type, choose your tint shade or PPF coverage, and preview the look — then send your build to Mario's Tint Shop in Murfreesboro, TN for a free quote.";
+  'Preview 3M window tint shades and PPF coverage on a 3D car, then send your build to Mario’s Tint Shop in Murfreesboro, TN for a free quote.';
 
 // Mirrors the visual breadcrumb below.
 const schema = [
@@ -225,7 +227,7 @@ const PPF_PACKAGES = [
           <div class="acc border-b border-sand px-6" data-open="true">
             <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
               <span>
-                <h2 class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the coverage</h2>
+                <h2 class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the tint coverage</h2>
                 <span class="mt-0.5 block text-xs text-ash">Select a coverage zone to get started.</span>
               </span>
               <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
@@ -337,7 +339,9 @@ const PPF_PACKAGES = [
             <div class="acc border-b border-sand px-6" data-open="true">
               <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
                 <span>
-                  <h2 class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the coverage</h2>
+                  {/* Distinct from the tint panel's "Select the coverage" —
+                      two identical H2s muddied the document outline. */}
+                  <h2 class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the PPF coverage</h2>
                   <span class="mt-0.5 block text-xs text-ash">Protected panels are highlighted in green on the model.</span>
                 </span>
                 <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">

@@ -1,0 +1,68 @@
+# Mario's Tint Shop
+
+> Authorized 3M Platinum Dealer in Murfreesboro, Tennessee, specializing in
+> automotive window tinting, paint protection film (PPF), ceramic coating,
+> Tesla-specific installs, and commercial/office window film. Over 25 years in
+> the window film and vehicle protection trade.
+
+**Maintainer note:** this file is written by hand. The source of truth for every
+fact below is `src/consts.ts` in the site repository — update both together.
+
+## Business details
+
+- **Name:** Mario's Tint Shop
+- **Address:** 515 NW Broad St, Murfreesboro, TN 37130, United States
+- **Phone:** (615) 410-7170
+- **Email:** mario@mariostintshop.com
+- **Hours:** Monday–Friday 8:00 a.m. – 5:00 p.m.; Saturday by appointment; Sunday closed
+- **Service area:** Murfreesboro, Smyrna, La Vergne, Lebanon, Franklin, Brentwood,
+  Nashville, Rutherford County, and Middle Tennessee
+- **Credentials:** Authorized 3M Platinum Dealer · BBB A+ accredited · 25+ years in business
+- **Rating:** 5.0 stars from 390+ Google reviews
+
+## Services
+
+- [Car Window Tinting](https://www.mariostintshop.com/services/window-tinting/):
+  3M™ Ceramic IR film rejecting up to 90% of infrared heat and up to 99% of UV.
+  Three tiers — Silver (Obsidian carbon), Gold (CS IR nano ceramic), Platinum
+  (Ceramic IR). Non-metallized, so GPS and cell signal are unaffected. Tennessee
+  law requires a minimum of 35% VLT on front side, rear side, and rear windows.
+  Lifetime warranty available.
+- [Paint Protection Film (PPF)](https://www.mariostintshop.com/services/paint-protection-film/):
+  3M self-healing clear bra against rock chips, scratches, and road debris.
+  Partial front, full front, or complete coverage. Lasts 8–10 years with a
+  10-year 3M warranty against yellowing, cracking, and delamination.
+- [Ceramic Coating](https://www.mariostintshop.com/services/ceramic-coating/):
+  3M ceramic formula bonding to paint, PPF, glass, trim, and vinyl wrap. Single
+  layer lasts up to 3 years, dual layer up to 5. Multi-stage paint correction is
+  performed before coating so swirls are removed rather than sealed in.
+- [Tesla Services](https://www.mariostintshop.com/services/tesla/):
+  Tint, PPF, and ceramic coating for Model 3, Model Y, Model S, Model X, and
+  Cybertruck, using patterns pre-cut per model including the panoramic glass roof.
+- [Office & Commercial Films](https://www.mariostintshop.com/services/commercial-films/):
+  3M architectural film — Prestige (up to 97% IR rejection while staying
+  virtually clear), Ceramic, Night Vision, All Season Low-E, plus safety,
+  security, decorative, and privacy frost films. Installed after hours to avoid
+  business disruption. Energy paybacks in as little as three years.
+
+## Tools
+
+- [Window Tint & PPF Visualizer](https://www.mariostintshop.com/visualizer/):
+  interactive 3D preview of tint shades and PPF coverage on a vehicle, with the
+  resulting build sendable to the shop as a free quote request.
+
+## Common questions
+
+- **Pricing:** every vehicle is quoted individually and for free. Price depends on
+  the vehicle, the number of windows, and the 3M tier chosen. Call (615) 410-7170.
+- **Booking:** appointments recommended; Saturdays are appointment-only.
+- **Combining services:** tint, PPF, and ceramic coating are all done in-house in a
+  single appointment. When combining PPF and coating, the film goes on first and
+  the coating is applied over it.
+
+## More
+
+- [Homepage](https://www.mariostintshop.com/)
+- [Sitemap](https://www.mariostintshop.com/sitemap-index.xml)
+- [Google Business Profile](https://maps.app.goo.gl/ChC6iGfAj8wzBpwk6)
+- [BBB profile](https://www.bbb.org/us/tn/murfreesboro/profile/car-window-tinting/marios-tint-shop-0573-37192075)

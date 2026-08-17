@@ -29,11 +29,20 @@ import Ticker from './Ticker.astro';
   </div>
 
   <div class="relative w-full flex-1 content-center px-4 py-10 text-left sm:px-5 sm:py-12 md:py-16">
-    <div class="w-full max-w-2xl sm:pl-6 md:pl-16">
+    {/* max-w-4xl, not 2xl: the headline face is very wide, and at the 52px the
+        clamp tops out at, each H1 line needs ~740px. The md:pl-16 eats 64px of
+        whatever this cap is, so 2xl left only 608px of text width and both H1
+        lines re-wrapped — a two-line headline rendered as five. 4xl leaves
+        832px. The subcopy keeps its own max-w-[52ch], so the paragraph measure
+        is unaffected by the wider cap. */}
+    <div class="w-full max-w-4xl sm:pl-6 md:pl-16">
       <p class="reveal kicker text-[clamp(1rem,3vw,1.35rem)] text-accent">{HERO.kicker}</p>
 
       <h1 class="reveal headline mt-3 text-[clamp(1.6rem,4.5vw,3.25rem)] text-paper md:mt-4">
-        {HERO.line1}<br />{HERO.line2}
+        {/* The space before <br> is deliberate: without it the extracted text
+            of the H1 reads "…Protectionin Murfreesboro, TN". It renders
+            invisibly, since trailing whitespace before a line break collapses. */}
+        {HERO.line1} <br />{HERO.line2}
       </h1>
 
       <p class="reveal mt-5 max-w-[52ch] text-[clamp(0.9rem,2.5vw,1.125rem)] leading-relaxed text-smoke md:mt-6">

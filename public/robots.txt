@@ -1,4 +1,26 @@
 User-agent: *
 Allow: /
+# No pagination exists today; this is a guard so an accidental /page/2 route
+# can never be indexed as duplicate content.
+Disallow: /page/
+Disallow: /*?*
+
+# AI crawlers are explicitly welcome — the wildcard above already allows them,
+# but stating it means a policy tightening upstream can't quietly cut us out of
+# AI Overviews, ChatGPT, Claude, and Perplexity citations. See /llms.txt.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
 
 Sitemap: https://www.mariostintshop.com/sitemap-index.xml

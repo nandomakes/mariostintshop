@@ -7,13 +7,21 @@ import Services from '../components/Services.astro';
 import Features from '../components/Features.astro';
 import Gallery from '../components/Gallery.astro';
 import Testimonials from '../components/Testimonials.astro';
+import Faq from '../components/Faq.astro';
 import QuoteCTA from '../components/QuoteCTA.astro';
 import Location from '../components/Location.astro';
 import Footer from '../components/Footer.astro';
 import CallFab from '../components/CallFab.astro';
+import { HOME_FAQS, faqPageSchema } from '../consts';
+
+// The homepage had no FAQ and therefore no FAQPage node — only the service
+// pages were eligible for FAQ rich results. These are shop-level questions
+// (price, booking, area, warranty) so they don't cannibalize the per-service
+// FAQs. Same helper the service pages use, so the shape can't drift.
+const schema = [faqPageSchema(HOME_FAQS)];
 ---
 
-<Layout>
+<Layout schema={schema}>
   <Header />
   <main id="content">
     <Hero />
@@ -22,6 +30,7 @@ import CallFab from '../components/CallFab.astro';
     <Features />
     <Gallery />
     <Testimonials />
+    <Faq items={HOME_FAQS} />
     <QuoteCTA />
     <Location />
   </main>
