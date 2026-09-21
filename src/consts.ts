@@ -104,7 +104,9 @@ import tinting1Img from './assets/images/suv-window-tinting-murfreesboro.webp';
 import tintingImg from './assets/images/car-window-tinting-installation.webp';
 import paintImg from './assets/images/paint-protection-film-installation.webp';
 import coatingImg from './assets/images/ceramic-coating-finish.webp';
-import teslaSvcImg from './assets/images/tesla-window-tint-ppf.webp';
+import teslaSvcImg from './assets/images/tesla/tesla-cybertrucks-bay-hero.jpeg';
+import teslaSplitImg from './assets/images/tesla/tesla-model-y-red-bay.jpeg';
+import ppfWorkImg from './assets/images/instagram/columna3-1.jpeg';
 import officeImg from './assets/images/office-window-film-murfreesboro.webp';
 import office2Img from './assets/images/commercial-window-film-building.webp';
 import installImg from './assets/images/lamborghini-paint-protection-film.webp';
@@ -138,7 +140,15 @@ export const IMAGES = {
   },
   teslaSvc: {
     src: teslaSvcImg,
-    alt: 'Tesla with premium tint and protection',
+    alt: 'Two Tesla Cybertrucks in the bay at Mario\'s Tint Shop, ready for tint and paint protection film',
+  },
+  teslaSplit: {
+    src: teslaSplitImg,
+    alt: 'Red Tesla Model Y with freshly tinted windows and glass roof in the bay at Mario\'s Tint Shop',
+  },
+  ppfWork: {
+    src: ppfWorkImg,
+    alt: 'Paint protection film being applied to the hood of a red Corvette at Mario\'s Tint Shop',
   },
   office: {
     src: officeImg,
@@ -146,7 +156,7 @@ export const IMAGES = {
   },
   office2: {
     src: office2Img,
-    alt: 'Commercial building with window film installed',
+    alt: 'Installer applying window film to a commercial window',
   },
   install: {
     src: installImg,
@@ -252,6 +262,8 @@ export interface Service {
   // Second photo for the "Why {name}?" split. Without it the split reuses the
   // hero image, which shows the same picture twice within one screen of scroll.
   splitImage?: keyof typeof IMAGES;
+  // One short word set as the outlined display type behind the split photo.
+  splitWord?: string;
   // Per-service section headings. Every service used to share one hardcoded
   // pair ("Built to protect" / "How it works"), which read as a template and
   // gave the H2s no keyword differentiation. Optional — falls back below.
@@ -274,6 +286,7 @@ export const SERVICES: Service[] = [
   {
     id: 'window-tinting',
     slug: 'window-tinting',
+    splitWord: 'Tint',
     kicker: 'Window Tinting',
     name: 'Car Window Tinting',
     short:
@@ -329,6 +342,7 @@ export const SERVICES: Service[] = [
   {
     id: 'ppf',
     slug: 'paint-protection-film',
+    splitWord: 'PPF',
     kicker: 'Paint Protection',
     name: 'Paint Protection Film (PPF)',
     short:
@@ -368,7 +382,7 @@ export const SERVICES: Service[] = [
       { q: 'Which areas do you serve?', a: 'We are based in Murfreesboro and regularly install PPF for customers from Smyrna, Lebanon, Franklin, La Vergne, Brentwood, Nashville, and across Rutherford County and Middle Tennessee.' },
     ],
     image: 'paint',
-    splitImage: 'install',
+    splitImage: 'ppfWork',
     featuresKicker: 'Why clear bra',
     featuresTitle: 'Protection you never see',
     processKicker: 'Our process',
@@ -381,6 +395,7 @@ export const SERVICES: Service[] = [
   {
     id: 'ceramic-coating',
     slug: 'ceramic-coating',
+    splitWord: 'Ceramic',
     kicker: 'Ceramic Coating',
     name: 'Ceramic Coating',
     short:
@@ -436,6 +451,7 @@ export const SERVICES: Service[] = [
   {
     id: 'tesla',
     slug: 'tesla',
+    splitWord: 'Tesla',
     kicker: 'Tesla Services',
     name: 'Tesla Services',
     short:
@@ -477,7 +493,7 @@ export const SERVICES: Service[] = [
       { q: 'Which areas do you serve?', a: 'We are based in Murfreesboro and see Tesla owners from Smyrna, Lebanon, Franklin, La Vergne, Brentwood, Nashville, and across Rutherford County and Middle Tennessee.' },
     ],
     image: 'teslaSvc',
-    splitImage: 'tinting1',
+    splitImage: 'teslaSplit',
     featuresKicker: 'Built for Tesla',
     featuresTitle: 'Made to fit your model',
     processKicker: 'Our process',
@@ -490,6 +506,7 @@ export const SERVICES: Service[] = [
   {
     id: 'commercial-films',
     slug: 'commercial-films',
+    splitWord: 'Commercial',
     kicker: 'Commercial Films',
     name: 'Office & Commercial Films',
     short:
@@ -743,7 +760,7 @@ import igColumna2 from './assets/images/instagram/columna2.jpeg';
 import ig4 from './assets/images/instagram/ig-4.webp';
 import igColumna31 from './assets/images/instagram/columna3-1.jpeg';
 import ig6 from './assets/images/instagram/ig-6.webp';
-import igColumna32 from './assets/images/instagram/columna3-2.jpg';
+import teslaCybertruckGalleryImg from './assets/images/tesla/tesla-cybertruck-gallery.jpeg';
 
 export const GALLERY = [
   { src: ig1, alt: "Window tint work by Mario's Tint Shop" },
@@ -752,7 +769,7 @@ export const GALLERY = [
   { src: ig4, alt: "Detail work by Mario's Tint Shop" },
   { src: igColumna31, alt: "Paint protection film being applied to a red Corvette at Mario's Tint Shop" },
   { src: ig6, alt: "Finished vehicle by Mario's Tint Shop" },
-  { src: igColumna32, alt: "Tesla Model Y in the bay at Mario's Tint Shop" },
+  { src: teslaCybertruckGalleryImg, alt: "Tesla Cybertruck in the bay at Mario's Tint Shop" },
 ];
 
 // ── Navigation ──────────────────────────────────────────────────────

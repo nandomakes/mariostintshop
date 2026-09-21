@@ -38,9 +38,22 @@ const FALLBACK: FeedItem[] = GALLERY.map((g) => ({
   href: INSTAGRAM.url,
 }));
 
+// Truncates to `limit`, or pads by cycling the fallback tiles when a source
+// (live feed or the curated list itself) comes up short.
+function fillTo(items: FeedItem[], limit: number): FeedItem[] {
+  if (!items.length) return items;
+  const out = items.slice(0, limit);
+  for (let i = 0; out.length < limit; i++) out.push(items[i % items.length]);
+  return out;
+}
+
+// Gallery.astro's bento layout is a fixed 7-slot grid, so this must always
+// resolve to exactly `limit` tiles — a shorter live feed (or a fallback list
+// that's grown/shrunk) would leave the trailing grid cells empty instead of
+// reflowing, since the layout is hand-tuned per slot index, not auto-flow.
 export async function getInstagramFeed(limit = 8): Promise<FeedItem[]> {
   const token = import.meta.env.INSTAGRAM_TOKEN;
-  if (!token) return FALLBACK;
+  if (!token) return fillTo(FALLBACK, limit);
 
   const userId = import.meta.env.INSTAGRAM_USER_ID || 'me';
   const fields = 'id,media_type,media_url,thumbnail_url,permalink,caption';
@@ -50,7 +63,7 @@ export async function getInstagramFeed(limit = 8): Promise<FeedItem[]> {
     const res = await fetch(url);
     if (!res.ok) {
       console.warn(`[instagram] feed fetch failed (${res.status}); using fallback`);
-      return FALLBACK;
+      return fillTo(FALLBACK, limit);
     }
     const json = (await res.json()) as { data?: IgMedia[] };
     const items = (json.data ?? [])
@@ -66,9 +79,9 @@ export async function getInstagramFeed(limit = 8): Promise<FeedItem[]> {
       })
       .filter((x): x is FeedItem => x !== null);
 
-    return items.length ? items : FALLBACK;
+    return items.length ? fillTo(items, limit) : fillTo(FALLBACK, limit);
   } catch (err) {
     console.warn('[instagram] feed fetch errored; using fallback', err);
-    return FALLBACK;
+    return fillTo(FALLBACK, limit);
   }
 }

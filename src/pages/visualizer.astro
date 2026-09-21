@@ -28,7 +28,7 @@ const schema = [
       {
         '@type': 'ListItem',
         position: 2,
-        name: 'Tint visualizer',
+        name: 'Tint & PPF visualizer',
         item: `${SITE.url}/visualizer/`,
       },
     ],
@@ -134,7 +134,7 @@ const PPF_PACKAGES = [
         <nav class="reveal text-[11px] font-bold uppercase tracking-[0.16em] text-smoke" aria-label="Breadcrumb">
           <a href="/" class="transition-colors hover:text-paper">Home</a>
           <span class="mx-2 text-line">/</span>
-          <span class="text-accent">Tint visualizer</span>
+          <span class="text-accent">Tint &amp; PPF visualizer</span>
         </nav>
       </div>
     </section>
@@ -143,11 +143,12 @@ const PPF_PACKAGES = [
     <section class="border-b border-sand bg-paper">
       <div class="mx-auto max-w-4xl px-5 py-12 text-center md:py-14">
         <h1 class="reveal headline text-[clamp(1.4rem,2.8vw,2.1rem)] text-ink">
-          Window tint visualizer
+          Window tint &amp; paint protection film visualizer
         </h1>
         <p class="reveal mx-auto mt-5 max-w-[64ch] text-[15px] leading-relaxed text-char">
-          See 3M window tint on your car. Select a car category, determine the coverage
-          area, pick a shade, and rotate the 3D model to preview the look — before you buy.
+          Preview 3M window tint or paint protection film (PPF) on your car — switch between
+          the two modes below. Select a car category, determine the coverage area, pick a
+          tint shade or PPF package, and rotate the 3D model to preview the look before you buy.
         </p>
       </div>
     </section>
@@ -194,31 +195,53 @@ const PPF_PACKAGES = [
       <div class="mx-auto grid max-w-6xl gap-8 px-5 py-10 md:py-14 lg:grid-cols-[5fr_7fr] lg:items-start">
         <!-- Controls column -->
         <div class="min-w-0 border border-sand bg-whisper lg:order-1">
-          <!-- Mode tabs + reset -->
-          <div class="flex items-center border-b border-sand pr-3" role="tablist" aria-label="Simulator mode">
-            <button
-              type="button" role="tab" data-mode="tint" aria-selected="true"
-              id="mode-tab-tint" aria-controls="mode-panel-tint"
-              class="mode-tab pressable relative px-4 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-ash transition-colors duration-200 aria-selected:text-accentDk"
-            >
-              Window Tint
-              <span class="mode-underline absolute inset-x-0 bottom-0 h-0.5 bg-accent opacity-0 transition-opacity duration-200"></span>
-            </button>
-            <button
-              type="button" role="tab" data-mode="ppf" aria-selected="false"
-              id="mode-tab-ppf" aria-controls="mode-panel-ppf"
-              class="mode-tab pressable relative px-4 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-ash transition-colors duration-200 aria-selected:text-accentDk"
-            >
-              Paint Protection
-              <span class="mode-underline absolute inset-x-0 bottom-0 h-0.5 bg-accent opacity-0 transition-opacity duration-200"></span>
-            </button>
-            <button
-              type="button" id="reset-btn"
-              class="pressable ml-auto flex items-center gap-1.5 px-2 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-ash transition-colors hover:text-accentDk"
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
-              <span class="hidden sm:inline">Start over</span>
-            </button>
+          <!-- Mode switcher + reset. Two equal cards rather than text tabs so
+               both modes read as choices — users kept missing that PPF was
+               here at all. -->
+          <div class="border-b border-sand px-3 pb-3 pt-2.5">
+            <div class="mb-2 flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-[0.16em] text-ash">Choose what to preview</span>
+              <button
+                type="button" id="reset-btn"
+                class="pressable flex items-center gap-1.5 px-1 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-ash transition-colors hover:text-accentDk"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+                Start over
+              </button>
+            </div>
+            <div class="grid grid-cols-2 gap-2" role="tablist" aria-label="Simulator mode">
+              <button
+                type="button" role="tab" data-mode="tint" aria-selected="true"
+                id="mode-tab-tint" aria-controls="mode-panel-tint"
+                class="mode-tab pressable group relative flex flex-col items-center gap-2 border border-sand bg-paper px-3 py-3 text-center transition-colors duration-200 hover:border-ash/60 aria-selected:border-accent aria-selected:bg-accent sm:flex-row sm:gap-3 sm:text-left"
+              >
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center bg-mint text-accentDk transition-colors duration-200 group-aria-selected:bg-ink group-aria-selected:text-accent" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l2.2-5.5A2 2 0 0 1 7 6h10a2 2 0 0 1 1.8 1.5L21 13"/><path d="M3 13h18v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M8 10l2-3M13 10l2-3"/></svg>
+                </span>
+                <span class="min-w-0">
+                  <span class="block text-[11px] font-bold uppercase tracking-[0.1em] text-ink">Window Tint</span>
+                  <span class="block text-[10px] leading-tight text-ash group-aria-selected:text-ink/70">Glass shades</span>
+                </span>
+              </button>
+              <button
+                type="button" role="tab" data-mode="ppf" aria-selected="false"
+                id="mode-tab-ppf" aria-controls="mode-panel-ppf"
+                class="mode-tab pressable group relative flex flex-col items-center gap-2 border border-sand bg-paper px-3 py-3 text-center transition-colors duration-200 hover:border-ash/60 aria-selected:border-accent aria-selected:bg-accent sm:flex-row sm:gap-3 sm:text-left"
+              >
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center bg-mint text-accentDk transition-colors duration-200 group-aria-selected:bg-ink group-aria-selected:text-accent" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.6-3 7.7-7 9-4-1.3-7-4.4-7-9V6z"/><path d="M9.2 12l2 2 3.6-3.7"/></svg>
+                </span>
+                <span class="min-w-0">
+                  <span class="block text-[11px] font-bold uppercase tracking-[0.1em] text-ink">Paint Protection</span>
+                  <span class="block text-[10px] leading-tight text-ash group-aria-selected:text-ink/70">Body panels (PPF)</span>
+                </span>
+                <!-- Attention marker: pulses until PPF is opened once. -->
+                <span class="mode-dot absolute right-2 top-2 flex h-2.5 w-2.5" aria-hidden="true">
+                  <span class="mode-dot-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                  <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-accent"></span>
+                </span>
+              </button>
+            </div>
           </div>
 
           <!-- ══ Window-tint panel ══ -->
@@ -332,6 +355,23 @@ const PPF_PACKAGES = [
               </div>
             </div>
           </div>
+
+          <!-- Cross-sell into the other mode: the shop does both in one visit. -->
+          <div class="flex flex-wrap items-center gap-4 border-t border-sand bg-paper px-6 py-5">
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center bg-mint text-accentDk" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.6-3 7.7-7 9-4-1.3-7-4.4-7-9V6z"/><path d="M9.2 12l2 2 3.6-3.7"/></svg>
+            </span>
+            <div class="min-w-0 flex-1 basis-40">
+              <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-ink">Protecting the paint too?</p>
+              <p class="mt-0.5 text-xs leading-snug text-ash">Same 3D car — see which panels each PPF package covers.</p>
+            </div>
+            <button
+              type="button" data-switch-mode="ppf"
+              class="pressable w-full shrink-0 border border-accent px-3 py-2.5 text-center text-[10px] font-bold uppercase tracking-[0.12em] text-accentDk transition-colors duration-200 hover:bg-accent hover:text-ink sm:w-auto"
+            >
+              Preview PPF <span class="font-black" aria-hidden="true">&gt;</span>
+            </button>
+          </div>
           </div>
 
           <!-- ══ Paint-protection panel ══ -->
@@ -381,6 +421,22 @@ const PPF_PACKAGES = [
                   </p>
                 </div>
               </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-4 border-t border-sand bg-paper px-6 py-5">
+              <span class="flex h-10 w-10 shrink-0 items-center justify-center bg-mint text-accentDk" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l2.2-5.5A2 2 0 0 1 7 6h10a2 2 0 0 1 1.8 1.5L21 13"/><path d="M3 13h18v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M8 10l2-3M13 10l2-3"/></svg>
+              </span>
+              <div class="min-w-0 flex-1 basis-40">
+                <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-ink">Want the glass done too?</p>
+                <p class="mt-0.5 text-xs leading-snug text-ash">Tint and PPF happen in the same appointment.</p>
+              </div>
+              <button
+                type="button" data-switch-mode="tint"
+                class="pressable w-full shrink-0 border border-accent px-3 py-2.5 text-center text-[10px] font-bold uppercase tracking-[0.12em] text-accentDk transition-colors duration-200 hover:bg-accent hover:text-ink sm:w-auto"
+              >
+                Preview Tint <span class="font-black" aria-hidden="true">&gt;</span>
+              </button>
             </div>
           </div>
         </div>
@@ -496,6 +552,22 @@ const PPF_PACKAGES = [
        visual weight regardless of source canvas size. */
     .veh-thumb-frame[data-veh='sport'] .veh-thumb {
       transform: scale(0.94);
+    }
+
+    /* PPF attention marker: pings until the mode is opened once. */
+    .mode-dot-ping {
+      animation: mode-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+    @keyframes mode-ping {
+      75%, 100% {
+        transform: scale(2.4);
+        opacity: 0;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .mode-dot-ping {
+        animation: none;
+      }
     }
 
     /* Accordions: +/− icon morph and body collapse. */
@@ -790,10 +862,10 @@ const PPF_PACKAGES = [
     function setMode(mode: 'tint' | 'ppf') {
       state.mode = mode;
       $$('.mode-tab').forEach((t) => {
-        const on = t.dataset.mode === mode;
-        t.setAttribute('aria-selected', String(on));
-        t.querySelector('.mode-underline')?.classList.toggle('opacity-0', !on);
+        t.setAttribute('aria-selected', String(t.dataset.mode === mode));
       });
+      // The marker has done its job once PPF has been seen.
+      if (mode === 'ppf') document.querySelector('.mode-dot')?.remove();
       $$('[data-panel]').forEach((p) => {
         (p as HTMLElement).hidden = p.dataset.panel !== mode;
       });
@@ -805,6 +877,17 @@ const PPF_PACKAGES = [
     }
     $$('.mode-tab').forEach((tab) =>
       tab.addEventListener('click', () => setMode(tab.dataset.mode as 'tint' | 'ppf'))
+    );
+    // Cross-mode nudges at the bottom of each panel. On phones the switcher
+    // is a full panel above, so bring it back into view and hand it focus.
+    $$('[data-switch-mode]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const mode = btn.dataset.switchMode as 'tint' | 'ppf';
+        setMode(mode);
+        const tab = document.getElementById(`mode-tab-${mode}`);
+        tab?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        tab?.focus({ preventScroll: true });
+      })
     );
 
     $$('.ppf-tile').forEach((tile) =>

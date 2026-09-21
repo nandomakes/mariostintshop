@@ -67,7 +67,7 @@ const isCurrent = (href: string) => {
             <a
               href={link.href}
               aria-current={isCurrent(link.href) ? 'page' : undefined}
-              class="nav-link inline-flex items-center gap-1 py-3 transition-colors duration-200 hover:text-accent aria-[current=page]:text-accent"
+              class="nav-link inline-flex items-center gap-1 whitespace-nowrap py-3 transition-colors duration-200 hover:text-accent aria-[current=page]:text-accent"
             >
               {link.label}
               {link.children && (

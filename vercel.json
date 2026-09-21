@@ -1,5 +1,17 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    { "source": "/paint-protection", "destination": "/services/paint-protection-film/", "permanent": true },
+    { "source": "/paint-protection/", "destination": "/services/paint-protection-film/", "permanent": true },
+    { "source": "/window-tinting", "destination": "/services/window-tinting/", "permanent": true },
+    { "source": "/window-tinting/", "destination": "/services/window-tinting/", "permanent": true },
+    { "source": "/ceramic-coating", "destination": "/services/ceramic-coating/", "permanent": true },
+    { "source": "/ceramic-coating/", "destination": "/services/ceramic-coating/", "permanent": true },
+    { "source": "/tesla", "destination": "/services/tesla/", "permanent": true },
+    { "source": "/tesla/", "destination": "/services/tesla/", "permanent": true },
+    { "source": "/commercial-films", "destination": "/services/commercial-films/", "permanent": true },
+    { "source": "/commercial-films/", "destination": "/services/commercial-films/", "permanent": true }
+  ],
   "headers": [
     {
       "source": "/(.*)",
