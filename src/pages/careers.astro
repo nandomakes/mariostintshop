@@ -1,0 +1,369 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import HeroService from '../components/HeroService.astro';
+import Footer from '../components/Footer.astro';
+import CallFab from '../components/CallFab.astro';
+import { SITE, CONTACT, CAREERS, IMAGES, SOCIALS } from '../consts';
+
+const jobs = CAREERS.openings;
+const title = `Careers: Tint Installer & Shop Jobs in Murfreesboro, TN | ${SITE.brand}`;
+const description =
+  "Now hiring in Murfreesboro, TN: Window Tint Installer, Shop Assistant, and Receptionist / Sales. Paid training on 3M film. Apply online in 2 minutes.";
+
+const list = (items: string[]) => `<ul>${items.map((i) => `<li>${i}</li>`).join('')}</ul>`;
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE.url },
+      { '@type': 'ListItem', position: 2, name: 'Careers', item: `${SITE.url}/careers/` },
+    ],
+  },
+  // Google for Jobs. hiringOrganization is spelled out rather than an @id
+  // reference — the Rich Results validator wants a name on the node itself.
+  ...jobs.map((job) => ({
+    '@context': 'https://schema.org',
+    '@type': 'JobPosting',
+    title: job.title,
+    description: [
+      `<p>${job.summary}</p>`,
+      ...job.responsibilities.map((r) => `<p><strong>${r.heading}</strong></p>${list(r.items)}`),
+      `<p><strong>Requirements</strong></p>${list(job.requirements)}`,
+      `<p><strong>Nice to have</strong></p>${list(job.niceToHave)}`,
+      `<p><strong>Benefits</strong></p>${list(job.benefits)}`,
+      `<p><strong>Schedule:</strong> ${job.schedule}</p>`,
+    ].join(''),
+    identifier: { '@type': 'PropertyValue', name: SITE.brand, value: job.id },
+    datePosted: job.datePosted,
+    validThrough: `${job.validThrough}T23:59:59-06:00`,
+    employmentType: job.employmentType,
+    hiringOrganization: {
+      '@type': 'Organization',
+      '@id': `${SITE.url}/#business`,
+      name: SITE.brand,
+      sameAs: SOCIALS.map((s) => s.href),
+      logo: `${SITE.url}/favicon-512.png`,
+    },
+    jobLocation: {
+      '@type': 'Place',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: CONTACT.address,
+        addressLocality: 'Murfreesboro',
+        addressRegion: 'TN',
+        postalCode: '37130',
+        addressCountry: 'US',
+      },
+    },
+    directApply: true,
+    url: `${SITE.url}/careers/#${job.id}`,
+    ...(job.pay
+      ? {
+          baseSalary: {
+            '@type': 'MonetaryAmount',
+            currency: 'USD',
+            value: {
+              '@type': 'QuantitativeValue',
+              minValue: job.pay.min,
+              maxValue: job.pay.max,
+              unitText: job.pay.unit,
+            },
+          },
+        }
+      : {}),
+  })),
+];
+
+const check = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6.5" /></svg>`;
+const inputCls =
+  'mt-1.5 w-full border border-sand bg-paper px-3.5 py-3 text-[15px] text-ink outline-none transition-colors focus:border-accent';
+const labelCls = 'block text-[11px] font-bold uppercase tracking-[0.14em] text-ink';
+---
+
+<Layout title={title} description={description} schema={schema}>
+  <Header />
+  <main id="content">
+    <HeroService
+      kicker="Careers"
+      title="Now hiring in Murfreesboro"
+      subcopy={CAREERS.intro}
+      imageSrc={IMAGES.shopBay.src}
+      breadcrumbParent={null}
+      primaryCta={{ href: '#openings', label: 'See Open Jobs' }}
+    />
+
+    <!-- Job index -->
+    <section id="openings" class="scroll-mt-20 border-b border-sand bg-whisper">
+      <div class="mx-auto max-w-6xl px-5 py-14 md:py-16">
+        <p class="kicker text-center text-accentDk">{jobs.length} open positions</p>
+        <h2 class="headline mt-3 text-center text-[clamp(1.5rem,3.4vw,2.4rem)] text-ink">Find your spot on the team</h2>
+        <div class="mt-10 grid gap-5 md:grid-cols-3">
+          {
+            jobs.map((job) => (
+              <a
+                href={`#${job.id}`}
+                class="lift group flex flex-col border border-sand bg-paper p-6 shadow-[0_2px_10px_rgba(0,0,0,0.05)] transition-colors hover:border-accent"
+              >
+                <span class="self-start bg-mint px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-accentDk">
+                  {job.employmentLabel}
+                </span>
+                <h3 class="headline mt-4 text-lg tracking-[0.04em] text-ink">{job.title}</h3>
+                <p class="mt-3 flex-1 text-sm leading-relaxed text-char">{job.short}</p>
+                <span class="mt-5 text-[11px] font-bold uppercase tracking-[0.12em] text-accentDk">
+                  View details <span class="font-black" aria-hidden="true">&gt;</span>
+                </span>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    {
+      jobs.map((job, i) => (
+        <section id={job.id} class:list={['scroll-mt-24 border-b border-sand', i % 2 ? 'bg-whisper' : 'hex-bg bg-paper']}>
+          <div class="mx-auto max-w-6xl px-5 py-16 md:py-24">
+            <div class="grid gap-10 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] lg:gap-14">
+              <div>
+                <p class="kicker text-accentDk">Open position</p>
+                <h2 class="headline mt-3 text-[clamp(1.5rem,3.4vw,2.4rem)] text-ink">{job.title}</h2>
+                <p class="mt-6 max-w-[64ch] text-[15px] leading-relaxed text-char">{job.summary}</p>
+
+                {job.responsibilities.map((r) => (
+                  <div class="mt-10">
+                    <h3 class="headline text-base tracking-[0.06em] text-ink">{r.heading}</h3>
+                    <ul class="mt-4 space-y-3">
+                      {r.items.map((item) => (
+                        <li class="flex items-start gap-3 text-[15px] leading-relaxed text-char">
+                          <span class="mt-1 flex h-5 w-5 shrink-0 items-center justify-center bg-accent text-ink" aria-hidden="true" set:html={check} />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+
+                <div class="mt-10 grid gap-8 sm:grid-cols-2">
+                  <div>
+                    <h3 class="headline text-base tracking-[0.06em] text-ink">What you bring</h3>
+                    <ul class="mt-4 list-disc space-y-2 pl-5 text-[15px] leading-relaxed text-char marker:text-accentDk">
+                      {job.requirements.map((r) => <li>{r}</li>)}
+                    </ul>
+                  </div>
+                  <div>
+                    <h3 class="headline text-base tracking-[0.06em] text-ink">Nice to have</h3>
+                    <ul class="mt-4 list-disc space-y-2 pl-5 text-[15px] leading-relaxed text-char marker:text-accentDk">
+                      {job.niceToHave.map((r) => <li>{r}</li>)}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <aside class="lg:sticky lg:top-28 lg:self-start">
+                <div class="border border-sand bg-paper p-7 shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
+                  <dl class="space-y-4 text-sm">
+                    <div>
+                      <dt class={labelCls}>Job type</dt>
+                      <dd class="mt-1 text-char">{job.employmentLabel}</dd>
+                    </div>
+                    {job.pay && (
+                      <div>
+                        <dt class={labelCls}>Pay</dt>
+                        <dd class="mt-1 text-char">{job.pay.label}</dd>
+                      </div>
+                    )}
+                    <div>
+                      <dt class={labelCls}>Schedule</dt>
+                      <dd class="mt-1 text-char">{job.schedule}</dd>
+                    </div>
+                    <div>
+                      <dt class={labelCls}>Location</dt>
+                      <dd class="mt-1 text-char">{CONTACT.address}, {CONTACT.city}</dd>
+                    </div>
+                  </dl>
+                  <h3 class="headline mt-7 text-base tracking-[0.06em] text-ink">Benefits</h3>
+                  <ul class="mt-3 space-y-2.5">
+                    {job.benefits.map((b) => (
+                      <li class="flex items-start gap-2.5 text-sm leading-relaxed text-char">
+                        <span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center bg-accent text-ink" aria-hidden="true" set:html={check} />
+                        {b}
+                      </li>
+                    ))}
+                  </ul>
+                  <a
+                    href="#apply"
+                    data-position={job.title}
+                    data-role-id={job.id}
+                    class="apply-link pressable sticker mt-8 block bg-accent px-6 py-3.5 text-center text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
+                  >
+                    Apply for this job <span class="ml-0.5 font-black" aria-hidden="true">&gt;</span>
+                  </a>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </section>
+      ))
+    }
+
+    <!-- Application form -->
+    <section id="apply" class="scroll-mt-20 bg-ink">
+      <div class="mx-auto max-w-6xl px-5 py-20 md:py-24">
+        <div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-16">
+          <div class="reveal lg:sticky lg:top-28 lg:self-start">
+            <p class="kicker text-accent">Apply online</p>
+            <h2 class="headline mt-3 text-[clamp(1.4rem,2.8vw,2.2rem)] text-paper">Send us your application</h2>
+            <p class="mt-5 max-w-[54ch] text-[15px] leading-relaxed text-smoke">
+              Takes about two minutes. Fill in every field and attach your resume — we'll reach
+              out to set up a time to meet at the shop.
+            </p>
+            <p class="mt-8 text-sm text-smoke">
+              Questions about the job? Call us at
+              <a href={`tel:${CONTACT.phoneTel}`} class="font-bold text-accent underline underline-offset-4 hover:text-accentDk">
+                {CONTACT.phoneDisplay}
+              </a>
+              · {CONTACT.scheduleShort}
+            </p>
+            <p class="mt-6 max-w-[54ch] text-xs leading-relaxed text-ash">
+              {SITE.brand} is an equal opportunity employer. We consider all qualified applicants
+              without regard to race, color, religion, sex, national origin, age, disability, or
+              any other protected status.
+            </p>
+          </div>
+
+          <div class="reveal bg-paper p-6 shadow-[0_30px_60px_-30px_rgba(0,0,0,0.6)] sm:p-8">
+            <form id="apply-form" class="space-y-5" novalidate>
+              <div>
+                <label for="f-position" class={labelCls}>Position *</label>
+                <select id="f-position" name="position" required class={inputCls}>
+                  <option value="" disabled selected>Select a position…</option>
+                  {jobs.map((j) => <option value={j.title}>{j.title}</option>)}
+                </select>
+              </div>
+              <div class="grid gap-5 sm:grid-cols-2">
+                <div class="sm:col-span-2">
+                  <label for="f-name" class={labelCls}>Full name *</label>
+                  <input id="f-name" name="name" type="text" required autocomplete="name" class={inputCls} />
+                </div>
+                <div>
+                  <label for="f-email" class={labelCls}>Email *</label>
+                  <input id="f-email" name="email" type="email" required autocomplete="email" class={inputCls} />
+                </div>
+                <div>
+                  <label for="f-phone" class={labelCls}>Phone *</label>
+                  <input id="f-phone" name="phone" type="tel" required autocomplete="tel" class={inputCls} />
+                </div>
+                <div>
+                  <label for="f-experience" class={labelCls}>Tint / automotive experience *</label>
+                  <select id="f-experience" name="experience" required class={inputCls}>
+                    <option value="" disabled selected>Select…</option>
+                    <option>None — ready to learn</option>
+                    <option>Less than 1 year</option>
+                    <option>1–3 years</option>
+                    <option>3+ years</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="f-type" class={labelCls}>Looking for *</label>
+                  <select id="f-type" name="employmentType" required class={inputCls}>
+                    <option value="" disabled selected>Select…</option>
+                    <option>Full-time</option>
+                    <option>Part-time</option>
+                    <option>Either</option>
+                  </select>
+                </div>
+                <div class="sm:col-span-2">
+                  <label for="f-availability" class={labelCls}>When can you start? *</label>
+                  <input id="f-availability" name="availability" type="text" required placeholder="e.g. Immediately, in 2 weeks" class={inputCls} />
+                </div>
+              </div>
+              <div>
+                <label for="f-resume" class={labelCls}>Resume *</label>
+                <input
+                  required
+                  id="f-resume"
+                  name="resume"
+                  type="file"
+                  accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  class="mt-1.5 block w-full text-sm text-char file:mr-4 file:border-0 file:bg-ink file:px-4 file:py-2.5 file:text-xs file:font-bold file:uppercase file:tracking-[0.12em] file:text-paper hover:file:bg-char"
+                />
+                <p class="mt-1.5 text-xs text-ash">PDF or Word, up to 4 MB.</p>
+              </div>
+              <!-- Honeypot: hidden from people, filled in by bots. -->
+              <div class="absolute -left-[9999px]" aria-hidden="true">
+                <label for="f-company">Company</label>
+                <input id="f-company" name="company" type="text" tabindex="-1" autocomplete="off" />
+              </div>
+
+              <p id="apply-status" class="hidden text-sm" role="status" aria-live="polite"></p>
+
+              <button
+                type="submit"
+                id="apply-submit"
+                class="pressable sticker w-full bg-accent px-8 py-4 text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform,opacity] duration-200 hover:-translate-y-0.5 hover:bg-accentDk disabled:pointer-events-none disabled:opacity-50"
+              >
+                Submit application <span class="ml-0.5 font-black" aria-hidden="true">&gt;</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+  <CallFab />
+
+  <script>
+    const form = document.getElementById('apply-form') as HTMLFormElement;
+    const status = document.getElementById('apply-status')!;
+    const submit = document.getElementById('apply-submit') as HTMLButtonElement;
+    const position = document.getElementById('f-position') as HTMLSelectElement;
+
+    // "Apply for this job" pre-selects its role, as does /careers/?role=<id>#apply
+    // from the homepage band.
+    const select = (title?: string) => {
+      if (title) position.value = title;
+    };
+    document.querySelectorAll<HTMLAnchorElement>('.apply-link').forEach((a) =>
+      a.addEventListener('click', () => select(a.dataset.position))
+    );
+    const role = new URLSearchParams(location.search).get('role');
+    if (role) select(document.querySelector<HTMLElement>(`[data-role-id="${CSS.escape(role)}"]`)?.dataset.position);
+    const MAX_BYTES = 4 * 1024 * 1024;
+
+    const show = (msg: string, ok: boolean) => {
+      status.textContent = msg;
+      status.className = `text-sm font-semibold ${ok ? 'text-accentDk' : 'text-[#B42318]'}`;
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+      const file = (form.elements.namedItem('resume') as HTMLInputElement).files?.[0];
+      if (file && file.size > MAX_BYTES) {
+        show('Your resume is over 4 MB — please upload a smaller file.', false);
+        return;
+      }
+      submit.disabled = true;
+      show('Sending…', true);
+      try {
+        const res = await fetch('/api/apply', { method: 'POST', body: new FormData(form) });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Something went wrong.');
+        (window as any).gtag?.('event', 'job_application_submit', { position: position.value });
+        form.reset();
+        show("Thanks! Your application was sent. We'll be in touch soon.", true);
+      } catch (err) {
+        show(`${(err as Error).message} You can also call us at the number on this page.`, false);
+      } finally {
+        submit.disabled = false;
+      }
+    });
+  </script>
+</Layout>

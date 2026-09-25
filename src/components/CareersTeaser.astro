@@ -1,0 +1,80 @@
+---
+import { CAREERS } from '../consts';
+
+const jobs = CAREERS.openings;
+---
+
+{
+  CAREERS.hiring && jobs.length > 0 && (
+    <section id="careers" class="border-y border-line bg-coal">
+      <div class="mx-auto max-w-6xl px-5 py-14 md:py-16">
+        <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+          <div class="reveal max-w-2xl">
+            <p class="kicker flex items-center gap-2.5 text-accent">
+              <span class="relative flex h-2.5 w-2.5" aria-hidden="true">
+                <span class="hiring-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+                <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-accent" />
+              </span>
+              {CAREERS.kicker}
+            </p>
+            <h2 class="headline mt-3 text-[clamp(1.4rem,3vw,2.2rem)] text-paper">Join our team in Murfreesboro</h2>
+            <p class="mt-4 text-[15px] leading-relaxed text-smoke">
+              Paid training on 3M window film &amp; PPF · no tint experience required · apply online
+              in about two minutes.
+            </p>
+          </div>
+          <a
+            href="/careers/#openings"
+            class="reveal pressable shrink-0 border border-line px-8 py-3.5 text-center text-xs font-bold uppercase tracking-[0.12em] text-paper transition-colors duration-200 hover:border-accent hover:text-accent"
+          >
+            View all jobs
+          </a>
+        </div>
+
+        <ul class="mt-10 grid gap-4 md:grid-cols-3">
+          {
+            jobs.map((job) => (
+              <li class="reveal flex flex-col border border-line bg-ink p-6">
+                <span class="text-[10px] font-bold uppercase tracking-[0.14em] text-accent">{job.employmentLabel}</span>
+                <h3 class="headline mt-2 text-base tracking-[0.04em] text-paper">{job.title}</h3>
+                <p class="mt-3 flex-1 text-sm leading-relaxed text-smoke">{job.short}</p>
+                <div class="mt-6 flex items-center gap-5">
+                  <a
+                    href={`/careers/?role=${job.id}#apply`}
+                    class="pressable sticker bg-accent px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
+                  >
+                    Apply <span class="font-black" aria-hidden="true">&gt;</span>
+                  </a>
+                  <a
+                    href={`/careers/#${job.id}`}
+                    class="text-[11px] font-bold uppercase tracking-[0.12em] text-smoke transition-colors hover:text-accent"
+                  >
+                    Details
+                  </a>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .hiring-ping {
+    animation: hiring-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+  @keyframes hiring-ping {
+    75%,
+    100% {
+      transform: scale(2.4);
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hiring-ping {
+      animation: none;
+    }
+  }
+</style>

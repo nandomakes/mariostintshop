@@ -110,6 +110,7 @@ import ppfWorkImg from './assets/images/instagram/columna3-1.jpeg';
 import officeImg from './assets/images/office-window-film-murfreesboro.webp';
 import office2Img from './assets/images/commercial-window-film-building.webp';
 import installImg from './assets/images/lamborghini-paint-protection-film.webp';
+import shopBayImg from './assets/images/marios-tint-shop-install-bay.jpg';
 
 export const IMAGES = {
   heroBg: {
@@ -161,6 +162,10 @@ export const IMAGES = {
   install: {
     src: installImg,
     alt: 'Lamborghini with premium tint and paint protection',
+  },
+  shopBay: {
+    src: shopBayImg,
+    alt: "Inside the install bay at Mario's Tint Shop, with a freshly tinted Tesla Model Y",
   },
 };
 
@@ -793,6 +798,169 @@ export const NAV_LINKS: {
   { href: '/#gallery', label: 'Gallery' },
   { href: '/#testimonials', label: 'Reviews' },
 ];
+
+// Kept out of NAV_LINKS: a sixth desktop link crowded the centered logo. The
+// header shows it in the top bar instead, and in the mobile menu.
+export const CAREERS_LINK = { href: '/careers/', label: 'Careers' };
+
+// ── Careers ─────────────────────────────────────────────────────────
+// Open positions for /careers/ and the homepage "We're hiring" band. Each
+// entry also becomes a JobPosting JSON-LD node (Google for Jobs). When a role
+// is filled, delete it here — an expired posting left in the schema is a
+// Google policy violation. Set `hiring: false` to hide the homepage band too.
+export interface JobOpening {
+  id: string;
+  title: string;
+  short: string; // one-liner for the homepage band and the job index cards
+  employmentType: 'FULL_TIME' | 'PART_TIME';
+  employmentLabel: string;
+  datePosted: string; // YYYY-MM-DD
+  validThrough: string; // YYYY-MM-DD — Google drops the listing after this date
+  pay?: { min: number; max: number; unit: 'HOUR' | 'YEAR'; label: string }; // ⚠️ REPLACE with real pay
+  schedule: string;
+  summary: string;
+  responsibilities: { heading: string; items: string[] }[];
+  requirements: string[];
+  niceToHave: string[];
+  benefits: string[];
+}
+
+export const CAREERS = {
+  hiring: true,
+  kicker: "We're hiring",
+  headline: 'Join the Mario’s Tint Shop crew',
+  intro:
+    "We're a busy, family-run 3M Platinum Dealer in Murfreesboro with 390+ five-star reviews — and we're growing. If you take pride in doing things right and treating people well, we'd like to meet you. No tint experience? We'll teach you how we do it — applications go straight to Mario, no recruiters.",
+  // ⚠️ CONFIRM WITH CLIENT — employment type, schedule, benefits, and pay are drafts.
+  openings: [
+    {
+      id: 'tint-installer',
+      title: 'Window Tint Installer',
+      short: 'Install 3M window film and paint protection film on everything from daily drivers to Teslas.',
+      employmentType: 'FULL_TIME',
+      employmentLabel: 'Full-time',
+      datePosted: '2026-09-25',
+      validThrough: '2026-12-31',
+      schedule: 'Mon–Fri, 8:00 a.m. – 5:00 p.m. · some Saturdays by appointment',
+      summary:
+        "Our installers are the reason we have 390+ five-star reviews. You'll install computer-cut, hand-finished 3M window film and paint protection film on cars, trucks, SUVs, and Teslas — including the tricky stuff like curved rear glass and panoramic roofs. Patience and clean technique matter more than speed here, and if you're new to film, we'll teach you how we do it.",
+      responsibilities: [
+        {
+          heading: 'In the bay',
+          items: [
+            'Install 3M automotive window film — computer-cut patterns, hand-finished edges',
+            'Install 3M paint protection film, from a partial front to full-vehicle coverage',
+            'Remove old, bubbled, or purple tint cleanly without damaging the glass or defroster lines',
+            'Keep every install dust-free and inspect each job before the customer sees it',
+            'Occasionally install architectural film on office and commercial glass',
+          ],
+        },
+      ],
+      requirements: [
+        '18 years or older with a valid driver’s license',
+        'Steady hands, a good eye for detail, and the patience to redo it until it’s right',
+        'Reliable, on time, and comfortable standing and working on vehicles all day',
+        'Willing to learn — experience is a plus, not required',
+      ],
+      niceToHave: [
+        'Window tint, PPF, or vinyl wrap installation experience',
+        'Detailing or paint correction experience',
+        'Bilingual (English / Spanish)',
+      ],
+      benefits: [
+        'Paid, hands-on training directly from Mario and our certified 3M installers',
+        'Pay that grows with your install skills and speed',
+        'Weekday schedule — evenings and Sundays off',
+        'A clean shop and a team that has your back',
+        'Employee discount on tint, PPF, and ceramic coating',
+      ],
+    },
+    {
+      id: 'shop-assistant',
+      title: 'Shop Assistant',
+      short: 'Prep vehicles, support our installers, and keep the shop running — the best way to start a tint career.',
+      employmentType: 'PART_TIME',
+      employmentLabel: 'Part-time (15–25 hrs/week)',
+      datePosted: '2026-09-25',
+      validThrough: '2026-12-31',
+      schedule: 'Weekdays, flexible shifts · some Saturday availability preferred',
+      summary:
+        "A reliable, detail-oriented team member to assist with window tinting and general shop operations in a hands-on, fast-paced environment. It's the entry point into the trade: you'll learn tint installation from the ground up and have a real opportunity to grow into a full installer role.",
+      responsibilities: [
+        {
+          heading: 'Day to day',
+          items: [
+            'Assist with automotive window tint and paint protection film installation',
+            'Prepare vehicles for install — cleaning, taping, and setup',
+            'Support our installers with the daily workflow',
+            'Keep the bays and workspace clean, dust-free, and organized',
+            'Handle shop tasks — inventory, tools, supplies, and trash',
+          ],
+        },
+      ],
+      requirements: [
+        '18 years or older',
+        'Strong attention to detail',
+        'Reliable and punctual attendance',
+        'Willingness to learn',
+        'Comfortable working on your feet in a garage / shop setting',
+      ],
+      niceToHave: [
+        'Prior automotive or detailing experience — preferred but not required',
+        'A valid driver’s license',
+      ],
+      benefits: [
+        'Opportunity to learn window tinting and grow into a full installer role',
+        'Growth potential into a full-time position',
+        'Skill-based, hands-on work environment',
+        'Employee discount on tint, PPF, and ceramic coating',
+      ],
+    },
+    {
+      id: 'receptionist-sales',
+      title: 'Receptionist / Sales',
+      short: 'Be the first voice customers hear — answer calls, give honest quotes, and book the shop’s calendar.',
+      employmentType: 'FULL_TIME',
+      employmentLabel: 'Full-time',
+      datePosted: '2026-09-25',
+      validThrough: '2026-12-31',
+      schedule: 'Mon–Fri, 8:00 a.m. – 5:00 p.m.',
+      summary:
+        "You'll be the first person customers talk to. Answer phones, walk people through their options at the counter, give honest quotes, and keep the booking calendar full. If you genuinely enjoy talking to people and helping them pick the right thing — not pushing the priciest one — this job is for you. We'll teach you the products.",
+      responsibilities: [
+        {
+          heading: 'Front desk & sales',
+          items: [
+            'Greet walk-in customers and answer phone calls, texts, and online quote requests',
+            'Run customer consultations and explain tint, PPF, and ceramic coating options in plain language',
+            'Give honest, accurate quotes and follow up on open estimates',
+            'Explain Tennessee tint laws so customers pick a legal shade',
+            'Schedule appointments and keep the shop calendar organized',
+            'Check vehicles in and out and take payments',
+          ],
+        },
+      ],
+      requirements: [
+        '18 years or older',
+        'You enjoy talking to people — friendly and clear in person and on the phone',
+        'Organized, reliable, and on time',
+        'Basic computer and smartphone skills',
+        'Willing to learn — experience is a plus, not required',
+      ],
+      niceToHave: [
+        'Customer service, sales, or front-desk experience',
+        'Automotive or car-audio / accessories background',
+        'Bilingual (English / Spanish)',
+      ],
+      benefits: [
+        'Paid training on our full 3M product line',
+        'Weekday schedule — evenings and Sundays off',
+        'A busy shop with a steady flow of customers who already trust us',
+        'Employee discount on tint, PPF, and ceramic coating',
+      ],
+    },
+  ] as JobOpening[],
+};
 
 // ── Social profiles ─────────────────────────────────────────────────
 export const SOCIALS = [

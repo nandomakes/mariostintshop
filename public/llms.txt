@@ -51,6 +51,12 @@ fact below is `src/consts.ts` in the site repository — update both together.
   interactive 3D preview of tint shades and PPF coverage on a vehicle, with the
   resulting build sendable to the shop as a free quote request.
 
+## Careers
+
+- [Careers](https://www.mariostintshop.com/careers/): open positions at the
+  shop — currently hiring a Window Tint Installer, Shop Assistant, and
+  Receptionist / Sales in Murfreesboro, TN, with paid training. Apply online.
+
 ## Common questions
 
 - **Pricing:** every vehicle is quoted individually and for free. Price depends on

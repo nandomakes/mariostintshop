@@ -1,5 +1,5 @@
 ---
-import { NAV_LINKS, CONTACT, SOCIALS } from '../consts';
+import { NAV_LINKS, CONTACT, SOCIALS, CAREERS, CAREERS_LINK } from '../consts';
 import Logo from './Logo.astro';
 
 // Most nav links are same-page anchors (/#about); only the standalone routes
@@ -32,7 +32,20 @@ const isCurrent = (href: string) => {
       </span>
     </div>
     <div class="flex items-center gap-6">
-      <span class="flex items-center gap-1.5">
+      <a
+        href={CAREERS_LINK.href}
+        aria-current={isCurrent(CAREERS_LINK.href) ? 'page' : undefined}
+        class="flex items-center gap-2 whitespace-nowrap font-bold uppercase tracking-[0.14em] text-accent transition-colors hover:text-paper"
+      >
+        {CAREERS.hiring && (
+          <span class="relative flex h-2 w-2" aria-hidden="true">
+            <span class="hiring-dot absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+            <span class="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+          </span>
+        )}
+        {CAREERS.hiring ? "We're hiring" : CAREERS_LINK.label}
+      </a>
+      <span class="hidden items-center gap-1.5 whitespace-nowrap lg:flex">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00A8FF" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></svg>
         {CONTACT.scheduleShort}
       </span>
@@ -178,6 +191,18 @@ const isCurrent = (href: string) => {
             </li>
           ))
         }
+        <li>
+          <a
+            href={CAREERS_LINK.href}
+            aria-current={isCurrent(CAREERS_LINK.href) ? 'page' : undefined}
+            class="flex items-center justify-between border-b border-line py-3.5 text-sm font-bold uppercase tracking-[0.16em] text-smoke transition-colors duration-200 hover:text-accent aria-[current=page]:text-accent"
+          >
+            {CAREERS_LINK.label}
+            {CAREERS.hiring && (
+              <span class="bg-accent px-2 py-0.5 text-[9px] tracking-[0.12em] text-ink">We're hiring</span>
+            )}
+          </a>
+        </li>
         <li class="py-4">
           <a
             href={quoteHref}
@@ -190,6 +215,24 @@ const isCurrent = (href: string) => {
     </div>
   </div>
 </header>
+
+<style>
+  .hiring-dot {
+    animation: hiring-dot 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+  @keyframes hiring-dot {
+    75%,
+    100% {
+      transform: scale(2.4);
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hiring-dot {
+      animation: none;
+    }
+  }
+</style>
 
 <script>
   const toggle = document.getElementById('menu-toggle');
