@@ -82,7 +82,7 @@ export const HERO = {
   // hero column is narrow, so "Paint Protection" spelled out wrapped to six
   // lines on mobile. "PPF" is the term customers search anyway.
   line1: '3M Window Tint & PPF',
-  line2: 'in Murfreesboro, TN',
+  line2: 'in Murfreesboro, TN',
   sub: "Mario's Tint Shop is the premier provider of 3M automotive and architectural window tinting, paint protection film, and ceramic coating services to customers in Middle Tennessee.",
   address: 'We are ready for you at: ',
   addressPlace: '515 NW Broad St, Murfreesboro, TN 37130',

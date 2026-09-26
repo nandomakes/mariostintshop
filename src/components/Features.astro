@@ -15,14 +15,14 @@ import { BENEFITS, STATS, CONTACT } from '../consts';
     <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
       {
         BENEFITS.map((b) => (
-          <div class="lift border border-sand bg-paper px-6 py-9 text-center shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
+          <div class="lift border border-sand bg-paper px-4 py-9 text-center sm:px-6 shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
             <span class="mx-auto flex h-14 w-14 items-center justify-center bg-accent text-ink" aria-hidden="true">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Z" />
                 <path d="m9 12 2 2 4-4" />
               </svg>
             </span>
-            <h3 class="headline mt-5 text-base tracking-[0.06em] text-ink">{b.title}</h3>
+            <h3 class="headline mt-5 text-[13px] tracking-[0.03em] text-ink sm:text-base sm:tracking-[0.06em]">{b.title}</h3>
             <p class="mt-3 text-sm leading-relaxed text-char">{b.body}</p>
           </div>
         ))

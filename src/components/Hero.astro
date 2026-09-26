@@ -1,6 +1,6 @@
 ---
 import { Picture } from 'astro:assets';
-import { HERO, IMAGES } from '../consts';
+import { HERO, IMAGES, CAREERS } from '../consts';
 import Ticker from './Ticker.astro';
 ---
 
@@ -36,9 +36,28 @@ import Ticker from './Ticker.astro';
         832px. The subcopy keeps its own max-w-[52ch], so the paragraph measure
         is unaffected by the wider cap. */}
     <div class="w-full max-w-4xl sm:pl-6 md:pl-16">
+      {
+        CAREERS.hiring && CAREERS.openings.length > 0 && (
+          <a
+            href="/careers/#openings"
+            class="reveal pressable group mb-5 inline-flex items-center gap-2.5 whitespace-nowrap border border-accent/60 bg-ink/70 py-2 pl-3 pr-3.5 text-[10px] font-bold uppercase tracking-[0.14em] text-paper backdrop-blur-sm transition-colors duration-200 hover:border-accent hover:bg-ink md:mb-6 md:text-[11px]"
+          >
+            <span class="relative flex h-2 w-2" aria-hidden="true">
+              <span class="hero-hiring-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+              <span class="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+            </span>
+            <span class="text-accent">We're hiring</span>
+            <span class="text-line" aria-hidden="true">|</span>
+            {CAREERS.openings.length} open jobs
+            <span class="font-black text-accent transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden="true">&gt;</span>
+          </a>
+        )
+      }
       <p class="reveal kicker text-[clamp(1rem,3vw,1.35rem)] text-accent">{HERO.kicker}</p>
 
-      <h1 class="reveal headline mt-3 text-[clamp(1.6rem,4.5vw,3.25rem)] text-paper md:mt-4">
+      {/* 1.3rem floor keeps each line whole on a 375px phone; at 1.6rem the
+          H1 broke into four lines with "TN" orphaned on the last. */}
+      <h1 class="reveal headline mt-3 text-[clamp(1.3rem,4.5vw,3.25rem)] text-paper md:mt-4">
         {/* The space before <br> is deliberate: without it the extracted text
             of the H1 reads "…Protectionin Murfreesboro, TN". It renders
             invisibly, since trailing whitespace before a line break collapses. */}
@@ -69,3 +88,21 @@ import Ticker from './Ticker.astro';
   <!-- Single ticker strip for the whole site -->
   <Ticker />
 </section>
+
+<style>
+  .hero-hiring-ping {
+    animation: hero-hiring-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+  @keyframes hero-hiring-ping {
+    75%,
+    100% {
+      transform: scale(2.4);
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-hiring-ping {
+      animation: none;
+    }
+  }
+</style>

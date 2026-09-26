@@ -83,6 +83,12 @@
     transform: none;
   }
 
+  /* A phone number or email split across two lines reads as two things. */
+  a[href^='tel:'],
+  a[href^='mailto:'] {
+    white-space: nowrap;
+  }
+
   .pressable {
     transition: transform 160ms var(--ease-out);
   }

@@ -32,9 +32,9 @@ const { turnaround, headline = WARRANTY.headline, body = WARRANTY.body } = Astro
       </div>
 
       <ul class="reveal grid gap-4">
-        <li class="flex items-start gap-4 border border-sand bg-paper p-5 shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
+        <li class="flex items-start gap-3 border border-sand bg-paper p-4 sm:gap-4 sm:p-5 shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
           <span
-            class="flex h-11 w-11 shrink-0 items-center justify-center bg-accent text-ink"
+            class="flex h-10 w-10 shrink-0 items-center justify-center bg-accent text-ink sm:h-11 sm:w-11"
             aria-hidden="true"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
@@ -42,7 +42,7 @@ const { turnaround, headline = WARRANTY.headline, body = WARRANTY.body } = Astro
             </svg>
           </span>
           <span>
-            <span class="headline block text-sm tracking-[0.06em] text-ink">
+            <span class="headline block text-[11px] tracking-[0.02em] text-ink sm:text-sm sm:tracking-[0.06em]">
               Manufacturer-backed
             </span>
             <span class="mt-1 block text-sm leading-relaxed text-char">
@@ -53,9 +53,9 @@ const { turnaround, headline = WARRANTY.headline, body = WARRANTY.body } = Astro
 
         {
           turnaround && (
-            <li class="flex items-start gap-4 border border-sand bg-paper p-5 shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
+            <li class="flex items-start gap-3 border border-sand bg-paper p-4 sm:gap-4 sm:p-5 shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
               <span
-                class="flex h-11 w-11 shrink-0 items-center justify-center bg-accent text-ink"
+                class="flex h-10 w-10 shrink-0 items-center justify-center bg-accent text-ink sm:h-11 sm:w-11"
                 aria-hidden="true"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
@@ -63,16 +63,16 @@ const { turnaround, headline = WARRANTY.headline, body = WARRANTY.body } = Astro
                 </svg>
               </span>
               <span>
-                <span class="headline block text-sm tracking-[0.06em] text-ink">Turnaround</span>
+                <span class="headline block text-[11px] tracking-[0.02em] text-ink sm:text-sm sm:tracking-[0.06em]">Turnaround</span>
                 <span class="mt-1 block text-sm leading-relaxed text-char">{turnaround}</span>
               </span>
             </li>
           )
         }
 
-        <li class="flex items-start gap-4 border border-sand bg-paper p-5 shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
+        <li class="flex items-start gap-3 border border-sand bg-paper p-4 sm:gap-4 sm:p-5 shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
           <span
-            class="flex h-11 w-11 shrink-0 items-center justify-center bg-accent text-ink"
+            class="flex h-10 w-10 shrink-0 items-center justify-center bg-accent text-ink sm:h-11 sm:w-11"
             aria-hidden="true"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
@@ -80,7 +80,7 @@ const { turnaround, headline = WARRANTY.headline, body = WARRANTY.body } = Astro
             </svg>
           </span>
           <span>
-            <span class="headline block text-sm tracking-[0.06em] text-ink">
+            <span class="headline block text-[11px] tracking-[0.02em] text-ink sm:text-sm sm:tracking-[0.06em]">
               Questions first, quote second
             </span>
             <span class="mt-1 block text-sm leading-relaxed text-char">
