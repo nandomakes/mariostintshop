@@ -47,9 +47,8 @@ export async function POST(request) {
   const position = field(form, 'position');
   const experience = field(form, 'experience');
   const availability = field(form, 'availability');
-  const employmentType = field(form, 'employmentType');
 
-  if (!position || !name || !phone || !experience || !employmentType || !availability) {
+  if (!position || !name || !phone || !experience || !availability) {
     return json(400, { error: 'Please fill in every field.' });
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -77,7 +76,6 @@ export async function POST(request) {
     ['Email', email],
     ['Phone', phone],
     ['Experience', experience || '—'],
-    ['Looking for', employmentType || '—'],
     ['Can start', availability || '—'],
   ];
   const html = `

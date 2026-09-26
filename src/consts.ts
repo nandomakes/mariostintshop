@@ -812,17 +812,13 @@ export interface JobOpening {
   id: string;
   title: string;
   short: string; // one-liner for the homepage band and the job index cards
-  employmentType: 'FULL_TIME' | 'PART_TIME';
-  employmentLabel: string;
   datePosted: string; // YYYY-MM-DD
   validThrough: string; // YYYY-MM-DD — Google drops the listing after this date
-  pay?: { min: number; max: number; unit: 'HOUR' | 'YEAR'; label: string }; // ⚠️ REPLACE with real pay
   schedule: string;
   summary: string;
   responsibilities: { heading: string; items: string[] }[];
   requirements: string[];
   niceToHave: string[];
-  benefits: string[];
 }
 
 export const CAREERS = {
@@ -831,14 +827,11 @@ export const CAREERS = {
   headline: 'Join the Mario’s Tint Shop crew',
   intro:
     "We're a busy, family-run 3M Platinum Dealer in Murfreesboro with 390+ five-star reviews — and we're growing. If you take pride in doing things right and treating people well, we'd like to meet you. No tint experience? We'll teach you how we do it — applications go straight to Mario, no recruiters.",
-  // ⚠️ CONFIRM WITH CLIENT — employment type, schedule, benefits, and pay are drafts.
   openings: [
     {
       id: 'tint-installer',
       title: 'Window Tint Installer',
       short: 'Install 3M window film and paint protection film on everything from daily drivers to Teslas.',
-      employmentType: 'FULL_TIME',
-      employmentLabel: 'Full-time',
       datePosted: '2026-09-25',
       validThrough: '2026-12-31',
       schedule: 'Mon–Fri, 8:00 a.m. – 5:00 p.m. · some Saturdays by appointment',
@@ -867,20 +860,11 @@ export const CAREERS = {
         'Detailing or paint correction experience',
         'Bilingual (English / Spanish)',
       ],
-      benefits: [
-        'Paid, hands-on training directly from Mario and our certified 3M installers',
-        'Pay that grows with your install skills and speed',
-        'Weekday schedule — evenings and Sundays off',
-        'A clean shop and a team that has your back',
-        'Employee discount on tint, PPF, and ceramic coating',
-      ],
     },
     {
       id: 'shop-assistant',
       title: 'Shop Assistant',
       short: 'Prep vehicles, support our installers, and keep the shop running — the best way to start a tint career.',
-      employmentType: 'PART_TIME',
-      employmentLabel: 'Part-time (15–25 hrs/week)',
       datePosted: '2026-09-25',
       validThrough: '2026-12-31',
       schedule: 'Weekdays, flexible shifts · some Saturday availability preferred',
@@ -909,19 +893,11 @@ export const CAREERS = {
         'Prior automotive or detailing experience — preferred but not required',
         'A valid driver’s license',
       ],
-      benefits: [
-        'Opportunity to learn window tinting and grow into a full installer role',
-        'Growth potential into a full-time position',
-        'Skill-based, hands-on work environment',
-        'Employee discount on tint, PPF, and ceramic coating',
-      ],
     },
     {
       id: 'receptionist-sales',
       title: 'Receptionist / Sales',
       short: 'Be the first voice customers hear — answer calls, give honest quotes, and book the shop’s calendar.',
-      employmentType: 'FULL_TIME',
-      employmentLabel: 'Full-time',
       datePosted: '2026-09-25',
       validThrough: '2026-12-31',
       schedule: 'Mon–Fri, 8:00 a.m. – 5:00 p.m.',
@@ -951,12 +927,6 @@ export const CAREERS = {
         'Customer service, sales, or front-desk experience',
         'Automotive or car-audio / accessories background',
         'Bilingual (English / Spanish)',
-      ],
-      benefits: [
-        'Paid training on our full 3M product line',
-        'Weekday schedule — evenings and Sundays off',
-        'A busy shop with a steady flow of customers who already trust us',
-        'Employee discount on tint, PPF, and ceramic coating',
       ],
     },
   ] as JobOpening[],

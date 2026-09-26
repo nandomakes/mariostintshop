@@ -16,8 +16,12 @@ pnpm-debug.log*
 
 # environment variables
 .env
+.env.local
 .env.production
 .env.*.local
+
+# Vercel CLI project link (`vercel env pull` also writes .env.local)
+.vercel
 
 # source/original imagery (optimized copies live in public/images) — keep out
 # of the repo and the deploy; these raw files are hundreds of MB

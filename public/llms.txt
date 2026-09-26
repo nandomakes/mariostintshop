@@ -55,7 +55,7 @@ fact below is `src/consts.ts` in the site repository — update both together.
 
 - [Careers](https://www.mariostintshop.com/careers/): open positions at the
   shop — currently hiring a Window Tint Installer, Shop Assistant, and
-  Receptionist / Sales in Murfreesboro, TN, with paid training. Apply online.
+  Receptionist / Sales in Murfreesboro, TN, with hands-on training. Apply online.
 
 ## Common questions
 

@@ -9,7 +9,7 @@ import { SITE, CONTACT, CAREERS, IMAGES, SOCIALS } from '../consts';
 const jobs = CAREERS.openings;
 const title = `Careers: Tint Installer & Shop Jobs in Murfreesboro, TN | ${SITE.brand}`;
 const description =
-  "Now hiring in Murfreesboro, TN: Window Tint Installer, Shop Assistant, and Receptionist / Sales. Paid training on 3M film. Apply online in 2 minutes.";
+  "Now hiring in Murfreesboro, TN: Window Tint Installer, Shop Assistant, and Receptionist / Sales. Hands-on training on 3M film. Apply online in 2 minutes.";
 
 const list = (items: string[]) => `<ul>${items.map((i) => `<li>${i}</li>`).join('')}</ul>`;
 
@@ -33,13 +33,11 @@ const schema = [
       ...job.responsibilities.map((r) => `<p><strong>${r.heading}</strong></p>${list(r.items)}`),
       `<p><strong>Requirements</strong></p>${list(job.requirements)}`,
       `<p><strong>Nice to have</strong></p>${list(job.niceToHave)}`,
-      `<p><strong>Benefits</strong></p>${list(job.benefits)}`,
       `<p><strong>Schedule:</strong> ${job.schedule}</p>`,
     ].join(''),
     identifier: { '@type': 'PropertyValue', name: SITE.brand, value: job.id },
     datePosted: job.datePosted,
     validThrough: `${job.validThrough}T23:59:59-06:00`,
-    employmentType: job.employmentType,
     hiringOrganization: {
       '@type': 'Organization',
       '@id': `${SITE.url}/#business`,
@@ -60,20 +58,6 @@ const schema = [
     },
     directApply: true,
     url: `${SITE.url}/careers/#${job.id}`,
-    ...(job.pay
-      ? {
-          baseSalary: {
-            '@type': 'MonetaryAmount',
-            currency: 'USD',
-            value: {
-              '@type': 'QuantitativeValue',
-              minValue: job.pay.min,
-              maxValue: job.pay.max,
-              unitText: job.pay.unit,
-            },
-          },
-        }
-      : {}),
   })),
 ];
 
@@ -107,10 +91,7 @@ const labelCls = 'block text-[11px] font-bold uppercase tracking-[0.14em] text-i
                 href={`#${job.id}`}
                 class="lift group flex flex-col border border-sand bg-paper p-6 shadow-[0_2px_10px_rgba(0,0,0,0.05)] transition-colors hover:border-accent"
               >
-                <span class="self-start bg-mint px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-accentDk">
-                  {job.employmentLabel}
-                </span>
-                <h3 class="headline mt-4 text-[15px] tracking-[0.03em] text-ink sm:text-lg sm:tracking-[0.04em]">{job.title}</h3>
+                <h3 class="headline text-[15px] tracking-[0.03em] text-ink sm:text-lg sm:tracking-[0.04em]">{job.title}</h3>
                 <p class="mt-3 flex-1 text-sm leading-relaxed text-char">{job.short}</p>
                 <span class="mt-5 text-[11px] font-bold uppercase tracking-[0.12em] text-accentDk">
                   View details <span class="font-black" aria-hidden="true">&gt;</span>
@@ -166,16 +147,6 @@ const labelCls = 'block text-[11px] font-bold uppercase tracking-[0.14em] text-i
                 <div class="border border-sand bg-paper p-7 shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
                   <dl class="space-y-4 text-sm">
                     <div>
-                      <dt class={labelCls}>Job type</dt>
-                      <dd class="mt-1 text-char">{job.employmentLabel}</dd>
-                    </div>
-                    {job.pay && (
-                      <div>
-                        <dt class={labelCls}>Pay</dt>
-                        <dd class="mt-1 text-char">{job.pay.label}</dd>
-                      </div>
-                    )}
-                    <div>
                       <dt class={labelCls}>Schedule</dt>
                       <dd class="mt-1 text-char">{job.schedule}</dd>
                     </div>
@@ -184,15 +155,6 @@ const labelCls = 'block text-[11px] font-bold uppercase tracking-[0.14em] text-i
                       <dd class="mt-1 text-char">{CONTACT.address}, {CONTACT.city}</dd>
                     </div>
                   </dl>
-                  <h3 class="headline mt-7 text-base tracking-[0.06em] text-ink">Benefits</h3>
-                  <ul class="mt-3 space-y-2.5">
-                    {job.benefits.map((b) => (
-                      <li class="flex items-start gap-2.5 text-sm leading-relaxed text-char">
-                        <span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center bg-accent text-ink" aria-hidden="true" set:html={check} />
-                        {b}
-                      </li>
-                    ))}
-                  </ul>
                   <a
                     href="#apply"
                     data-position={job.title}
@@ -267,15 +229,6 @@ const labelCls = 'block text-[11px] font-bold uppercase tracking-[0.14em] text-i
                   </select>
                 </div>
                 <div>
-                  <label for="f-type" class={labelCls}>Looking for *</label>
-                  <select id="f-type" name="employmentType" required class={inputCls}>
-                    <option value="" disabled selected>Select…</option>
-                    <option>Full-time</option>
-                    <option>Part-time</option>
-                    <option>Either</option>
-                  </select>
-                </div>
-                <div class="sm:col-span-2">
                   <label for="f-availability" class={labelCls}>When can you start? *</label>
                   <input id="f-availability" name="availability" type="text" required placeholder="e.g. Immediately, in 2 weeks" class={inputCls} />
                 </div>
