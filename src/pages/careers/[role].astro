@@ -1,0 +1,12 @@
+---
+import CareersPage from '../../components/CareersPage.astro';
+import { CAREERS } from '../../consts';
+
+export function getStaticPaths() {
+  return CAREERS.openings.map((job) => ({ params: { role: job.id }, props: { job } }));
+}
+
+const { job } = Astro.props;
+---
+
+<CareersPage job={job} />

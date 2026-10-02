@@ -56,6 +56,12 @@ fact below is `src/consts.ts` in the site repository — update both together.
 - [Careers](https://www.mariostintshop.com/careers/): open positions at the
   shop — currently hiring a Window Tint Installer, Shop Assistant, and
   Receptionist / Sales in Murfreesboro, TN, with hands-on training. Apply online.
+- [Window Tint Installer](https://www.mariostintshop.com/careers/tint-installer/):
+  install 3M window film and PPF; experience a plus, not required.
+- [Shop Assistant](https://www.mariostintshop.com/careers/shop-assistant/):
+  entry-level shop role that trains into a full installer position.
+- [Receptionist / Sales](https://www.mariostintshop.com/careers/receptionist-sales/):
+  front desk, phone quotes, and booking the shop calendar.
 
 ## Common questions
 
