@@ -24,7 +24,7 @@ const img = IMAGES[service.pageImage ?? service.image];
 // service sets splitImage so the same picture no longer appears twice within
 // one screen of scrolling.
 const splitImg = IMAGES[service.splitImage ?? service.pageImage ?? service.image];
-const title = `${service.name} in Murfreesboro, TN | ${SITE.brand}`;
+const title = service.metaTitle ?? `${service.name} in Murfreesboro, TN | ${SITE.brand}`;
 // heroSubcopy doubles as page copy, so a service can override just the meta
 // when its hero paragraph runs past what Google will display.
 const description = service.metaDescription ?? service.heroSubcopy;

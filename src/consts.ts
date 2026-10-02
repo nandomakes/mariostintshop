@@ -255,6 +255,9 @@ export interface Service {
   includes: string[]; // "what's included" rows for the packages section
   // Per-service page content:
   heroSubcopy: string;
+  /** Overrides the default "{name} in Murfreesboro, TN | brand" <title> when
+   *  that runs past the ~60 chars Google shows. */
+  metaTitle?: string;
   /** Overrides heroSubcopy as the <meta description>. Set it when the hero
    *  copy reads well on the page but runs past the ~155 chars Google shows. */
   metaDescription?: string;
@@ -350,6 +353,7 @@ export const SERVICES: Service[] = [
     splitWord: 'PPF',
     kicker: 'Paint Protection',
     name: 'Paint Protection Film (PPF)',
+    metaTitle: "PPF & Clear Bra in Murfreesboro, TN | Mario's Tint Shop",
     short:
       'Professional clear bra installation by certified 3M installers — self-healing defense against scratches, UV damage, and rock chips.',
     meta: '3M Paint Protection Film · 10-year warranty',
@@ -472,7 +476,7 @@ export const SERVICES: Service[] = [
     heroSubcopy:
       'The leading 3M installer for Tesla owners in the Nashville area — precision-fit window tint, paint protection film, and ceramic coating for every Tesla model.',
     metaDescription:
-      'Precision-fit 3M window tint, PPF, and ceramic coating for every Tesla model — Model 3, Y, S, X, and Cybertruck. Murfreesboro, TN.',
+      'Precision-fit 3M window tint, PPF, and ceramic coating for every Tesla model — Model 3, Y, S, X, and Cybertruck — in Murfreesboro, TN. Free quotes.',
     intro:
       "As a leading installer of high-quality 3M automotive products in the Nashville area, Mario's Tint Shop offers Tesla owners a comprehensive range of services to enhance the comfort, appearance, and protection of their electric vehicles. We understand the unique specifications of all Tesla models, ensuring a precision fit and flawless finish for every installation.",
     features: [
@@ -514,6 +518,7 @@ export const SERVICES: Service[] = [
     splitWord: 'Commercial',
     kicker: 'Commercial Films',
     name: 'Office & Commercial Films',
+    metaTitle: "Commercial Window Film, Murfreesboro TN | Mario's Tint Shop",
     short:
       '3M window tinting solutions for office and commercial buildings — professional installation for optimal protection and energy efficiency.',
     meta: '3M Prestige · Ceramic · Night Vision · Low-E',
@@ -527,7 +532,7 @@ export const SERVICES: Service[] = [
     heroSubcopy:
       'Enhance your business environment with 3M commercial and office window films — heat rejection up to 97% IR, 99% UV blocking, energy savings, and preserved views.',
     metaDescription:
-      '3M office and commercial window film in Murfreesboro, TN — up to 97% IR heat rejection, 99% UV blocking, and lower energy bills.',
+      '3M office and commercial window film in Murfreesboro, TN — up to 97% IR heat rejection, 99% UV blocking, and lower energy bills. Request a quote today.',
     intro:
       "At Mario's Tint Shop, we understand the importance of creating a comfortable, functional, and aesthetically pleasing environment for your business and employees. We install 3M architectural films that reject heat, block 99% of UV rays, and lower energy costs — with paybacks in as little as three years.",
     features: [
