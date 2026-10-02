@@ -175,9 +175,11 @@ const ga4Id = import.meta.env.PUBLIC_GA4_ID ?? GA4_ID;
           <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`} />
           <script is:inline define:vars={{ ga4Id }}>
             window.dataLayer = window.dataLayer || [];
-            function gtag() {
+            // define:vars wraps this script in an IIFE, so a plain `function gtag`
+            // stays private. Other scripts (the careers form) call window.gtag.
+            window.gtag = function gtag() {
               dataLayer.push(arguments);
-            }
+            };
             gtag('js', new Date());
             gtag('config', ga4Id);
 
