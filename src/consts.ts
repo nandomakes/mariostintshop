@@ -62,9 +62,10 @@ export const CONTACT = {
       opens: '08:00',
       closes: '17:00',
     },
-    // Saturday is appointment-only; marked as such rather than omitted, so
-    // Google doesn't show the shop as closed on Saturdays.
-    { days: ['Saturday'], opens: '09:00', closes: '15:00', byAppointment: true },
+    // Saturday is appointment-only, so it has no posted hours to declare. The
+    // old 09:00–15:00 entry was invented and contradicted both the site copy
+    // and the Google Business profile. The "by appointment" wording lives in
+    // `hours`/`schedule` above; keep GBP saying the same thing.
   ],
   geo: { lat: 35.8470688, lng: -86.3974265 },
   googleBusinessUrl:
