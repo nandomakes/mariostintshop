@@ -14,7 +14,7 @@ fact below is `src/consts.ts` in the site repository — update both together.
 - **Address:** 515 NW Broad St, Murfreesboro, TN 37130, United States
 - **Phone:** (615) 410-7170
 - **Email:** mario@mariostintshop.com
-- **Hours:** Monday–Friday 8:00 a.m. – 5:00 p.m.; Saturday by appointment; Sunday closed
+- **Hours:** Monday–Friday 8:00 a.m. – 5:00 p.m.; Saturday 8 AM–12 PM, by appointment; Sunday closed
 - **Service area:** Murfreesboro, Smyrna, La Vergne, Lebanon, Franklin, Brentwood,
   Nashville, Rutherford County, and Middle Tennessee
 - **Credentials:** Authorized 3M Platinum Dealer · BBB A+ accredited · 25+ years in business
@@ -67,7 +67,7 @@ fact below is `src/consts.ts` in the site repository — update both together.
 
 - **Pricing:** every vehicle is quoted individually and for free. Price depends on
   the vehicle, the number of windows, and the 3M tier chosen. Call (615) 410-7170.
-- **Booking:** appointments recommended; Saturdays are appointment-only.
+- **Booking:** appointments recommended; Saturday 8 AM–12 PM, by appointment.
 - **Combining services:** tint, PPF, and ceramic coating are all done in-house in a
   single appointment. When combining PPF and coating, the film goes on first and
   the coating is applied over it.
