@@ -38,8 +38,16 @@ export async function POST(request) {
     return json(400, { error: 'Invalid submission.' });
   }
 
-  // Honeypot: real visitors never see this field, bots fill everything.
-  if (field(form, 'company')) return json(200, { ok: true });
+  // Honeypot: real visitors never see this field, bots fill everything. The bot
+  // still gets a 200 so it doesn't retry, but the drop is logged so a real
+  // applicant caught by it shows up in the function logs.
+  if (field(form, 'hp_website_confirm')) {
+    console.warn('apply: honeypot triggered', {
+      position: field(form, 'position'),
+      ua: request.headers.get('user-agent'),
+    });
+    return json(200, { ok: true });
+  }
 
   const name = field(form, 'name');
   const email = field(form, 'email');
@@ -91,22 +99,40 @@ export async function POST(request) {
     <p style="font-family:sans-serif;font-size:12px;color:#999">Sent from the careers page on mariostintshop.com. Reply to this email to answer the applicant directly.</p>
   `;
 
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from,
-      to: to.split(',').map((s) => s.trim()).filter(Boolean),
-      reply_to: email,
-      subject: `Job application: ${position} — ${name}`,
-      html,
-      attachments,
-    }),
-  });
+  const sendError = 'We could not send your application. Please try again or call the shop.';
+  let res;
+  try {
+    res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from,
+        to: to.split(',').map((s) => s.trim()).filter(Boolean),
+        reply_to: email,
+        subject: `Job application: ${position} — ${name}`,
+        html,
+        attachments,
+      }),
+    });
+  } catch (err) {
+    console.error('apply: Resend request failed', err);
+    return json(502, { error: sendError });
+  }
+
+  // Read the body once. Resend answers JSON, but a proxy/gateway error page
+  // might not be, so fall back to the raw text for the log.
+  const text = await res.text();
+  let body;
+  try {
+    body = JSON.parse(text);
+  } catch {
+    body = { raw: text };
+  }
 
   if (!res.ok) {
-    console.error('apply: Resend error', res.status, await res.text());
-    return json(502, { error: 'We could not send your application. Please try again or call the shop.' });
+    console.error('apply: Resend error', res.status, body);
+    return json(502, { error: sendError });
   }
-  return json(200, { ok: true });
+  console.log('apply: sent', { id: body.id, to, position });
+  return json(200, { ok: true, id: body.id });
 }
