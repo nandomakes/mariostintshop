@@ -46,14 +46,14 @@ export const CONTACT = {
   phoneDisplay: PHONE_DISPLAY,
   phoneTel: PHONE_TEL,
   email: 'mario@mariostintshop.com',
-  schedule: 'Mon–Fri, 8:00 a.m. to 5:00 p.m. · Sat by appointment',
+  schedule: 'Mon–Fri, 8:00 a.m. to 5:00 p.m. · Saturday 8 AM–12 PM, by appointment',
   scheduleShort: 'Mon–Fri 8–5',
   // Single source of truth for opening hours: the footer list and the
   // JSON-LD openingHoursSpecification are both derived from this, so the
   // three can no longer drift apart.
   hours: [
     { label: 'Mon–Fri', value: '8:00 a.m. – 5:00 p.m.' },
-    { label: 'Saturday', value: 'By appointment' },
+    { label: 'Saturday', value: '8 AM–12 PM, by appointment' },
     { label: 'Sunday', value: 'Closed' },
   ],
   hoursSpec: [
@@ -62,10 +62,9 @@ export const CONTACT = {
       opens: '08:00',
       closes: '17:00',
     },
-    // Saturday is appointment-only, so it has no posted hours to declare. The
-    // old 09:00–15:00 entry was invented and contradicted both the site copy
-    // and the Google Business profile. The "by appointment" wording lives in
-    // `hours`/`schedule` above; keep GBP saying the same thing.
+    // Saturday 8–12 by appointment — the same window the Google Business
+    // profile shows. Keep the two matching.
+    { days: ['Saturday'], opens: '08:00', closes: '12:00', byAppointment: true },
   ],
   geo: { lat: 35.8470688, lng: -86.3974265 },
   googleBusinessUrl:
@@ -608,7 +607,7 @@ export const HOME_FAQS: Faq[] = [
   },
   {
     q: 'Do I need an appointment, or can I walk in?',
-    a: 'We recommend booking. We are open Monday through Friday from 8:00 a.m. to 5:00 p.m., with Saturdays available by appointment. Call ahead and we will hold a bay for you rather than have you wait.',
+    a: 'We recommend booking. We are open Monday through Friday from 8:00 a.m. to 5:00 p.m., and Saturday 8 AM–12 PM, by appointment. Call ahead and we will hold a bay for you rather than have you wait.',
   },
   {
     q: 'What areas do you serve?',

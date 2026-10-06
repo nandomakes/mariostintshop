@@ -65,6 +65,7 @@ const business = {
     dayOfWeek: h.days,
     opens: h.opens,
     closes: h.closes,
+    ...(h.byAppointment ? { description: 'By appointment only' } : {}),
   })),
   areaServed:
     'Murfreesboro, Nashville, Smyrna, Lebanon, La Vergne, Franklin, Brentwood, Rutherford County, and Middle Tennessee',
