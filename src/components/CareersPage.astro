@@ -268,10 +268,14 @@ const labelCls = 'block text-[11px] font-bold uppercase tracking-[0.14em] text-i
                 />
                 <p class="mt-1.5 text-xs text-ash">PDF or Word, up to 4 MB.</p>
               </div>
-              <!-- Honeypot: hidden from people, filled in by bots. -->
-              <div class="absolute -left-[9999px]" aria-hidden="true">
-                <label for="f-company">Company</label>
-                <input id="f-company" name="company" type="text" tabindex="-1" autocomplete="off" />
+              <!-- Honeypot: hidden from people, filled in by bots. The name and
+                   label are deliberately ones Chrome's address autofill can't
+                   map (the old "Company" field got autofilled, silently
+                   dropping real applications); display:none keeps it out of
+                   autofill and the tab order entirely. -->
+              <div style="display:none" aria-hidden="true">
+                <label for="f-hp">Leave this field empty</label>
+                <input id="f-hp" name="hp_website_confirm" type="text" tabindex="-1" autocomplete="new-password" />
               </div>
 
               <p id="apply-status" class="hidden text-sm" role="status" aria-live="polite"></p>
