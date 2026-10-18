@@ -12,18 +12,23 @@ export const SITE = {
   city: 'Murfreesboro, TN',
   yearsInBusiness: '25+',
   license: 'BBB A+ Accredited · Authorized 3M Platinum Dealer',
-  // Kept under ~60 chars so Google shows it whole. The full service list
-  // ("PPF & Ceramic Coating") lives in the description and the H1 instead —
-  // the old 81-char title was truncated mid-phrase in the SERP.
-  title: "Window Tinting & PPF in Murfreesboro, TN | Mario's Tint Shop",
+  // Kept under ~60 chars so Google shows it whole. Leads with the two
+  // queries this shop needs to win — window tint and ceramic coating — plus
+  // the city. PPF stays in the description and the hero subcopy.
+  title: "Window Tint & Ceramic Coating in Murfreesboro, TN | Mario's",
   // Kept under ~155 chars so Google doesn't truncate it in search results.
   description:
-    "Mario's Tint Shop in Murfreesboro, TN provides top-notch automotive window tinting, paint protection film & ceramic coating. 25+ years, BBB A+ rated.",
+    "3M window tint and ceramic coating in Murfreesboro, TN. Heat rejection, UV protection, and a hydrophobic finish. 25+ years, BBB A+ rated.",
   // Must match `site` in astro.config.mjs. www, because Vercel 308-redirects
   // the apex to www — a non-www canonical would point at a redirect.
   url: 'https://www.mariostintshop.com',
   themeColor: '#111111',
 };
+
+// Last meaningful content update. WebPage and Service JSON-LD `dateModified`
+// read this. public/llms.txt is hand-maintained — keep its "Last updated"
+// line on the same date.
+export const CONTENT_UPDATED = '2026-10-18';
 
 // ── Analytics ───────────────────────────────────────────────────────
 // GA4 Measurement ID for this property. Hardcoded rather than env-only so a
@@ -46,14 +51,14 @@ export const CONTACT = {
   phoneDisplay: PHONE_DISPLAY,
   phoneTel: PHONE_TEL,
   email: 'mario@mariostintshop.com',
-  schedule: 'Mon–Fri, 8:00 a.m. to 5:00 p.m. · Saturday 8 AM–12 PM, by appointment',
-  scheduleShort: 'Mon–Fri 8–5',
+  schedule: 'Mon–Fri, 8:00 a.m. to 5:00 p.m. · Saturday 8:00 a.m. – 12:00 p.m., by appointment',
+  scheduleShort: 'Mon–Fri 8–5 · Sat 8–12 by appt',
   // Single source of truth for opening hours: the footer list and the
   // JSON-LD openingHoursSpecification are both derived from this, so the
   // three can no longer drift apart.
   hours: [
     { label: 'Mon–Fri', value: '8:00 a.m. – 5:00 p.m.' },
-    { label: 'Saturday', value: '8 AM–12 PM, by appointment' },
+    { label: 'Saturday', value: '8:00 a.m. – 12:00 p.m., by appointment' },
     { label: 'Sunday', value: 'Closed' },
   ],
   hoursSpec: [
@@ -76,14 +81,14 @@ export const CONTACT = {
 // ── Hero copy ───────────────────────────────────────────────────────
 export const HERO = {
   kicker: "Murfreesboro's Elite Tint Shop",
-  // The H1. Carries the service + city that search intent is actually built on,
-  // and is worded differently from SITE.title so the two don't duplicate.
-  // Keep both lines SHORT (~20 chars): the headline face is very wide and the
-  // hero column is narrow, so "Paint Protection" spelled out wrapped to six
-  // lines on mobile. "PPF" is the term customers search anyway.
-  line1: '3M Window Tint & PPF',
-  line2: 'in Murfreesboro, TN',
-  sub: "Mario's Tint Shop is the premier provider of 3M automotive and architectural window tinting, paint protection film, and ceramic coating services to customers in Middle Tennessee.",
+  // The H1. Three short lines so the wide headline face stays one line each
+  // on a 375px phone (the old "Paint Protection" spelling wrapped to six).
+  // Read together: "Window Tint & Ceramic Coating in Murfreesboro, TN".
+  // PPF stays in the subcopy directly underneath — it is not dropped.
+  line1: 'Window Tint &',
+  line2: 'Ceramic Coating',
+  line3: 'in Murfreesboro, TN',
+  sub: "Mario's Tint Shop installs 3M window tint and ceramic coating at 515 NW Broad St in Murfreesboro, plus paint protection film and commercial window film. Ceramic IR tint rejects up to 90% of infrared heat. A dual-layer ceramic coating lasts up to 5 years.",
   address: 'We are ready for you at: ',
   addressPlace: '515 NW Broad St, Murfreesboro, TN 37130',
 };
@@ -249,6 +254,9 @@ export interface Service {
   slug: string; // -> /services/{slug}
   kicker: string; // technical label (uppercase)
   name: string;
+  /** On-page H1. Cards and the nav keep `name`; a service page can use a
+   *  longer local heading without stretching those. */
+  pageTitle?: string;
   short: string; // card description on the home grid
   meta: string; // tagline / scope shown on the card
   startingPrice: string; // ⚠️ REPLACE with real pricing
@@ -297,8 +305,9 @@ export const SERVICES: Service[] = [
     splitWord: 'Tint',
     kicker: 'Window Tinting',
     name: 'Car Window Tinting',
+    pageTitle: 'Car Window Tinting in Murfreesboro',
     short:
-      'Quality 3M car window tinting that protects your vehicle, keeps your interior cooler, and blocks up to 99% of damaging UV rays.',
+      '3M car window tinting in Murfreesboro that rejects infrared heat, blocks up to 99% of UV rays, and leaves GPS and cell signal clear.',
     meta: '3M Obsidian · CS IR nano ceramic · Ceramic IR',
     startingPrice: 'Free quote',
     includes: [
@@ -307,12 +316,13 @@ export const SERVICES: Service[] = [
       'Platinum: 3M™ Ceramic IR — up to 90% IR rejection',
       'Lifetime warranty available',
     ],
+    metaTitle: "Window Tinting in Murfreesboro, TN | Mario's Tint Shop",
     heroSubcopy:
-      'Premium 3M™ Ceramic IR window tint in Murfreesboro — infrared heat rejection, up to 99% UV protection, less glare, and a stylish custom look for any vehicle.',
+      '3M car window tinting in Murfreesboro, TN — Ceramic IR film rejects up to 90% of infrared heat, blocks up to 99% of UV, and leaves GPS and cell signal clear.',
     metaDescription:
-      'Premium 3M™ Ceramic IR window tint in Murfreesboro, TN — up to 90% infrared heat rejection, 99% UV protection, and less glare on every drive.',
+      '3M car window tinting in Murfreesboro, TN. Ceramic IR rejects up to 90% of infrared heat and blocks up to 99% of UV, with no GPS or cell interference.',
     intro:
-      "Tennessee summers can make a vehicle unbearably hot. At Mario's Tint Shop in Murfreesboro, TN, we install premium 3M™ Ceramic IR window film engineered to reject infrared heat, block up to 99% of harmful UV rays, and give you a cooler, more comfortable drive. Whether you're commuting across Murfreesboro, running I-24, or parked in the summer sun, ceramic tint cuts heat and glare and protects your interior from fading. As an Authorized 3M Platinum Dealer we serve Murfreesboro, Smyrna, Lebanon, Franklin, Nashville and the surrounding Middle Tennessee area, with films tailored to every budget and performance need.",
+      "Mario's Tint Shop installs 3M car window tint at 515 NW Broad St in Murfreesboro, TN. Ceramic IR film rejects up to 90% of infrared heat and blocks up to 99% of harmful UV rays, and the non-metallized film does not interfere with GPS, Bluetooth, cell phone, or satellite radio. Choose Silver (3M Obsidian carbon), Gold (3M CS IR nano ceramic), or Platinum (3M Ceramic IR). Tennessee law requires a minimum of 35% VLT on front side, rear side, and rear windows, and we help you pick a legal shade. Lifetime warranty is available. We serve Murfreesboro, Smyrna, Lebanon, Franklin, Nashville, and the surrounding Middle Tennessee area.",
     features: [
       { title: 'Infrared Heat Rejection', body: '3M™ Ceramic IR rejects up to 90% of infrared heat — the part of sunlight you actually feel — so the cabin stays cooler and your A/C works less.' },
       { title: 'Up to 99% UV Protection', body: 'Our premium ceramic and carbon films block up to 99% of damaging UVA and UVB rays, protecting leather, vinyl, dashboards, and upholstery from fading and cracking.' },
@@ -328,7 +338,8 @@ export const SERVICES: Service[] = [
       'Final inspection and cure-time care instructions',
     ],
     faqs: [
-      { q: 'How dark can I legally tint in Tennessee?', a: 'Tennessee allows a minimum of 35% VLT on front side, rear side, and rear windows. We help you choose a legal shade that still delivers strong heat and UV protection.' },
+      { q: 'Where can I get car window tint in Murfreesboro?', a: "At Mario's Tint Shop, 515 NW Broad St, Murfreesboro, TN 37130. We install 3M window tint — Silver (Obsidian carbon), Gold (CS IR nano ceramic), and Platinum (Ceramic IR) — Monday through Friday, 8:00 a.m. to 5:00 p.m., and Saturday 8:00 a.m. to 12:00 p.m. by appointment. Quotes are free at (615) 410-7170." },
+      { q: 'How dark can I legally tint in Tennessee?', a: 'Tennessee requires a minimum of 35% VLT on front side, rear side, and rear windows. We help you choose a legal shade that still delivers strong heat and UV protection.' },
       { q: 'How long does the tint take to cure?', a: 'Most tint fully cures within 3–5 days depending on weather. We ask you to keep windows rolled up during that time for the best result.' },
       { q: 'Will the tint turn purple over time?', a: 'No. Our premium ceramic and carbon films are dyed and constructed to never fade to purple, unlike low-cost dyed films.' },
       { q: 'Is ceramic window tint worth it over standard film?', a: "If heat is what bothers you, yes. Standard dyed film mainly darkens the glass, while 3M™ Ceramic IR is built to reject infrared — up to 90% of it — so the cabin actually feels cooler rather than just looking darker. It also keeps GPS, Bluetooth, and cell signals clear, and carries a manufacturer's limited warranty." },
@@ -338,7 +349,7 @@ export const SERVICES: Service[] = [
     image: 'tinting',
     pageImage: 'tinting1',
     splitImage: 'tinting',
-    featuresKicker: 'Why ceramic tint',
+    featuresKicker: 'Why 3M window tint',
     featuresTitle: 'Cooler, clearer, protected',
     processKicker: 'Our process',
     processTitle: 'How your tint gets installed',
@@ -407,8 +418,9 @@ export const SERVICES: Service[] = [
     splitWord: 'Ceramic',
     kicker: 'Ceramic Coating',
     name: 'Ceramic Coating',
+    pageTitle: 'Ceramic Coating in Murfreesboro',
     short:
-      "Say goodbye to scratches, swirls, and blemishes — 3M ceramic coating keeps your vehicle's paint protected and looking great for years to come.",
+      '3M ceramic coating in Murfreesboro — a hydrophobic finish on paint, PPF, glass, trim, and vinyl wrap. One layer lasts up to 3 years, two layers up to 5.',
     meta: '3M ceramic coating · up to 5-year protection',
     startingPrice: 'Free quote',
     includes: [
@@ -418,12 +430,12 @@ export const SERVICES: Service[] = [
       'Hydrophobic "wet look" finish',
     ],
     heroSubcopy:
-      "A leading-industry 3M ceramic formula that safeguards your car's paint against environmental contaminants, harsh UV rays, and damaging factors — with a durable, hydrophobic gloss.",
-    // heroSubcopy reads ~178 chars, which Google truncates. Shorter twin here.
+      '3M ceramic coating in Murfreesboro, TN. A single layer lasts up to 3 years and a dual layer up to 5, with a hydrophobic gloss on paint, PPF, glass, trim, and vinyl wrap.',
+    // Kept under ~155 chars so Google shows the description whole.
     metaDescription:
-      '3M ceramic coating in Murfreesboro, TN — a durable, hydrophobic gloss shielding your paint from UV, contaminants, and etching for up to 5 years.',
+      '3M ceramic coating in Murfreesboro, TN. One layer lasts up to 3 years and two layers up to 5, on paint, PPF, glass, trim, and vinyl wrap.',
     intro:
-      "At Mario's Tint Shop in Murfreesboro, our ceramic coating service utilizes a leading-industry 3M formula designed to safeguard your car's paint against environmental contaminants, harsh UV rays, and other damaging factors. The durable, hydrophobic layer enhances gloss and clarity while repelling dirt and water — making it easy to maintain that showroom finish.",
+      "Mario's Tint Shop installs 3M ceramic coating at 515 NW Broad St in Murfreesboro, TN. The formula bonds to paint, paint protection film, glass, trim, and vinyl wrap. It repels water and dirt, resists UV and chemical etching from bug splatter and bird droppings, and leaves a hydrophobic gloss. A single layer lasts up to 3 years and a dual layer up to 5 with proper maintenance. We decontaminate the paint and run multi-stage paint correction first, so swirls are removed rather than sealed in. Every vehicle is quoted for free.",
     features: [
       { title: 'Superior Environmental Protection', body: 'Robust defense against dirt, road debris, UV rays, chemical etching from bug splatter, and corrosive bird droppings.' },
       { title: 'Long-Lasting Durability', body: 'A single layer protects for up to three years; a dual-layer application lasts up to five years with proper maintenance.' },
@@ -439,17 +451,18 @@ export const SERVICES: Service[] = [
       'Infrared or timed cure, then a final quality inspection',
     ],
     faqs: [
-      { q: 'How long does ceramic coating last?', a: 'Depending on the package, our coatings last from 2 to 5+ years with proper maintenance. We offer tiered options to match your goals and budget.' },
+      { q: 'Do you install ceramic coating in Murfreesboro?', a: "Yes. Mario's Tint Shop installs 3M ceramic coating at 515 NW Broad St, Murfreesboro, TN 37130. A single layer lasts up to 3 years and a dual layer up to 5, on paint, paint protection film, glass, trim, and vinyl wrap. Call (615) 410-7170 for a free quote." },
+      { q: 'How long does ceramic coating last?', a: 'A single layer lasts up to 3 years and a dual layer lasts up to 5 years with proper maintenance. The coating is the 3M formula we install in Murfreesboro, after multi-stage paint correction.' },
       { q: 'Does ceramic coating replace PPF?', a: 'No. Ceramic coating resists swirls, chemicals, and water spots but does not stop rock chips. For impact protection, pair it with PPF.' },
       { q: 'Do I still need to wash my car?', a: 'Yes, but far less often and much more easily. Dirt releases with a simple rinse and gentle wash — no waxing required.' },
-      { q: 'Can you coat a car that already has swirls or scratches?', a: 'Yes, and it is the reason we correct the paint first. Because the coating seals in whatever is underneath it, we decontaminate and run multi-stage paint correction before a drop of coating goes on.' },
+      { q: 'Can you coat a car that already has swirls or scratches?', a: 'Yes. We decontaminate and run multi-stage paint correction before any coating goes on, because the coating seals in whatever is underneath it.' },
       { q: 'How do I look after a ceramic-coated car?', a: 'Wash with a pH-neutral soap and a clean wash mitt, and skip automatic brush washes — those cause most of the swirl marks we correct. No waxing is needed; the coating is the protection.' },
       { q: 'Which areas do you serve?', a: 'We are based in Murfreesboro and coat vehicles for customers from Smyrna, Lebanon, Franklin, La Vergne, Brentwood, Nashville, and across Rutherford County and Middle Tennessee.' },
     ],
     image: 'coating',
     splitImage: 'teslaSvc',
-    featuresKicker: 'Why ceramic',
-    featuresTitle: 'A finish that fights back',
+    featuresKicker: 'Why ceramic coating',
+    featuresTitle: 'What ceramic coating does',
     processKicker: 'Our process',
     processTitle: 'How your coating is applied',
     warrantyHeadline: 'Up to 5 years of protection, backed by 3M',
@@ -602,12 +615,20 @@ export const faqPageSchema = (faqs: Faq[]) => ({
  */
 export const HOME_FAQS: Faq[] = [
   {
+    q: 'Who does window tint in Murfreesboro, TN?',
+    a: "Mario's Tint Shop does, at 515 NW Broad St, Murfreesboro, TN 37130. We install 3M window tint in three tiers — Silver (Obsidian carbon), Gold (CS IR nano ceramic), and Platinum (Ceramic IR, up to 90% infrared heat rejection and up to 99% UV protection). The quote is free. Call (615) 410-7170.",
+  },
+  {
+    q: 'Who does ceramic coating in Murfreesboro, TN?',
+    a: "Mario's Tint Shop does, at 515 NW Broad St, Murfreesboro, TN 37130. We install 3M ceramic coating on paint, paint protection film, glass, trim, and vinyl wrap. One layer lasts up to 3 years and two layers last up to 5, after paint correction so swirls are not sealed in. The quote is free.",
+  },
+  {
     q: 'How much does window tinting cost in Murfreesboro?',
-    a: 'Price depends on the vehicle, how many windows you want done, and which of our three 3M tiers you pick — Silver (Obsidian carbon), Gold (CS IR nano ceramic), or Platinum (Ceramic IR). We quote every vehicle individually and for free, either over the phone at (615) 410-7170 or through the quote form on this page.',
+    a: 'Every vehicle is quoted individually, and the quote is free. Price depends on the vehicle, how many windows you want done, and which of our three 3M tiers you pick — Silver (Obsidian carbon), Gold (CS IR nano ceramic), or Platinum (Ceramic IR). Call (615) 410-7170 or use the quote form on this page.',
   },
   {
     q: 'Do I need an appointment, or can I walk in?',
-    a: 'We recommend booking. We are open Monday through Friday from 8:00 a.m. to 5:00 p.m., and Saturday 8 AM–12 PM, by appointment. Call ahead and we will hold a bay for you rather than have you wait.',
+    a: 'An appointment is the better way to come in. We are open Monday through Friday from 8:00 a.m. to 5:00 p.m., and Saturday 8:00 a.m. to 12:00 p.m. by appointment. Call ahead and we will hold a bay for you rather than have you wait.',
   },
   {
     q: 'What areas do you serve?',

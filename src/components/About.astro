@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import { ABOUT, IMAGES } from '../consts';
+import { ABOUT, IMAGES, SERVICES } from '../consts';
 
 // Words for the diagonal band running behind the Lamborghini artwork.
 const bandItems = ['Window Tint', 'PPF', 'Ceramic Coating', 'Tesla', 'Commercial Film'];
@@ -14,7 +14,7 @@ const bandSeq = [...bandItems, ...bandItems, ...bandItems, ...bandItems];
       <div class="reveal">
         <p class="kicker text-accentDk">About us</p>
         <h2 class="headline mt-3 text-[clamp(1.4rem,2.8vw,2.2rem)] text-ink">
-          Crafting excellence in surface protection & style
+          Window tint and ceramic coating in Murfreesboro
         </h2>
         <a
           href="/visualizer/"
@@ -27,6 +27,20 @@ const bandSeq = [...bandItems, ...bandItems, ...bandItems, ...bandItems];
         <p>{ABOUT.lead}</p>
         <p>{ABOUT.body1}</p>
         <p>{ABOUT.body2}</p>
+        <ul class="flex flex-wrap gap-x-5 gap-y-2 pt-2 text-sm font-bold">
+          {
+            SERVICES.map((service) => (
+              <li>
+                <a
+                  href={`/services/${service.slug}/`}
+                  class="text-accentDk underline decoration-accent/40 underline-offset-2 transition-colors hover:text-ink"
+                >
+                  {service.name}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
       </div>
     </div>
 

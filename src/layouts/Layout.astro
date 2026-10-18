@@ -10,7 +10,7 @@ import '@fontsource/gabarito/latin-400.css';
 // hashed file Vite actually emits.
 import specialGothicWoff2 from '@fontsource/special-gothic-expanded-one/files/special-gothic-expanded-one-latin-400-normal.woff2?url';
 import '../styles/global.css';
-import { SITE, CONTACT, PHONE_TEL, SERVICES, SOCIALS, TESTIMONIALS, GA4_ID } from '../consts';
+import { SITE, CONTACT, PHONE_TEL, SERVICES, SOCIALS, TESTIMONIALS, GA4_ID, CONTENT_UPDATED } from '../consts';
 
 interface Props {
   title?: string;
@@ -88,7 +88,13 @@ const business = {
     name: 'Services',
     itemListElement: SERVICES.map((s) => ({
       '@type': 'Offer',
-      itemOffered: { '@type': 'Service', name: s.name },
+      itemOffered: {
+        '@type': 'Service',
+        name: s.pageTitle ? `${s.pageTitle}, TN` : `${s.name} in Murfreesboro, TN`,
+        serviceType: s.kicker,
+        url: `${SITE.url}/services/${s.slug}/`,
+        description: s.metaDescription ?? s.heroSubcopy,
+      },
     })),
   },
 };
@@ -103,7 +109,22 @@ const website = {
   inLanguage: 'en-US',
 };
 
-const jsonLdNodes = [business, website, ...schema];
+// One WebPage node per indexable URL, with the content date the Service
+// nodes also use. 404 stays out of it.
+const webPage = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  '@id': `${canonical}#webpage`,
+  url: canonical,
+  name: title,
+  description,
+  dateModified: CONTENT_UPDATED,
+  isPartOf: { '@id': `${SITE.url}/#website` },
+  about: { '@id': `${SITE.url}/#business` },
+  inLanguage: 'en-US',
+};
+
+const jsonLdNodes = [business, website, ...(noindex ? [] : [webPage]), ...schema];
 
 // GA4. The property ID lives in consts; PUBLIC_GA4_ID overrides it so a
 // staging deploy can point elsewhere (or set it empty to disable the tag).
