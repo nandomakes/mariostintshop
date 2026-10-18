@@ -94,7 +94,7 @@ const IMG_FX_DEFAULT = 'object-center';
         </p>
         <p class="reveal mt-3 max-w-[58ch] text-[15px] leading-relaxed text-smoke">
           <a
-            href="/window-tint/3m-films/"
+            href="/services/3m-films/"
             class="font-bold text-paper underline decoration-accent/60 underline-offset-2 transition-colors hover:text-accent"
           >Color Stable IR, Ceramic IR, and Crystalline</a>{' '}
           are the three 3M films we install.
@@ -102,7 +102,7 @@ const IMG_FX_DEFAULT = 'object-center';
 
         <div class="mt-9 flex flex-col gap-3">
           {
-            SERVICES.map((service) => (
+            SERVICES.filter((service) => service.home !== false).map((service) => (
               <a
                 href={`/services/${service.slug}/`}
                 class="lift group relative flex items-center gap-3 overflow-hidden bg-paper p-4 shadow-[0_2px_10px_rgba(0,0,0,0.05)] sm:gap-4 sm:p-5 md:p-6"

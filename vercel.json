@@ -2,6 +2,8 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "redirects": [
     { "source": "/sitemap.xml", "destination": "/sitemap-index.xml", "permanent": true },
+    { "source": "/window-tint/3m-films", "destination": "/services/3m-films/", "statusCode": 301 },
+    { "source": "/window-tint/3m-films/", "destination": "/services/3m-films/", "statusCode": 301 },
     { "source": "/paint-protection", "destination": "/services/paint-protection-film/", "permanent": true },
     { "source": "/paint-protection/", "destination": "/services/paint-protection-film/", "permanent": true },
     { "source": "/window-tinting", "destination": "/services/window-tinting/", "permanent": true },

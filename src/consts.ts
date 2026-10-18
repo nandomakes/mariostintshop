@@ -296,6 +296,8 @@ export interface Service {
   // "lifetime warranty on our window films" — wrong on PPF and ceramic.
   warrantyHeadline?: string;
   warrantyBody?: string;
+  /** Homepage service cards. The films page is a service URL, not a sixth card. */
+  home?: boolean;
 }
 
 export const SERVICES: Service[] = [
@@ -582,6 +584,104 @@ export const SERVICES: Service[] = [
       'As an Authorized 3M Platinum Dealer, every architectural film we install — Prestige, Ceramic, Night Vision, All Season Low-E, safety and security — carries its 3M manufacturer warranty, and you leave the walk-through with the documentation in hand.',
     related: ['window-tinting', 'ppf', 'ceramic-coating'],
   },
+  {
+    id: '3m-films',
+    slug: '3m-films',
+    splitWord: 'Films',
+    kicker: '3M Window Films',
+    name: '3M Window Films',
+    pageTitle: '3M Window Films in Murfreesboro',
+    home: false,
+    short:
+      'Three 3M films in Murfreesboro: Color Stable IR, Ceramic IR, and Crystalline. Compare shades in person and choose the look and heat rejection you want.',
+    meta: 'Color Stable IR · Ceramic IR · Crystalline',
+    startingPrice: 'Personalized quote',
+    includes: [
+      'Color Stable IR — up to 64% total solar energy',
+      'Ceramic IR — up to 95% infrared, up to 66% total solar energy, up to 99.9% UV',
+      'Crystalline — more than 200 layers, up to 99.9% UV',
+      '3M limited lifetime warranty, subject to warranty terms',
+    ],
+    heroSubcopy:
+      'Three 3M films at Mario’s Tint Shop in Murfreesboro: Color Stable IR, Ceramic IR, and Crystalline. Compare shades at 515 NW Broad St.',
+    metaTitle: "3M Window Films in Murfreesboro | Mario's Tint Shop",
+    metaDescription:
+      'Color Stable IR, Ceramic IR, and Crystalline at Mario’s Tint Shop in Murfreesboro. Compare shades at 515 NW Broad St. Call (615) 410-7170.',
+    intro:
+      "Mario's Tint Shop installs three 3M films at 515 NW Broad St in Murfreesboro, TN: Color Stable IR, Ceramic IR, and Crystalline. Color Stable IR is the charcoal film for everyday heat control and value. Ceramic IR is for drivers who want more comfort in the heat. Crystalline is the premium film when you want strong heat rejection without a dark look. Compare samples in person, or call (615) 410-7170 for a personalized quote.",
+    features: [
+      {
+        title: 'Color Stable IR',
+        body: 'A rich charcoal look with everyday heat control and dependable 3M quality. It rejects up to 64% of total solar energy, depending on shade and glass, and the fade-resistant color comes in several shades.',
+      },
+      {
+        title: 'Ceramic IR',
+        body: 'The step up when a cooler cabin is the priority. It rejects up to 95% of infrared radiation within 3M’s specified measurement range, up to 66% of total solar energy depending on shade and glass, and blocks up to 99.9% of ultraviolet light.',
+      },
+      {
+        title: 'Crystalline',
+        body: 'Premium heat rejection without a dark tint. More than 200 layers help manage sunlight and heat, and lighter shades keep the windows open-looking. Darker shades are there when you want more privacy. It blocks up to 99.9% of ultraviolet light, depending on product and glass.',
+      },
+      {
+        title: 'Choose Color Stable IR',
+        body: 'Choose Color Stable IR if you want a stylish charcoal look, everyday heat control, and excellent value.',
+      },
+      {
+        title: 'Choose Ceramic IR',
+        body: 'Choose Ceramic IR if you want stronger heat comfort and advanced ceramic performance with a traditional tinted appearance.',
+      },
+      {
+        title: 'Choose Crystalline',
+        body: 'Choose Crystalline if you want premium technology, strong heat rejection, and the flexibility to keep your windows looking lighter.',
+      },
+    ],
+    process: [
+      'Compare Color Stable IR, Ceramic IR, and Crystalline samples and shades in person',
+      'We explain the differences and answer your questions',
+      'Choose the film that fits your vehicle, lifestyle, and budget',
+      'Call (615) 410-7170 for a personalized quote',
+    ],
+    faqs: [
+      {
+        q: 'Which 3M film is right for me?',
+        a: 'Color Stable IR is the best balance of style, comfort, and value. Ceramic IR is the stronger choice for enhanced heat comfort. Crystalline is the premium option for powerful heat rejection with lighter-looking shades.',
+      },
+      {
+        q: 'Who should choose Color Stable IR?',
+        a: 'Choose Color Stable IR if you want a stylish charcoal look, everyday heat control, and excellent value. It rejects up to 64% of total solar energy, depending on shade and glass.',
+      },
+      {
+        q: 'Who should choose Ceramic IR?',
+        a: 'Choose Ceramic IR if you want stronger heat comfort and advanced ceramic performance with a traditional tinted appearance. It rejects up to 95% of infrared radiation within 3M’s specified measurement range and up to 66% of total solar energy, depending on shade and glass, and blocks up to 99.9% of ultraviolet light.',
+      },
+      {
+        q: 'Who should choose Crystalline?',
+        a: 'Choose Crystalline if you want premium technology, strong heat rejection, and the flexibility to keep your windows looking lighter. It uses more than 200 layers and blocks up to 99.9% of ultraviolet light, depending on product and glass.',
+      },
+      {
+        q: 'Will these 3M films interfere with GPS or my phone?',
+        a: 'No. Color Stable IR and Crystalline are non-metalized, and Ceramic IR is metal-free. They help prevent interference with GPS, mobile devices, and satellite radio.',
+      },
+      {
+        q: 'Where can I compare the three films?',
+        a: "At Mario's Tint Shop, 515 NW Broad St, Murfreesboro, TN 37130. Call (615) 410-7170 for a personalized quote. We’ll walk you through the differences and help you choose.",
+      },
+      {
+        q: 'What do the “up to” performance figures mean?',
+        a: 'Performance varies by film series, shade, and existing glass. “Up to” figures represent maximum published performance and do not apply to every shade. Infrared rejection is a separate measurement from total solar energy rejection. Shade selection is subject to applicable tint laws.',
+      },
+    ],
+    image: 'tinting1',
+    splitImage: 'tinting',
+    featuresKicker: 'The three films',
+    featuresTitle: 'Color Stable IR, Ceramic IR, Crystalline',
+    processKicker: 'How to choose',
+    processTitle: 'Find the right 3M film',
+    warrantyHeadline: '3M limited lifetime warranty on each film',
+    warrantyBody:
+      'Color Stable IR, Ceramic IR, and Crystalline are each backed by a 3M limited lifetime warranty, subject to warranty terms. Performance varies by film series, shade, and existing glass. “Up to” figures represent maximum published performance and do not apply to every shade. Infrared rejection is a separate measurement from total solar energy rejection. Warranty terms, exclusions, and installation requirements apply. Shade selection is subject to applicable tint laws.',
+    related: ['window-tinting', 'ceramic-coating', 'ppf'],
+  },
 ];
 
 /** Look up a service by its slug (used by the per-service pages). */
@@ -820,7 +920,6 @@ export const NAV_LINKS: {
     label: 'Services',
     children: [
       ...SERVICES.map((s) => ({ href: `/services/${s.slug}/`, label: s.name })),
-      { href: '/window-tint/3m-films/', label: '3M Window Films' },
     ],
   },
   { href: '/visualizer/', label: 'Visualizer' },
