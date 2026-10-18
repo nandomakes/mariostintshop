@@ -10,7 +10,7 @@ import QuoteCTA from '../../components/QuoteCTA.astro';
 import Footer from '../../components/Footer.astro';
 import CallFab from '../../components/CallFab.astro';
 import { SERVICES, SITE, IMAGES, CONTENT_UPDATED, faqPageSchema } from '../../consts';
-import { WINDOW_FILMS, WINDOW_FILMS_PATH } from '../../lib/window-films';
+import { WINDOW_FILMS, WINDOW_FILMS_PATH, filmSchemaDescription } from '../../lib/window-films';
 
 export function getStaticPaths() {
   return SERVICES.map((service) => ({
@@ -89,7 +89,7 @@ const schema = [
               itemOffered: {
                 '@type': 'Product',
                 name: film.productName,
-                description: film.summary,
+                description: filmSchemaDescription(film),
                 url: `${SITE.url}${WINDOW_FILMS_PATH}#${film.id}`,
                 brand: { '@type': 'Brand', name: '3M' },
               },
@@ -175,10 +175,10 @@ const schema = [
           <div class="mx-auto max-w-3xl px-5 py-14 md:py-16">
             <p class="kicker text-accentDk">3M films</p>
             <h2 class="headline mt-3 text-[clamp(1.5rem,3vw,2.2rem)] text-ink">
-              Obsidian, CS IR, and Ceramic IR
+              Color Stable IR, Ceramic IR, and Crystalline
             </h2>
             <p class="mt-5 text-[15px] leading-relaxed text-char">
-              Silver, Gold, and Platinum are three different 3M films. Each one has its own heat, UV, and warranty figures on the film page.
+              At Mario’s Tint Shop, we offer three trusted 3M film options—Color Stable IR, Ceramic IR, and Crystalline—so you can choose the combination of appearance, heat rejection, privacy, and value that fits you best.
             </p>
             <a
               href="/window-tint/3m-films/"
