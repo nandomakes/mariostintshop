@@ -2,7 +2,6 @@
 import { Image } from 'astro:assets';
 import clicksrunLogo from '../assets/images/logo-clicksrun.webp';
 import { SITE, CONTACT, SERVICES, SOCIALS } from '../consts';
-import { WINDOW_FILMS_PATH } from '../lib/window-films';
 import Logo from './Logo.astro';
 
 const year = new Date().getFullYear();
@@ -73,11 +72,6 @@ const SOCIAL_ICONS: Record<string, string> = {
             </li>
           ))
         }
-        <li>
-          <a href={WINDOW_FILMS_PATH} class="transition-colors duration-200 hover:text-accent">
-            3M Window Films
-          </a>
-        </li>
       </ul>
     </div>
 

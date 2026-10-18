@@ -10,7 +10,6 @@ import QuoteCTA from '../../components/QuoteCTA.astro';
 import Footer from '../../components/Footer.astro';
 import CallFab from '../../components/CallFab.astro';
 import { SERVICES, SITE, IMAGES, CONTENT_UPDATED, faqPageSchema } from '../../consts';
-import { WINDOW_FILMS, WINDOW_FILMS_PATH, filmSchemaDescription } from '../../lib/window-films';
 
 export function getStaticPaths() {
   return SERVICES.map((service) => ({
@@ -77,26 +76,6 @@ const schema = [
       containedInPlace: { '@type': 'State', name: 'Tennessee' },
     })),
     url: `${SITE.url}/services/${service.slug}/`,
-    // Film-by-film Product nodes live on /window-tint/3m-films/. The tint
-    // service points at them without rewriting the page copy above.
-    ...(service.slug === 'window-tinting'
-      ? {
-          hasOfferCatalog: {
-            '@type': 'OfferCatalog',
-            name: '3M automotive window films',
-            itemListElement: WINDOW_FILMS.map((film) => ({
-              '@type': 'Offer',
-              itemOffered: {
-                '@type': 'Product',
-                name: film.productName,
-                description: filmSchemaDescription(film),
-                url: `${SITE.url}${WINDOW_FILMS_PATH}#${film.id}`,
-                brand: { '@type': 'Brand', name: '3M' },
-              },
-            })),
-          },
-        }
-      : {}),
   },
 ];
 ---
@@ -175,17 +154,16 @@ const schema = [
           <div class="mx-auto max-w-3xl px-5 py-14 md:py-16">
             <p class="kicker text-accentDk">3M films</p>
             <h2 class="headline mt-3 text-[clamp(1.5rem,3vw,2.2rem)] text-ink">
-              Color Stable IR, Ceramic IR, and Crystalline
+              3M Color Stable, Ceramic IR, and Crystalline
             </h2>
             <p class="mt-5 text-[15px] leading-relaxed text-char">
-              At Mario’s Tint Shop, we offer three trusted 3M film options—Color Stable IR, Ceramic IR, and Crystalline—so you can choose the combination of appearance, heat rejection, privacy, and value that fits you best.
+              Mario’s Tint Shop in Murfreesboro installs 3M window tint in three films: 3M Color Stable IR, 3M Ceramic IR, and 3M Crystalline.
             </p>
-            <a
-              href="/window-tint/3m-films/"
-              class="pressable sticker mt-6 inline-block bg-accent px-8 py-3.5 text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
-            >
-              See the three 3M films <span class="ml-0.5 font-black" aria-hidden="true">&gt;</span>
-            </a>
+            <ul class="mt-4 space-y-2 text-[15px] leading-relaxed text-char">
+              <li><span class="font-bold text-ink">3M Color Stable IR:</span> a charcoal look and everyday value.</li>
+              <li><span class="font-bold text-ink">3M Ceramic IR:</span> stronger heat comfort, up to 95% infrared rejection within 3M’s specified measurement range, and up to 99.9% UV.</li>
+              <li><span class="font-bold text-ink">3M Crystalline:</span> more than 200 layers, with strong heat rejection and lighter shades.</li>
+            </ul>
           </div>
         </section>
       )
