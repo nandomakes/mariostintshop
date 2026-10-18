@@ -9,7 +9,7 @@ import RelatedServices from '../../components/RelatedServices.astro';
 import QuoteCTA from '../../components/QuoteCTA.astro';
 import Footer from '../../components/Footer.astro';
 import CallFab from '../../components/CallFab.astro';
-import { SERVICES, SITE, IMAGES, faqPageSchema } from '../../consts';
+import { SERVICES, SITE, IMAGES, CONTENT_UPDATED, faqPageSchema } from '../../consts';
 
 export function getStaticPaths() {
   return SERVICES.map((service) => ({
@@ -50,25 +50,28 @@ const schema = [
   {
     '@context': 'https://schema.org',
     '@type': 'Service',
-    name: service.name,
-    description: service.heroSubcopy,
+    '@id': `${SITE.url}/services/${service.slug}/#service`,
+    name: service.pageTitle ? `${service.pageTitle}, TN` : `${service.name} in Murfreesboro, TN`,
+    description: service.metaDescription ?? service.heroSubcopy,
+    dateModified: CONTENT_UPDATED,
     // Absolute URL to the hashed, optimized asset Astro emits for this page.
     image: new URL(img.src.src, SITE.url).href,
     serviceType: service.kicker,
+    brand: { '@type': 'Brand', name: '3M' },
     provider: { '@id': `${SITE.url}/#business` },
     // The real service area, not just the home city — these are the towns the
-    // page copy and FAQs already name.
+    // page copy and FAQs already name. Rutherford County is a county, not a city.
     areaServed: [
-      'Murfreesboro',
-      'Smyrna',
-      'La Vergne',
-      'Lebanon',
-      'Franklin',
-      'Brentwood',
-      'Nashville',
-      'Rutherford County',
-    ].map((name) => ({
-      '@type': 'City',
+      { name: 'Murfreesboro', type: 'City' },
+      { name: 'Smyrna', type: 'City' },
+      { name: 'La Vergne', type: 'City' },
+      { name: 'Lebanon', type: 'City' },
+      { name: 'Franklin', type: 'City' },
+      { name: 'Brentwood', type: 'City' },
+      { name: 'Nashville', type: 'City' },
+      { name: 'Rutherford County', type: 'AdministrativeArea' },
+    ].map(({ name, type }) => ({
+      '@type': type,
       name,
       containedInPlace: { '@type': 'State', name: 'Tennessee' },
     })),
@@ -82,7 +85,7 @@ const schema = [
   <main id="content">
     <HeroService
       kicker={service.kicker}
-      title={service.name}
+      title={service.pageTitle ?? service.name}
       subcopy={service.heroSubcopy}
       imageSrc={img.src}
     />
@@ -145,7 +148,7 @@ const schema = [
       body={service.warrantyBody}
     />
 
-    <Faq items={service.faqs} />
+    <Faq items={service.faqs} heading={`${service.kicker} questions`} />
 
     <RelatedServices currentId={service.id} />
 

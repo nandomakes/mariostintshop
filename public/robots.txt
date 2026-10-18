@@ -23,4 +23,6 @@ Allow: /
 User-agent: Google-Extended
 Allow: /
 
+# /sitemap.xml permanently redirects to this index (vercel.json). Point
+# crawlers at the final URL so they don't stop on the redirect.
 Sitemap: https://www.mariostintshop.com/sitemap-index.xml

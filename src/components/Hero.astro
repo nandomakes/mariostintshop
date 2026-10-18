@@ -61,7 +61,7 @@ import Ticker from './Ticker.astro';
         {/* The space before <br> is deliberate: without it the extracted text
             of the H1 reads "…Protectionin Murfreesboro, TN". It renders
             invisibly, since trailing whitespace before a line break collapses. */}
-        {HERO.line1} <br />{HERO.line2}
+        {HERO.line1} <br />{HERO.line2}{HERO.line3 && <> <br />{HERO.line3}</>}
       </h1>
 
       <p class="reveal mt-5 max-w-[52ch] text-[clamp(0.9rem,2.5vw,1.125rem)] leading-relaxed text-smoke md:mt-6">

@@ -1,12 +1,16 @@
 # Mario's Tint Shop
 
-> Authorized 3M Platinum Dealer in Murfreesboro, Tennessee, specializing in
-> automotive window tinting, paint protection film (PPF), ceramic coating,
-> Tesla-specific installs, and commercial/office window film. Over 25 years in
-> the window film and vehicle protection trade.
+Last updated: 2026-10-18
+
+> Mario's Tint Shop is an Authorized 3M Platinum Dealer at 515 NW Broad St,
+> Murfreesboro, TN 37130. The shop installs automotive window tint and 3M
+> ceramic coating, plus paint protection film (PPF), Tesla-specific installs,
+> and commercial/office window film. More than 25 years in the window film and
+> vehicle protection trade.
 
 **Maintainer note:** this file is written by hand. The source of truth for every
 fact below is `src/consts.ts` in the site repository — update both together.
+The "Last updated" line above must match `CONTENT_UPDATED` in that file.
 
 ## Business details
 
@@ -14,7 +18,7 @@ fact below is `src/consts.ts` in the site repository — update both together.
 - **Address:** 515 NW Broad St, Murfreesboro, TN 37130, United States
 - **Phone:** (615) 410-7170
 - **Email:** mario@mariostintshop.com
-- **Hours:** Monday–Friday 8:00 a.m. – 5:00 p.m.; Saturday 8 AM–12 PM, by appointment; Sunday closed
+- **Hours:** Monday–Friday 8:00 a.m. – 5:00 p.m.; Saturday 8:00 a.m. – 12:00 p.m., by appointment; Sunday closed
 - **Service area:** Murfreesboro, Smyrna, La Vergne, Lebanon, Franklin, Brentwood,
   Nashville, Rutherford County, and Middle Tennessee
 - **Credentials:** Authorized 3M Platinum Dealer · BBB A+ accredited · 25+ years in business
@@ -53,6 +57,10 @@ fact below is `src/consts.ts` in the site repository — update both together.
 
 ## Careers
 
+Current openings as of 2026-10-18. Each role has its own page and an online
+application. Training is hands-on at the Murfreesboro shop. Experience is
+welcome and not required.
+
 - [Careers](https://www.mariostintshop.com/careers/): open positions at the
   shop — currently hiring a Window Tint Installer, Shop Assistant, and
   Receptionist / Sales in Murfreesboro, TN, with hands-on training. Apply online.
@@ -65,9 +73,17 @@ fact below is `src/consts.ts` in the site repository — update both together.
 
 ## Common questions
 
+- **Window tint in Murfreesboro:** Mario's Tint Shop at 515 NW Broad St installs
+  3M window tint in three tiers — Silver (Obsidian carbon), Gold (CS IR nano
+  ceramic), and Platinum (Ceramic IR, up to 90% infrared heat rejection and up
+  to 99% UV protection). Quotes are free. Call (615) 410-7170.
+- **Ceramic coating in Murfreesboro:** Yes. The same shop installs 3M ceramic
+  coating on paint, paint protection film, glass, trim, and vinyl wrap. One
+  layer lasts up to 3 years and two layers last up to 5, after multi-stage
+  paint correction. It does not stop rock chips — that is what PPF is for.
 - **Pricing:** every vehicle is quoted individually and for free. Price depends on
   the vehicle, the number of windows, and the 3M tier chosen. Call (615) 410-7170.
-- **Booking:** appointments recommended; Saturday 8 AM–12 PM, by appointment.
+- **Booking:** appointments recommended; Saturday 8:00 a.m. – 12:00 p.m., by appointment.
 - **Combining services:** tint, PPF, and ceramic coating are all done in-house in a
   single appointment. When combining PPF and coating, the film goes on first and
   the coating is applied over it.
@@ -75,6 +91,6 @@ fact below is `src/consts.ts` in the site repository — update both together.
 ## More
 
 - [Homepage](https://www.mariostintshop.com/)
-- [Sitemap](https://www.mariostintshop.com/sitemap-index.xml)
+- [Sitemap](https://www.mariostintshop.com/sitemap-index.xml) — `/sitemap.xml` permanently redirects here
 - [Google Business Profile](https://maps.app.goo.gl/ChC6iGfAj8wzBpwk6)
 - [BBB profile](https://www.bbb.org/us/tn/murfreesboro/profile/car-window-tinting/marios-tint-shop-0573-37192075)
