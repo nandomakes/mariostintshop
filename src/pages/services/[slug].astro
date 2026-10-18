@@ -10,6 +10,7 @@ import QuoteCTA from '../../components/QuoteCTA.astro';
 import Footer from '../../components/Footer.astro';
 import CallFab from '../../components/CallFab.astro';
 import { SERVICES, SITE, IMAGES, CONTENT_UPDATED, faqPageSchema } from '../../consts';
+import { WINDOW_FILMS, WINDOW_FILMS_PATH } from '../../lib/window-films';
 
 export function getStaticPaths() {
   return SERVICES.map((service) => ({
@@ -76,6 +77,26 @@ const schema = [
       containedInPlace: { '@type': 'State', name: 'Tennessee' },
     })),
     url: `${SITE.url}/services/${service.slug}/`,
+    // Film-by-film Product nodes live on /window-tint/3m-films/. The tint
+    // service points at them without rewriting the page copy above.
+    ...(service.slug === 'window-tinting'
+      ? {
+          hasOfferCatalog: {
+            '@type': 'OfferCatalog',
+            name: '3M automotive window films',
+            itemListElement: WINDOW_FILMS.map((film) => ({
+              '@type': 'Offer',
+              itemOffered: {
+                '@type': 'Product',
+                name: film.productName,
+                description: film.summary,
+                url: `${SITE.url}${WINDOW_FILMS_PATH}#${film.id}`,
+                brand: { '@type': 'Brand', name: '3M' },
+              },
+            })),
+          },
+        }
+      : {}),
   },
 ];
 ---
@@ -147,6 +168,28 @@ const schema = [
       headline={service.warrantyHeadline}
       body={service.warrantyBody}
     />
+
+    {
+      service.slug === 'window-tinting' && (
+        <section class="border-t border-sand bg-whisper">
+          <div class="mx-auto max-w-3xl px-5 py-14 md:py-16">
+            <p class="kicker text-accentDk">3M films</p>
+            <h2 class="headline mt-3 text-[clamp(1.5rem,3vw,2.2rem)] text-ink">
+              Obsidian, CS IR, and Ceramic IR
+            </h2>
+            <p class="mt-5 text-[15px] leading-relaxed text-char">
+              Silver, Gold, and Platinum are three different 3M films. Each one has its own heat, UV, and warranty figures on the film page.
+            </p>
+            <a
+              href="/window-tint/3m-films/"
+              class="pressable sticker mt-6 inline-block bg-accent px-8 py-3.5 text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
+            >
+              See the three 3M films <span class="ml-0.5 font-black" aria-hidden="true">&gt;</span>
+            </a>
+          </div>
+        </section>
+      )
+    }
 
     <Faq items={service.faqs} heading={`${service.kicker} questions`} />
 

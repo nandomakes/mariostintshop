@@ -1,0 +1,143 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import HeroService from '../../components/HeroService.astro';
+import Faq from '../../components/Faq.astro';
+import QuoteCTA from '../../components/QuoteCTA.astro';
+import Footer from '../../components/Footer.astro';
+import CallFab from '../../components/CallFab.astro';
+import { CONTACT, IMAGES, SITE, faqPageSchema } from '../../consts';
+import {
+  WINDOW_FILMS,
+  WINDOW_FILMS_PATH,
+  WINDOW_FILM_DISCLAIMER,
+  WINDOW_FILM_FAQS,
+} from '../../lib/window-films';
+
+const title = "3M Window Films in Murfreesboro | Mario's Tint Shop";
+const description =
+  "Mario's Tint Shop in Murfreesboro installs three 3M films: Obsidian, Color Stable CS IR, and Ceramic IR. Ceramic IR is rated up to 95% infrared rejection. Free quotes.";
+
+const pageUrl = `${SITE.url}${WINDOW_FILMS_PATH}`;
+
+const filmsSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: '3M automotive window films installed in Murfreesboro',
+  itemListElement: WINDOW_FILMS.map((film, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    item: {
+      '@type': 'Product',
+      '@id': `${pageUrl}#${film.id}`,
+      name: film.productName,
+      description: film.summary,
+      brand: { '@type': 'Brand', name: '3M' },
+      category: 'Automotive window film',
+      url: `${pageUrl}#${film.id}`,
+      offers: {
+        '@type': 'Offer',
+        availability: 'https://schema.org/InStock',
+        url: `${SITE.url}/services/window-tinting/#contact`,
+        seller: { '@id': `${SITE.url}/#business` },
+        description: `Free quote at ${CONTACT.address}, ${CONTACT.city}. Call ${CONTACT.phoneDisplay}.`,
+        areaServed: 'Murfreesboro, TN',
+      },
+    },
+  })),
+};
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE.url },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Car Window Tinting',
+        item: `${SITE.url}/services/window-tinting/`,
+      },
+      { '@type': 'ListItem', position: 3, name: '3M Window Films', item: pageUrl },
+    ],
+  },
+  filmsSchema,
+  faqPageSchema(WINDOW_FILM_FAQS),
+];
+---
+
+<Layout title={title} description={description} schema={schema}>
+  <Header />
+  <main id="content">
+    <HeroService
+      kicker="3M window films"
+      title="Obsidian, CS IR, and Ceramic IR"
+      subcopy={`Mario's Tint Shop installs three 3M automotive window films at ${CONTACT.address}, ${CONTACT.city}: Obsidian, Color Stable CS IR, and Ceramic IR. Each film has its own heat and UV figures from 3M.`}
+      imageSrc={IMAGES.tinting1.src}
+      breadcrumbParent={{ href: '/services/window-tinting/', label: 'Window Tinting' }}
+    />
+
+    <section class="hex-bg border-b border-sand bg-paper">
+      <div class="mx-auto max-w-3xl px-5 py-16 md:py-20">
+        <p class="kicker text-accentDk">The three films</p>
+        <h2 class="headline mt-3 text-[clamp(1.6rem,3.4vw,2.4rem)] text-ink">
+          Which 3M film is which
+        </h2>
+        <p class="mt-6 text-[15px] leading-relaxed text-char">
+          Silver, Gold, and Platinum on our
+          <a href="/services/window-tinting/" class="font-bold text-accentDk underline decoration-accent/40 underline-offset-2 hover:text-ink">window tint page</a>
+          are these three 3M products. That page still says Ceramic IR rejects up to 90% of infrared heat and that the films block up to 99% of UV. The figures below are the ones 3M publishes for each film, and they are not the same measurement in every case.
+        </p>
+        <p class="mt-4 text-[15px] leading-relaxed text-char">
+          3M rates Ceramic IR at up to 95% infrared rejection, measured on the film alone in the 900–1,000 nm range, and at up to 99.9% UV rejection. Obsidian and Color Stable CS IR stay at up to 99% UV. The 90% line stays on the tint page as the shop’s infrared-heat figure for Ceramic IR. The 95% and 99.9% lines stay here as 3M’s published figures for that same film.
+        </p>
+      </div>
+    </section>
+
+    {
+      WINDOW_FILMS.map((film, i) => (
+        <section id={film.id} class:list={[i % 2 === 0 ? 'bg-ink' : 'hex-bg bg-paper', 'scroll-mt-24']}>
+          <div class="mx-auto max-w-6xl px-5 py-16 md:py-24">
+            <p class:list={['kicker', i % 2 === 0 ? 'text-accent' : 'text-accentDk']}>{film.tier} tier</p>
+            <h2 class:list={['headline mt-3 max-w-4xl text-[clamp(1.5rem,3.2vw,2.4rem)]', i % 2 === 0 ? 'text-paper' : 'text-ink']}>
+              {film.productName}
+            </h2>
+            <p class:list={['mt-6 max-w-3xl text-[15px] leading-relaxed', i % 2 === 0 ? 'text-smoke' : 'text-char']}>
+              {film.summary}
+            </p>
+            <ul class="mt-8 grid gap-4 sm:grid-cols-2">
+              {film.points.map((point) => (
+                <li class:list={['border p-5 text-sm leading-relaxed', i % 2 === 0 ? 'border-line bg-coal text-smoke' : 'border-sand bg-paper text-char']}>
+                  {point}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      ))
+    }
+
+    <Faq items={WINDOW_FILM_FAQS} heading="3M film questions" />
+
+    <section class="border-t border-sand bg-whisper">
+      <div class="mx-auto max-w-3xl px-5 py-16 md:py-20">
+        <p class="kicker text-accentDk">From 3M</p>
+        <h2 class="headline mt-3 text-[clamp(1.5rem,3vw,2.2rem)] text-ink">
+          Performance and warranty
+        </h2>
+        <div class="mt-6 space-y-4 text-sm leading-relaxed text-char">
+          {WINDOW_FILM_DISCLAIMER.map((paragraph) => <p>{paragraph}</p>)}
+        </div>
+        <p class="mt-8 text-sm leading-relaxed text-char">
+          {SITE.brand} · {CONTACT.address}, {CONTACT.city} ·
+          <a href={`tel:${CONTACT.phoneTel}`} class="font-bold text-accentDk underline decoration-accent/40 underline-offset-2 hover:text-ink">{CONTACT.phoneDisplay}</a>
+        </p>
+      </div>
+    </section>
+
+    <QuoteCTA defaultService="window tint" />
+  </main>
+  <Footer />
+  <CallFab />
+</Layout>

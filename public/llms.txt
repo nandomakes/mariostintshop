@@ -32,6 +32,18 @@ The "Last updated" line above must match `CONTENT_UPDATED` in that file.
   (Ceramic IR). Non-metallized, so GPS and cell signal are unaffected. Tennessee
   law requires a minimum of 35% VLT on front side, rear side, and rear windows.
   Lifetime warranty available.
+- [3M Window Films](https://www.mariostintshop.com/window-tint/3m-films/):
+  Obsidian, Color Stable CS IR, and Ceramic IR — the three films behind Silver,
+  Gold, and Platinum. 3M rates Obsidian at up to 60% total solar energy
+  rejection and up to 99% UV; Color Stable CS IR at up to 64% total solar energy
+  rejection and up to 99% UV; Ceramic IR at up to 95% infrared rejection, up to
+  66% total solar energy rejection, and up to 99.9% UV. The window-tint page
+  still says Ceramic IR rejects up to 90% of infrared heat and that the films
+  block up to 99% of UV. Those shop sentences stay. The 95% infrared-rejection
+  figure is 3M’s published number for Ceramic IR (film alone, 900–1,000 nm), and
+  the 99.9% UV figure is 3M’s published number for Ceramic IR only. Limited
+  lifetime warranty for the original owner, not transferable. Performance
+  figures are 3M estimates; see the disclaimer on that page.
 - [Paint Protection Film (PPF)](https://www.mariostintshop.com/services/paint-protection-film/):
   3M self-healing clear bra against rock chips, scratches, and road debris.
   Partial front, full front, or complete coverage. Lasts 8–10 years with a
@@ -81,6 +93,13 @@ welcome and not required.
   coating on paint, paint protection film, glass, trim, and vinyl wrap. One
   layer lasts up to 3 years and two layers last up to 5, after multi-stage
   paint correction. It does not stop rock chips — that is what PPF is for.
+- **Which 3M film is right for me?** It depends on the vehicle and the shade.
+  Silver is Obsidian (up to 60% total solar energy rejection). Gold is Color
+  Stable CS IR (up to 64% total solar energy rejection, and it won’t fade to
+  purple). Platinum is Ceramic IR (up to 95% infrared rejection and up to 66%
+  total solar energy rejection). The tint page’s “up to 90% infrared heat” line
+  is the shop’s figure for Ceramic IR and stays there. Every vehicle is quoted
+  individually and for free. Call (615) 410-7170.
 - **Pricing:** every vehicle is quoted individually and for free. Price depends on
   the vehicle, the number of windows, and the 3M tier chosen. Call (615) 410-7170.
 - **Booking:** appointments recommended; Saturday 8:00 a.m. – 12:00 p.m., by appointment.
