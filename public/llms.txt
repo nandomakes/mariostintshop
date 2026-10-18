@@ -31,17 +31,11 @@ The "Last updated" line above must match `CONTENT_UPDATED` in that file.
   Three films — Color Stable IR, Ceramic IR, and Crystalline. Non-metallized,
   so GPS and cell signal are unaffected. Tennessee
   law requires a minimum of 35% VLT on front side, rear side, and rear windows.
-  Lifetime warranty available.
-- [3M Window Films](https://www.mariostintshop.com/window-tint/3m-films/):
-  Color Stable IR, Ceramic IR, and Crystalline. Color Stable IR rejects up to
-  64% of total solar energy, depending on shade and glass. Ceramic IR rejects
-  up to 95% of infrared radiation within 3M’s specified measurement range,
-  rejects up to 66% of total solar energy, depending on shade and glass, and
-  blocks up to 99.9% of ultraviolet light. Crystalline uses more than 200 layers
-  and blocks up to 99.9% of ultraviolet light, depending on product and glass.
-  Call (615) 410-7170. 515 NW Broad St, Murfreesboro, TN 37130. Performance
-  varies by film series, shade, and existing glass. “Up to” figures represent
-  maximum published performance and do not apply to every shade.
+  Lifetime warranty available. The same page also names 3M Color Stable IR
+  (charcoal look and everyday value), 3M Ceramic IR (stronger heat comfort, up
+  to 95% infrared rejection within 3M’s specified measurement range, and up to
+  99.9% UV), and 3M Crystalline (more than 200 layers, strong heat rejection
+  with lighter shades).
 - [Paint Protection Film (PPF)](https://www.mariostintshop.com/services/paint-protection-film/):
   3M self-healing clear bra against rock chips, scratches, and road debris.
   Partial front, full front, or complete coverage. Lasts 8–10 years with a
@@ -91,10 +85,12 @@ welcome and not required.
   coating on paint, paint protection film, glass, trim, and vinyl wrap. One
   layer lasts up to 3 years and two layers last up to 5, after multi-stage
   paint correction. It does not stop rock chips — that is what PPF is for.
-- **Which 3M Film Is Right for You?** Color Stable IR: The best balance of
-  style, comfort, and value. Ceramic IR: A stronger choice for drivers who want
-  enhanced heat comfort. Crystalline: The premium option for powerful heat
-  rejection with lighter-looking shades.
+- **Which 3M films do you install?** 3M Color Stable IR, 3M Ceramic IR, and
+  3M Crystalline, at the Murfreesboro shop. Color Stable IR is the charcoal
+  look and everyday value. Ceramic IR is for stronger heat comfort, with up to
+  95% infrared rejection within 3M’s specified measurement range and up to
+  99.9% UV. Crystalline uses more than 200 layers for strong heat rejection
+  with lighter shades.
 - **Pricing:** every vehicle is quoted individually and for free. Price depends on
   the vehicle, the number of windows, and the 3M tier chosen. Call (615) 410-7170.
 - **Booking:** appointments recommended; Saturday 8:00 a.m. – 12:00 p.m., by appointment.

@@ -345,6 +345,7 @@ export const SERVICES: Service[] = [
       { q: 'Is ceramic window tint worth it over standard film?', a: "If heat is what bothers you, yes. Standard dyed film mainly darkens the glass, while 3M™ Ceramic IR is built to reject infrared — up to 90% of it — so the cabin actually feels cooler rather than just looking darker. It also keeps GPS, Bluetooth, and cell signals clear, and carries a manufacturer's limited warranty." },
       { q: 'Which areas do you serve?', a: 'We are based in Murfreesboro and regularly tint vehicles from Smyrna, Lebanon, Franklin, La Vergne, Brentwood, Nashville, and across Rutherford County and Middle Tennessee.' },
       { q: 'Do you offer more than window tint?', a: 'We do — paint protection film (PPF), ceramic coatings, windshield protection film, and full vehicle appearance protection. Many customers pair ceramic tint with PPF on the front end.' },
+      { q: 'Which 3M films do you install?', a: 'In Murfreesboro we install 3M window tint in three films: 3M Color Stable IR, 3M Ceramic IR, and 3M Crystalline. Color Stable IR is the charcoal look and everyday value. Ceramic IR is for stronger heat comfort, with up to 95% infrared rejection within 3M’s specified measurement range and up to 99.9% UV. Crystalline uses more than 200 layers for strong heat rejection with lighter shades.' },
     ],
     image: 'tinting',
     pageImage: 'tinting1',
@@ -820,7 +821,6 @@ export const NAV_LINKS: {
     label: 'Services',
     children: [
       ...SERVICES.map((s) => ({ href: `/services/${s.slug}/`, label: s.name })),
-      { href: '/window-tint/3m-films/', label: '3M Window Films' },
     ],
   },
   { href: '/visualizer/', label: 'Visualizer' },
