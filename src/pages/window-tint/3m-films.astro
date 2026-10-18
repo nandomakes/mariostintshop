@@ -1,0 +1,147 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import HeroService from '../../components/HeroService.astro';
+import QuoteCTA from '../../components/QuoteCTA.astro';
+import Footer from '../../components/Footer.astro';
+import CallFab from '../../components/CallFab.astro';
+import { CONTACT, IMAGES, SITE, faqPageSchema } from '../../consts';
+import {
+  WINDOW_FILMS,
+  WINDOW_FILMS_PATH,
+  WINDOW_FILM_CTA,
+  WINDOW_FILM_DISCLAIMER,
+  WINDOW_FILM_FAQS,
+  WINDOW_FILM_INTRO,
+  WINDOW_FILM_TAGLINE,
+  WINDOW_FILM_TITLE,
+  WINDOW_FILM_WHICH,
+  filmSchemaDescription,
+} from '../../lib/window-films';
+
+const title = WINDOW_FILM_TITLE;
+const description = WINDOW_FILM_INTRO[0];
+
+const pageUrl = `${SITE.url}${WINDOW_FILMS_PATH}`;
+
+const filmsSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: '3M window films at Mario’s Tint Shop',
+  itemListElement: WINDOW_FILMS.map((film, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    item: {
+      '@type': 'Product',
+      '@id': `${pageUrl}#${film.id}`,
+      name: film.productName,
+      description: filmSchemaDescription(film),
+      brand: { '@type': 'Brand', name: '3M' },
+      category: 'Automotive window film',
+      url: `${pageUrl}#${film.id}`,
+      offers: {
+        '@type': 'Offer',
+        availability: 'https://schema.org/InStock',
+        url: `${pageUrl}#quote`,
+        seller: { '@id': `${SITE.url}/#business` },
+        description: `${WINDOW_FILM_CTA.phoneLine} ${WINDOW_FILM_CTA.addressLine}`,
+        areaServed: 'Murfreesboro, TN',
+      },
+    },
+  })),
+};
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE.url },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Car Window Tinting',
+        item: `${SITE.url}/services/window-tinting/`,
+      },
+      { '@type': 'ListItem', position: 3, name: '3M Window Films', item: pageUrl },
+    ],
+  },
+  filmsSchema,
+  faqPageSchema(WINDOW_FILM_FAQS),
+];
+---
+
+<Layout title={title} description={description} schema={schema}>
+  <Header />
+  <main id="content">
+    <HeroService
+      kicker="3M window films"
+      title={WINDOW_FILM_TITLE}
+      subcopy={WINDOW_FILM_TAGLINE}
+      imageSrc={IMAGES.tinting1.src}
+      breadcrumbParent={{ href: '/services/window-tinting/', label: 'Window Tinting' }}
+    />
+
+    <section class="hex-bg border-b border-sand bg-paper">
+      <div class="mx-auto max-w-3xl px-5 py-16 md:py-20">
+        <div class="space-y-4 text-[15px] leading-relaxed text-char">
+          {WINDOW_FILM_INTRO.map((paragraph) => <p>{paragraph}</p>)}
+        </div>
+      </div>
+    </section>
+
+    {
+      WINDOW_FILMS.map((film, i) => (
+        <section id={film.id} class:list={[i % 2 === 0 ? 'bg-ink' : 'hex-bg bg-paper', 'scroll-mt-24']}>
+          <div class="mx-auto max-w-6xl px-5 py-16 md:py-24">
+            <h2 class:list={['headline max-w-4xl text-[clamp(1.5rem,3.2vw,2.4rem)]', i % 2 === 0 ? 'text-paper' : 'text-ink']}>
+              {film.heading}
+            </h2>
+            <div class:list={['mt-6 max-w-3xl space-y-4 text-[15px] leading-relaxed', i % 2 === 0 ? 'text-smoke' : 'text-char']}>
+              {film.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+            </div>
+            <ul class="mt-8 grid gap-4 sm:grid-cols-2">
+              {film.points.map((point) => (
+                <li class:list={['border p-5 text-sm leading-relaxed', i % 2 === 0 ? 'border-line bg-coal text-smoke' : 'border-sand bg-paper text-char']}>
+                  {point}
+                </li>
+              ))}
+            </ul>
+            <p class:list={['mt-8 max-w-3xl text-[15px] font-bold leading-relaxed', i % 2 === 0 ? 'text-paper' : 'text-ink']}>
+              {film.chooseIf}
+            </p>
+          </div>
+        </section>
+      ))
+    }
+
+    <section class="hex-bg border-t border-sand bg-paper">
+      <div class="mx-auto max-w-3xl px-5 py-16 md:py-20">
+        <h2 class="headline text-[clamp(1.5rem,3vw,2.2rem)] text-ink">
+          {WINDOW_FILM_WHICH.heading}
+        </h2>
+        <ul class="mt-6 space-y-3 text-[15px] leading-relaxed text-char">
+          {WINDOW_FILM_WHICH.points.map((point) => <li>{point}</li>)}
+        </ul>
+      </div>
+    </section>
+
+    <section id="quote" class="border-t border-sand bg-whisper">
+      <div class="mx-auto max-w-3xl px-5 py-16 md:py-20">
+        <h2 class="headline text-[clamp(1.5rem,3vw,2.2rem)] text-ink">
+          {WINDOW_FILM_CTA.heading}
+        </h2>
+        <p class="mt-6 text-[15px] leading-relaxed text-char">{WINDOW_FILM_CTA.body}</p>
+        <p class="mt-6 text-[15px] leading-relaxed text-char">
+          <a href={`tel:${CONTACT.phoneTel}`} class="font-bold text-accentDk underline decoration-accent/40 underline-offset-2 hover:text-ink">{WINDOW_FILM_CTA.phoneLine}</a>
+        </p>
+        <p class="mt-2 text-[15px] leading-relaxed text-char">{WINDOW_FILM_CTA.addressLine}</p>
+        <p class="mt-8 text-sm leading-relaxed text-char">{WINDOW_FILM_DISCLAIMER}</p>
+      </div>
+    </section>
+
+    <QuoteCTA defaultService="window tint" />
+  </main>
+  <Footer />
+  <CallFab />
+</Layout>

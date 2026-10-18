@@ -28,10 +28,20 @@ The "Last updated" line above must match `CONTENT_UPDATED` in that file.
 
 - [Car Window Tinting](https://www.mariostintshop.com/services/window-tinting/):
   3M™ Ceramic IR film rejecting up to 90% of infrared heat and up to 99% of UV.
-  Three tiers — Silver (Obsidian carbon), Gold (CS IR nano ceramic), Platinum
-  (Ceramic IR). Non-metallized, so GPS and cell signal are unaffected. Tennessee
+  Three films — Color Stable IR, Ceramic IR, and Crystalline. Non-metallized,
+  so GPS and cell signal are unaffected. Tennessee
   law requires a minimum of 35% VLT on front side, rear side, and rear windows.
   Lifetime warranty available.
+- [3M Window Films](https://www.mariostintshop.com/window-tint/3m-films/):
+  Color Stable IR, Ceramic IR, and Crystalline. Color Stable IR rejects up to
+  64% of total solar energy, depending on shade and glass. Ceramic IR rejects
+  up to 95% of infrared radiation within 3M’s specified measurement range,
+  rejects up to 66% of total solar energy, depending on shade and glass, and
+  blocks up to 99.9% of ultraviolet light. Crystalline uses more than 200 layers
+  and blocks up to 99.9% of ultraviolet light, depending on product and glass.
+  Call (615) 410-7170. 515 NW Broad St, Murfreesboro, TN 37130. Performance
+  varies by film series, shade, and existing glass. “Up to” figures represent
+  maximum published performance and do not apply to every shade.
 - [Paint Protection Film (PPF)](https://www.mariostintshop.com/services/paint-protection-film/):
   3M self-healing clear bra against rock chips, scratches, and road debris.
   Partial front, full front, or complete coverage. Lasts 8–10 years with a
@@ -74,13 +84,17 @@ welcome and not required.
 ## Common questions
 
 - **Window tint in Murfreesboro:** Mario's Tint Shop at 515 NW Broad St installs
-  3M window tint in three tiers — Silver (Obsidian carbon), Gold (CS IR nano
-  ceramic), and Platinum (Ceramic IR, up to 90% infrared heat rejection and up
-  to 99% UV protection). Quotes are free. Call (615) 410-7170.
+  3M window tint — Color Stable IR, Ceramic IR (up to 90% infrared heat
+  rejection and up to 99% UV protection), and Crystalline. Quotes are free.
+  Call (615) 410-7170.
 - **Ceramic coating in Murfreesboro:** Yes. The same shop installs 3M ceramic
   coating on paint, paint protection film, glass, trim, and vinyl wrap. One
   layer lasts up to 3 years and two layers last up to 5, after multi-stage
   paint correction. It does not stop rock chips — that is what PPF is for.
+- **Which 3M Film Is Right for You?** Color Stable IR: The best balance of
+  style, comfort, and value. Ceramic IR: A stronger choice for drivers who want
+  enhanced heat comfort. Crystalline: The premium option for powerful heat
+  rejection with lighter-looking shades.
 - **Pricing:** every vehicle is quoted individually and for free. Price depends on
   the vehicle, the number of windows, and the 3M tier chosen. Call (615) 410-7170.
 - **Booking:** appointments recommended; Saturday 8:00 a.m. – 12:00 p.m., by appointment.

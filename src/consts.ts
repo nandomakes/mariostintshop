@@ -818,7 +818,10 @@ export const NAV_LINKS: {
   {
     href: '/#services',
     label: 'Services',
-    children: SERVICES.map((s) => ({ href: `/services/${s.slug}/`, label: s.name })),
+    children: [
+      ...SERVICES.map((s) => ({ href: `/services/${s.slug}/`, label: s.name })),
+      { href: '/window-tint/3m-films/', label: '3M Window Films' },
+    ],
   },
   { href: '/visualizer/', label: 'Visualizer' },
   { href: '/#gallery', label: 'Gallery' },
