@@ -1,0 +1,24 @@
+{
+  // Sitio estático + /api/apply (antes Vercel Function en api/apply.js).
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mariostintshop",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-10-19",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    // Vercel sin trailingSlash sirve /careers y /careers/ con 200; esto redirige a la forma con barra.
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page",
+    // Solo /api/* pasa por el Worker; el resto lo sirve el asset server con _headers/_redirects.
+    "run_worker_first": ["/api/*"]
+  },
+  "workers_dev": true,
+  "preview_urls": true,
+  "observability": { "enabled": true }
+  // Secretos del Worker (no van aquí ni en el build):
+  //   npx wrangler secret put RESEND_API_KEY
+  //   npx wrangler secret put CAREERS_NOTIFY_EMAIL
+  //   npx wrangler secret put CAREERS_FROM_EMAIL
+  // INSTAGRAM_TOKEN sigue siendo de build (CI / la máquina que construye), no del Worker.
+}
