@@ -15,7 +15,14 @@
   },
   "workers_dev": true,
   "preview_urls": true,
-  "observability": { "enabled": true }
+  "observability": { "enabled": true },
+  // Límite por IP (3 envíos/min) y tope global (20/min). El binding de Cloudflare es aproximado
+  // (contadores por ubicación, consistencia eventual): sirve contra abuso pero no es un contador exacto.
+  // El periodo solo admite 10 o 60 s, así que no hay tope diario con este binding.
+  "ratelimits": [
+    { "name": "APPLY_LIMITER", "namespace_id": "1001", "simple": { "limit": 3, "period": 60 } },
+    { "name": "APPLY_GLOBAL_LIMITER", "namespace_id": "1002", "simple": { "limit": 20, "period": 60 } }
+  ]
   // Secretos del Worker (no van aquí ni en el build):
   //   npx wrangler secret put RESEND_API_KEY
   //   npx wrangler secret put CAREERS_NOTIFY_EMAIL

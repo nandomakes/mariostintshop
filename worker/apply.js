@@ -57,6 +57,18 @@ export async function handleApply(request, env) {
     return json(200, { ok: true });
   }
 
+  // Límite de envíos (Workers Rate Limiting, gratis): por IP y un tope global.
+  // El honeypot queda antes y no consume cuota. Si el binding no existe (pruebas locales), no se limita.
+  if (env.APPLY_LIMITER && env.APPLY_GLOBAL_LIMITER) {
+    const ip = request.headers.get('cf-connecting-ip') || 'unknown';
+    const perIp = await env.APPLY_LIMITER.limit({ key: ip });
+    const global = perIp.success ? await env.APPLY_GLOBAL_LIMITER.limit({ key: 'global' }) : null;
+    if (!perIp.success || !global.success) {
+      console.warn('apply: rate limited', { scope: perIp.success ? 'global' : 'ip' });
+      return json(429, { error: 'Too many requests. Please try again in a minute or call the shop.' }, { 'retry-after': '60' });
+    }
+  }
+
   const name = field(form, 'name');
   const email = field(form, 'email');
   const phone = field(form, 'phone');
