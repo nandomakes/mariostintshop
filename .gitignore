@@ -23,6 +23,10 @@ pnpm-debug.log*
 # Vercel CLI project link (`vercel env pull` also writes .env.local)
 .vercel
 
+# Cloudflare Wrangler local state and secrets (npx wrangler secret put / .dev.vars)
+.wrangler/
+.dev.vars
+
 # source/original imagery (optimized copies live in public/images) — keep out
 # of the repo and the deploy; these raw files are hundreds of MB
 public/images/archive/
