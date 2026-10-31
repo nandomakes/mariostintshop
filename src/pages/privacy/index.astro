@@ -32,8 +32,8 @@ const gaOptOut = 'https://tools.google.com/dlpage/gaoptout';
 
   <h2>Who we are</h2>
   <p>
-    {SITE.brand} is the window tint, paint protection film, and ceramic coating shop published on this website. The name on the site,
-    in the footer, and in our business listing is {SITE.brand}. We are located in Murfreesboro, Tennessee.
+    The business name is {SITE.brand}. That is the only name. There is no separate legal name.
+    We are the window tint, paint protection film, and ceramic coating shop at the address below, in Murfreesboro, Tennessee.
   </p>
   <address>
     {SITE.brand}<br />
@@ -60,11 +60,12 @@ const gaOptOut = 'https://tools.google.com/dlpage/gaoptout';
     <li>a resume file (PDF or Word, up to 4 MB)</li>
   </ul>
   <p>
-    The website does not store that application in a database. When you submit, our server checks the form and emails it, with your resume attached, to the shop through Resend, an email delivery service. The reply-to address on that email is the email you typed, so we can answer you directly. You can read Resend's privacy policy at{' '}
+    The website does not store that application in a database. When you submit, our server checks the form and emails it, with your resume attached, to{' '}
+    <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a> through Resend, an email delivery service. The reply-to address on that email is the email you typed, so we can answer you directly. You can read Resend's privacy policy at{' '}
     <a href={resendPrivacy} target="_blank" rel="noopener noreferrer">resend.com/legal/privacy-policy</a>.
   </p>
   <p>
-    We keep that email and resume while we review your application and for our ordinary hiring records after we decide. The website has no automatic deletion date. When we no longer need the email and resume, we delete them. We do not sell application information, and we do not add applicants to a marketing list.
+    We keep resumes and other candidate information for 6 months, and then we delete them. We do not sell application information, and we do not add applicants to a marketing list.
   </p>
   <p>
     The form has a hidden field that people do not see. If that field is filled in, we treat the submission as automated and we do not email it. We also limit how often the form can be submitted. That limit uses the IP address of the connection and does not add you to a profile or a mailing list. Openings on the site are for applicants 18 or older.
