@@ -1,0 +1,184 @@
+---
+import LegalPage from '../../components/LegalPage.astro';
+import { SITE, CONTACT, SOCIALS, GA4_ID } from '../../consts';
+
+const title = `Privacy Policy | ${SITE.brand}`;
+// Kept under ~155 characters so Google can show it whole.
+const description =
+  "How Mario's Tint Shop in Murfreesboro, TN handles website information, including job applications, TintWiz quotes, and Google Analytics.";
+
+const tintwizPrivacy = 'https://tintwiz.com/privacy-policy';
+const resendPrivacy = 'https://resend.com/legal/privacy-policy';
+const cloudflarePrivacy = 'https://www.cloudflare.com/privacypolicy/';
+const googlePrivacy = 'https://policies.google.com/privacy';
+const gaOptOut = 'https://tools.google.com/dlpage/gaoptout';
+---
+
+<LegalPage
+  title={title}
+  description={description}
+  heading="Privacy Policy"
+  crumb="Privacy Policy"
+  path="/privacy/"
+  updatedLabel="Last updated: October 30, 2026"
+  dateModified="2026-10-30"
+  related={{ href: '/terms/', label: 'Terms of Service' }}
+>
+  <h2>What this policy covers</h2>
+  <p>
+    This policy explains what {SITE.brand} collects on {SITE.url.replace('https://', '')}, why we collect it, and the choices you have.
+    It describes this website. It does not replace the written quote or any written warranty for a job you book at the shop.
+  </p>
+
+  <h2>Who we are</h2>
+  <p>
+    The business name is {SITE.brand}. That is the only name. There is no separate legal name.
+    We are the window tint, paint protection film, and ceramic coating shop at the address below, in Murfreesboro, Tennessee.
+  </p>
+  <address>
+    {SITE.brand}<br />
+    {CONTACT.address}<br />
+    {CONTACT.city}<br />
+    <a href={`tel:${CONTACT.phoneTel}`}>{CONTACT.phoneDisplay}</a><br />
+    <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
+  </address>
+  <p>
+    Shop hours, as published on this website: {CONTACT.hours.map((h) => `${h.label} ${h.value}`).join(' · ')}.
+  </p>
+
+  <h2>Job applications</h2>
+  <p>
+    The careers pages (<a href="/careers/">/careers/</a> and each open role) include an application form. If you apply, you give us:
+  </p>
+  <ul>
+    <li>the position you are applying for</li>
+    <li>your full name</li>
+    <li>your email address</li>
+    <li>your phone number</li>
+    <li>your tint or automotive experience (a range you select)</li>
+    <li>when you can start</li>
+    <li>a resume file (PDF or Word, up to 4 MB)</li>
+  </ul>
+  <p>
+    The website does not store that application in a database. When you submit, our server checks the form and emails it, with your resume attached, to{' '}
+    <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a> through Resend, an email delivery service. The reply-to address on that email is the email you typed, so we can answer you directly. You can read Resend's privacy policy at{' '}
+    <a href={resendPrivacy} target="_blank" rel="noopener noreferrer">resend.com/legal/privacy-policy</a>.
+  </p>
+  <p>
+    We keep resumes and other candidate information for 6 months, and then we delete them. We do not sell application information, and we do not add applicants to a marketing list.
+  </p>
+  <p>
+    The form has a hidden field that people do not see. If that field is filled in, we treat the submission as automated and we do not email it. We also limit how often the form can be submitted. That limit uses the IP address of the connection and does not add you to a profile or a mailing list. Openings on the site are for applicants 18 or older.
+  </p>
+  <p>
+    Sending an application does not mean we have offered you a job.
+  </p>
+
+  <h2>Quote requests</h2>
+  <p>
+    The quote form on this website is an iframe loaded from app.tintwiz.com. We do not receive what you type in that frame on our own server. TintWiz processes the form under its own privacy policy, and the request is then available to the shop so we can reply. Read TintWiz's policy at{' '}
+    <a href={tintwizPrivacy} target="_blank" rel="noopener noreferrer">tintwiz.com/privacy-policy</a>.
+  </p>
+  <p>
+    If you want a copy of a quote request, or you want it deleted, email or call us and we will look for the request that reached the shop. Information TintWiz keeps on its own systems is covered by TintWiz's policy, and you can contact TintWiz as well.
+  </p>
+  <p>
+    This website does not take payment and does not ask for a card number.
+  </p>
+
+  <h2>The visualizer</h2>
+  <p>
+    The page at <a href="/visualizer/">/visualizer/</a> previews sample window-tint shades and paint-protection coverage on generic 3D vehicles. It runs in your browser. The choices you make there are not sent to us. If you download the configuration PDF, the file is saved on your device. We do not receive a copy unless you send it to us yourself. The quote button on that page only scrolls to the TintWiz form.
+  </p>
+
+  <h2>Analytics, cookies, and logs</h2>
+  <p>
+    We use Google Analytics 4 to understand how the site is used. The measurement ID is {GA4_ID}. The tag loads from googletagmanager.com when you open a page. It sets analytics cookies (such as a cookie named <span class="font-semibold">_ga</span> and a cookie for this property). We have not changed Google's default cookie lifetime in the tag.
+  </p>
+  <p>
+    We use it for page views and for three actions: a click on a phone number, a click on a quote button, and a successful job-application submit. The application event includes the job title only — not your name, email, phone, or resume. This website does not run an advertising pixel and does not show ads.
+  </p>
+  <p>
+    Google's privacy policy is at{' '}
+    <a href={googlePrivacy} target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>.
+    You can block or delete cookies in your browser. Google also offers an opt-out add-on at{' '}
+    <a href={gaOptOut} target="_blank" rel="noopener noreferrer">tools.google.com/dlpage/gaoptout</a>.
+    The analytics tag loads when you open the site. We do not show a separate cookie banner.
+  </p>
+  <p>
+    The homepage embeds a Google Map of the shop. Loading that map contacts Google, and Google's privacy policy applies to what Google collects there.
+  </p>
+  <p>
+    The site is hosted on Cloudflare, which also serves it over its network. Cloudflare may keep standard connection logs, such as IP address, browser type, and the page requested, to run and protect the site. Those logs are described in Cloudflare's privacy policy at{' '}
+    <a href={cloudflarePrivacy} target="_blank" rel="noopener noreferrer">cloudflare.com/privacypolicy</a>.
+    Fonts on this site are stored on the site itself. Opening a page does not send your IP address to a Google Fonts server.
+  </p>
+
+  <h2>Instagram, social links, and reviews</h2>
+  <p>
+    The homepage gallery shows photos of our work. Those photos are stored on this website or, when a live Instagram feed is connected at build time, loaded from Instagram's content network. If a photo is loaded from Instagram, your browser requests it from Instagram, and Instagram receives that request. Clicking a photo or a social icon leaves this site.
+  </p>
+  <p>We link to:</p>
+  <ul>
+    {
+      SOCIALS.map((s) => (
+        <li>
+          {s.name}: <a href={s.href} target="_blank" rel="noopener noreferrer">{s.href}</a>
+        </li>
+      ))
+    }
+    <li>
+      Better Business Bureau:{' '}
+      <a href={CONTACT.bbbUrl} target="_blank" rel="noopener noreferrer">{CONTACT.bbbUrl}</a>
+    </li>
+  </ul>
+  <p>
+    We do not control those sites, and their own privacy policies apply once you leave this one.
+  </p>
+
+  <h2>How we use information</h2>
+  <p>We use the information described above to:</p>
+  <ul>
+    <li>read and reply to job applications</li>
+    <li>reply to quote requests that reach the shop</li>
+    <li>see which pages and buttons are used, so we can tell what is working</li>
+    <li>limit spam and abuse on the application form</li>
+    <li>host, secure, and operate the website</li>
+  </ul>
+  <p>
+    We do not sell personal information. We do not share it for cross-context behavioral advertising. Service providers listed above process information only so the site and the shop can do the things in this policy.
+  </p>
+
+  <h2>Your choices, access, and deletion</h2>
+  <p>
+    You can ask us for access to the personal information this website sent us, for a copy of it, or for deletion. For this website, that is the job-application email and resume. Email <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a> or call <a href={`tel:${CONTACT.phoneTel}`}>{CONTACT.phoneDisplay}</a>. We may need to confirm that the request is from you.
+  </p>
+  <p>
+    If you are a California resident, the California Consumer Privacy Act (as amended) also gives you the right to ask us to disclose the personal information we collected about you, to delete it (subject to exceptions the law allows), to correct inaccurate information, and to opt out of the sale or sharing of personal information. We do not sell personal information, and we do not share it for cross-context behavioral advertising, so there is no separate "Do Not Sell or Share" sale to opt out of. We will not discriminate against you for exercising these rights. You may use an authorized agent where California law allows it.
+  </p>
+  <p>
+    You do not have to live in California to contact us. Quote information that never left TintWiz has to be requested from TintWiz as well.
+  </p>
+
+  <h2>Children</h2>
+  <p>
+    This website is not directed to children under 13, and we do not knowingly collect personal information from children under 13. Our job postings ask applicants to be 18 or older. If you believe a child under 13 has given us personal information, contact us and we will delete it.
+  </p>
+
+  <h2>Changes</h2>
+  <p>
+    We may update this policy by posting a new version on this page and changing the date at the top. The posted date is the version that applies.
+  </p>
+
+  <h2>Contact us</h2>
+  <p>
+    Questions about this policy, or a request to access or delete information, can go to the shop:
+  </p>
+  <address>
+    {SITE.brand}<br />
+    {CONTACT.address}, {CONTACT.city}<br />
+    <a href={`tel:${CONTACT.phoneTel}`}>{CONTACT.phoneDisplay}</a><br />
+    <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a><br />
+    {CONTACT.hours.map((h) => `${h.label}: ${h.value}`).join(' · ')}
+  </address>
+</LegalPage>

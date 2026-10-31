@@ -1,0 +1,120 @@
+---
+// Shared shell for /privacy/ and /terms/. Same header, footer, and type as
+// the rest of the site; the page itself is a document, not a sales landing.
+import Layout from '../layouts/Layout.astro';
+import Header from './Header.astro';
+import Footer from './Footer.astro';
+import CallFab from './CallFab.astro';
+import { SITE } from '../consts';
+
+interface Props {
+  title: string;
+  description: string;
+  heading: string;
+  /** Breadcrumb and JSON-LD name. */
+  crumb: string;
+  /** Path with trailing slash, e.g. /privacy/ */
+  path: string;
+  /** Visible "Last updated" line. */
+  updatedLabel: string;
+  /** ISO date for the WebPage JSON-LD node. */
+  dateModified: string;
+  related: { href: string; label: string };
+}
+
+const { title, description, heading, crumb, path, updatedLabel, dateModified, related } = Astro.props;
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE.url },
+      { '@type': 'ListItem', position: 2, name: crumb, item: `${SITE.url}${path}` },
+    ],
+  },
+];
+---
+
+<Layout title={title} description={description} dateModified={dateModified} schema={schema}>
+  <Header />
+  <main id="content">
+    <section class="border-b border-line bg-ink">
+      <div class="mx-auto max-w-3xl px-5 pb-12 pt-24 md:pb-16 md:pt-32">
+        <nav class="reveal text-[11px] font-bold uppercase tracking-[0.16em] text-smoke" aria-label="Breadcrumb">
+          <a href="/" class="transition-colors hover:text-paper">Home</a>
+          <span class="mx-2 text-line">/</span>
+          <span class="text-accent">{crumb}</span>
+        </nav>
+        <p class="kicker reveal mt-8 text-accent">Legal</p>
+        <h1 class="headline reveal mt-3 text-[clamp(1.6rem,4vw,2.6rem)] text-paper">{heading}</h1>
+        <p class="reveal mt-4 text-sm text-smoke">{updatedLabel}</p>
+        <p class="reveal mt-3 text-sm text-smoke">
+          See also our <a href={related.href} class="text-accent underline decoration-accent/40 underline-offset-2 hover:text-paper">{related.label}</a>.
+        </p>
+      </div>
+    </section>
+
+    <article class="legal bg-paper">
+      <div class="mx-auto max-w-3xl px-5 py-14 md:py-20">
+        <slot />
+      </div>
+    </article>
+  </main>
+  <Footer />
+  <CallFab />
+</Layout>
+
+<style>
+  .legal :global(h2) {
+    font-family: 'Special Gothic Expanded One', Impact, sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0;
+    line-height: 1.12;
+    margin-top: 2.75rem;
+    font-size: 1.125rem;
+    color: #111111;
+  }
+  .legal :global(h2:first-child) {
+    margin-top: 0;
+  }
+  .legal :global(p) {
+    margin-top: 1rem;
+    font-size: 15px;
+    line-height: 1.7;
+    color: #333333;
+  }
+  .legal :global(ul) {
+    margin-top: 1rem;
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+  .legal :global(li) {
+    margin-top: 0.5rem;
+    font-size: 15px;
+    line-height: 1.7;
+    color: #333333;
+  }
+  .legal :global(li)::marker {
+    color: #0086d6;
+  }
+  .legal :global(a) {
+    font-weight: 700;
+    color: #0086d6;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-color: rgba(0, 168, 255, 0.4);
+    overflow-wrap: anywhere;
+  }
+  .legal :global(a:hover) {
+    color: #111111;
+  }
+  .legal :global(address) {
+    margin-top: 1rem;
+    font-size: 15px;
+    line-height: 1.7;
+    font-style: normal;
+    color: #333333;
+  }
+</style>

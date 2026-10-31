@@ -1,5 +1,5 @@
 ---
-import { NAV_LINKS, CONTACT, SOCIALS, CAREERS, CAREERS_LINK } from '../consts';
+import { NAV_LINKS, CONTACT, SOCIALS, CAREERS, CAREERS_LINK, quoteHrefFor } from '../consts';
 import Logo from './Logo.astro';
 
 // Most nav links are same-page anchors (/#about); only the standalone routes
@@ -7,11 +7,10 @@ import Logo from './Logo.astro';
 // whether or not the URL carries a trailing slash.
 const here = Astro.url.pathname.replace(/\/+$/, '') || '/';
 
-// Every page renders QuoteCTA (which owns id="contact") except 404, so the
-// quote CTA should scroll down rather than reload the homepage. On a service
-// page that matters twice over: the on-page form is pre-labelled with that
-// service, and the homepage one isn't.
-const quoteHref = here === '/404' ? '/#contact' : '#contact';
+// Pages that render QuoteCTA scroll to it. 404, privacy, and terms do not,
+// so the quote button goes to the homepage form. On a service page the
+// on-page form is pre-labelled with that service, and the homepage one isn't.
+const quoteHref = quoteHrefFor(here);
 const isCurrent = (href: string) => {
   if (href.includes('#')) return false;
   return (href.replace(/\/+$/, '') || '/') === here;

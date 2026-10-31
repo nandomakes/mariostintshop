@@ -1,15 +1,15 @@
 ---
 import { Image } from 'astro:assets';
 import clicksrunLogo from '../assets/images/logo-clicksrun.webp';
-import { SITE, CONTACT, SERVICES, SOCIALS } from '../consts';
+import { SITE, CONTACT, SERVICES, SOCIALS, quoteHrefFor } from '../consts';
 import Logo from './Logo.astro';
 
 const year = new Date().getFullYear();
 
-// Same reasoning as Header: every page except 404 has QuoteCTA's id="contact"
-// on it, so scroll to the form instead of reloading the homepage.
-const quoteHref =
-  (Astro.url.pathname.replace(/\/+$/, '') || '/') === '/404' ? '/#contact' : '#contact';
+// Same reasoning as Header: pages with QuoteCTA scroll to #contact. Pages
+// without it (404, privacy, terms) go to the homepage form.
+const here = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const quoteHref = quoteHrefFor(here);
 
 // Monochrome brand glyphs (site blue via currentColor) on black chips.
 const SOCIAL_ICONS: Record<string, string> = {
@@ -113,9 +113,27 @@ const SOCIAL_ICONS: Record<string, string> = {
   <!-- Bottom bar -->
   <div class="border-t border-line">
     <div class="mx-auto flex max-w-6xl flex-col items-center gap-5 px-5 py-6 pb-24 sm:flex-row sm:justify-between sm:pb-6">
-      <p class="text-xs text-smoke/70">
-        © {year} {SITE.brand} · Murfreesboro, TN. All rights reserved.
-      </p>
+      <div class="flex flex-col items-center gap-2 sm:items-start">
+        <p class="text-xs text-smoke/70">
+          © {year} {SITE.brand} · Murfreesboro, TN. All rights reserved.
+        </p>
+        <nav aria-label="Legal" class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs sm:justify-start">
+          <a
+            href="/privacy/"
+            aria-current={here === '/privacy' ? 'page' : undefined}
+            class="text-smoke/80 underline decoration-smoke/40 underline-offset-2 transition-colors hover:text-accent hover:decoration-accent"
+          >
+            Privacy Policy
+          </a>
+          <a
+            href="/terms/"
+            aria-current={here === '/terms' ? 'page' : undefined}
+            class="text-smoke/80 underline decoration-smoke/40 underline-offset-2 transition-colors hover:text-accent hover:decoration-accent"
+          >
+            Terms of Service
+          </a>
+        </nav>
+      </div>
       <a
         href="https://clicksrun.com"
         target="_blank"

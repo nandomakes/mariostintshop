@@ -13,7 +13,13 @@
     { "source": "/tesla", "destination": "/services/tesla/", "permanent": true },
     { "source": "/tesla/", "destination": "/services/tesla/", "permanent": true },
     { "source": "/commercial-films", "destination": "/services/commercial-films/", "permanent": true },
-    { "source": "/commercial-films/", "destination": "/services/commercial-films/", "permanent": true }
+    { "source": "/commercial-films/", "destination": "/services/commercial-films/", "permanent": true },
+    { "source": "/privacy-policy", "destination": "/privacy/", "permanent": true },
+    { "source": "/privacy-policy/", "destination": "/privacy/", "permanent": true },
+    { "source": "/terms-of-service", "destination": "/terms/", "permanent": true },
+    { "source": "/terms-of-service/", "destination": "/terms/", "permanent": true },
+    { "source": "/legal", "destination": "/privacy/", "permanent": true },
+    { "source": "/legal/", "destination": "/privacy/", "permanent": true }
   ],
   "headers": [
     {
