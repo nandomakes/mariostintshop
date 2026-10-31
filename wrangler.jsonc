@@ -10,8 +10,10 @@
     // Vercel sin trailingSlash sirve /careers y /careers/ con 200; esto redirige a la forma con barra.
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page",
-    // Solo /api/* pasa por el Worker; el resto lo sirve el asset server con _headers/_redirects.
-    "run_worker_first": ["/api/*"]
+    // El Worker corre primero para poder 301 el apex (mariostintshop.com) a www
+    // antes de que el asset server responda. En cualquier otro host no redirige
+    // y delega en assets (_redirects, html_handling, _headers). /api/apply no cambia.
+    "run_worker_first": true
   },
   "workers_dev": true,
   "preview_urls": true,
