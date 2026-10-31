@@ -19,6 +19,8 @@ interface Props {
   noindex?: boolean;
   /** Extra JSON-LD nodes for this page (BreadcrumbList, FAQPage, …). */
   schema?: unknown[];
+  /** ISO date for this page's WebPage node. Defaults to the site-wide content date. */
+  dateModified?: string;
 }
 
 const {
@@ -26,6 +28,7 @@ const {
   description = SITE.description,
   noindex = false,
   schema = [],
+  dateModified = CONTENT_UPDATED,
 } = Astro.props;
 
 const site = Astro.site ?? new URL(SITE.url);
@@ -118,7 +121,7 @@ const webPage = {
   url: canonical,
   name: title,
   description,
-  dateModified: CONTENT_UPDATED,
+  dateModified,
   isPartOf: { '@id': `${SITE.url}/#website` },
   about: { '@id': `${SITE.url}/#business` },
   inLanguage: 'en-US',
@@ -159,7 +162,11 @@ const ga4Id = import.meta.env.PUBLIC_GA4_ID ?? GA4_ID;
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="author" content={SITE.brand} />
-    {noindex && <meta name="robots" content="noindex, follow" />}
+    {noindex ? (
+      <meta name="robots" content="noindex, follow" />
+    ) : (
+      <meta name="robots" content="index, follow" />
+    )}
     <meta name="theme-color" content={SITE.themeColor} />
     <meta name="geo.region" content="US-TN" />
     <meta name="geo.placename" content="Murfreesboro" />

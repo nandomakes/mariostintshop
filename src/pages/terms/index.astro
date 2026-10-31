@@ -1,0 +1,155 @@
+---
+import LegalPage from '../../components/LegalPage.astro';
+import { SITE, CONTACT, SOCIALS } from '../../consts';
+
+const title = `Terms of Service | ${SITE.brand}`;
+// Kept under ~155 characters so Google can show it whole.
+const description =
+  "Terms for the Mario's Tint Shop website in Murfreesboro, TN. Quotes, appointments, the visualizer, warranties, and Tennessee law.";
+
+const tintwizPrivacy = 'https://tintwiz.com/privacy-policy';
+---
+
+<LegalPage
+  title={title}
+  description={description}
+  heading="Terms of Service"
+  crumb="Terms of Service"
+  path="/terms/"
+  updatedLabel="Last updated: October 30, 2026"
+  dateModified="2026-10-30"
+  related={{ href: '/privacy/', label: 'Privacy Policy' }}
+>
+  <h2>Agreement</h2>
+  <p>
+    These terms cover your use of {SITE.url.replace('https://', '')}, the website of {SITE.brand} in Murfreesboro, Tennessee.
+    By using the site, you agree to these terms. If you do not agree, please do not use the site. You can still call the shop about a job.
+    How we handle information collected on the site is described in our <a href="/privacy/">Privacy Policy</a>.
+  </p>
+  <p>
+    These terms cover the website. Work we do on a vehicle is the job you book with the shop, including the written quote and any written warranty we give you for that job.
+  </p>
+
+  <h2>Using the website</h2>
+  <p>
+    The site describes our window tint, paint protection film, ceramic coating, and related services, and it lets you ask for a quote or apply for a job.
+    Use it for that. Do not misuse the application form, try to break the site, or send applications that are not yours.
+    We may refuse a submission that looks automated or abusive.
+  </p>
+  <p>
+    Submitting a job application does not hire you and is not a job offer. Applications are handled as described in the Privacy Policy.
+  </p>
+
+  <h2>Services and prices</h2>
+  <p>
+    Descriptions of services, film names, performance figures, package names, and any prices or "free quote" labels on this website are general information.
+    They help you understand what the shop offers. They are not an offer to do a specific job at a specific price.
+  </p>
+  <p>
+    The price for your vehicle is the quote we confirm at the shop, or in writing, after we know the vehicle and the work.
+    Every vehicle is quoted on its own. Performance figures and a "free quote" label are not your price.
+    Sending a quote request does not create a contract and does not charge you. This website does not take payment.
+  </p>
+
+  <h2>Appointments and quotes</h2>
+  <p>
+    An appointment is the right way to come in. Calling, emailing, or sending the quote form does not by itself hold a bay. A time is confirmed when the shop confirms it.
+  </p>
+  <p>
+    Posted hours are {CONTACT.hours.map((h) => `${h.label} ${h.value}`).join('; ')}.
+    Saturday is by appointment. If the vehicle or the work is different from what you described, the time and the quote can change.
+    A quote from the website form is a request for us to follow up. It is not the final price.
+  </p>
+
+  <h2>The visualizer</h2>
+  <p>
+    The page at <a href="/visualizer/">/visualizer/</a> lets you preview sample window-tint shades and paint-protection coverage on generic 3D vehicles.
+    It is an illustration only. The models are not your car. Darkness, color, and coverage on a real install can look different from the screen.
+  </p>
+  <p>
+    The page notes that Tennessee law requires a minimum of 35% VLT on front side, rear side, and rear windows. That note is general information, not a legal opinion about your car.
+    We confirm a legal shade with you at the shop.
+  </p>
+  <p>
+    The preview runs in your browser. If you download the configuration PDF, it is saved on your device. The website does not upload that file.
+    The quote button on the visualizer scrolls to the quote form. The visualizer itself does not send your build to the shop.
+  </p>
+
+  <h2>Intellectual property</h2>
+  <p>
+    The text, photos, logo, page design, and 3D models on this website belong to {SITE.brand} or are used with permission.
+    You may view the site and download your own visualizer PDF to bring to a quote with us.
+    You may not copy the site, the photos, or the models for another business without our written permission.
+  </p>
+  <p>
+    Product names, including 3M, are trademarks of their owners. We are an authorized 3M dealer. That does not give you a license to use those marks.
+  </p>
+
+  <h2>Third-party services and links</h2>
+  <p>
+    The quote form is an iframe from app.tintwiz.com, operated by TintWiz. What you submit there is processed by TintWiz under TintWiz's own terms and privacy policy, at{' '}
+    <a href={tintwizPrivacy} target="_blank" rel="noopener noreferrer">tintwiz.com/privacy-policy</a>, and is then available to the shop so we can reply.
+    We are not responsible for TintWiz's website or for how TintWiz handles information it collects.
+  </p>
+  <p>Links that leave this site include:</p>
+  <ul>
+    {
+      SOCIALS.map((s) => (
+        <li>
+          {s.name}: <a href={s.href} target="_blank" rel="noopener noreferrer">{s.href}</a>
+        </li>
+      ))
+    }
+    <li>
+      Better Business Bureau:{' '}
+      <a href={CONTACT.bbbUrl} target="_blank" rel="noopener noreferrer">{CONTACT.bbbUrl}</a>
+    </li>
+  </ul>
+  <p>
+    Those sites are not operated by us. Their terms and privacy policies apply when you use them.
+  </p>
+
+  <h2>Warranties</h2>
+  <p>
+    The website is provided as general information. Film performance, how long a product lasts, and warranty length described on the site are general product information.
+    They are not a warranty for your vehicle, and they are not a promise of a specific result on your car, truck, or building.
+  </p>
+  <p>
+    The warranty that applies to a job is the written warranty from the manufacturer and any written warranty the shop gives you when the work is done.
+    Ask us for that paperwork if you want to read it before you book. Nothing on this website replaces those written warranties or adds a warranty the paperwork does not contain.
+  </p>
+
+  <h2>Limitation of liability</h2>
+  <p>
+    To the fullest extent Tennessee law allows, {SITE.brand} is not liable for damages that come from using this website, relying on general information on it, or using the visualizer.
+    That includes a quote that changes once we see the vehicle, and time spent using the site. We are not liable for third-party sites, including TintWiz, except for what we ourselves do with a request after it reaches the shop.
+  </p>
+  <p>
+    Nothing on this website limits a liability that Tennessee law does not allow us to limit. Work performed on a vehicle is covered by the agreement you make with the shop for that job, not by these website terms alone.
+  </p>
+
+  <h2>Tennessee law</h2>
+  <p>
+    These terms are governed by the laws of the State of Tennessee, without regard to conflict-of-law rules.
+    The shop's published address is {CONTACT.address}, {CONTACT.city}, in Rutherford County.
+    Disputes about this website will be brought in the state or federal courts located in Tennessee, and you agree that those courts may hear them.
+    This choice of law covers the website. It does not replace a written warranty or a written work order for a job.
+  </p>
+
+  <h2>Changes</h2>
+  <p>
+    We may update these terms by posting a new version on this page and changing the date at the top.
+    Continuing to use the website after we post a change means you accept the updated terms.
+    A job you already booked keeps the written terms of that job.
+  </p>
+
+  <h2>Contact</h2>
+  <p>Questions about these terms:</p>
+  <address>
+    {SITE.brand}<br />
+    {CONTACT.address}, {CONTACT.city}<br />
+    <a href={`tel:${CONTACT.phoneTel}`}>{CONTACT.phoneDisplay}</a><br />
+    <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a><br />
+    {CONTACT.hours.map((h) => `${h.label}: ${h.value}`).join(' · ')}
+  </address>
+</LegalPage>
