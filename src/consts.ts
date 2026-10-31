@@ -776,8 +776,8 @@ export const TESTIMONIALS = [
   },
 ];
 
-// Aggregate rating shown on the Google review badge — keep in sync with
-// Layout.astro's schema.org aggregateRating and the STATS review count.
+// Google review badge in the UI. Not copied into JSON-LD: Layout.astro does
+// not emit aggregateRating (Google does not show those self-served stars).
 export const GOOGLE_RATING = {
   value: 5.0,
   count: 390,
