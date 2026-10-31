@@ -11,3 +11,26 @@
 /tesla/ /services/tesla/ 308
 /commercial-films /services/commercial-films/ 308
 /commercial-films/ /services/commercial-films/ 308
+# WordPress URLs that 404. Both slash forms: html_handling only rewrites HTML
+# that exists, and none of these paths do. Destinations already use the
+# canonical trailing slash (auto-trailing-slash serves those with 200).
+/car-window-tinting /services/window-tinting/ 301
+/car-window-tinting/ /services/window-tinting/ 301
+/tesla-services /services/tesla/ 301
+/tesla-services/ /services/tesla/ 301
+/commercial /services/commercial-films/ 301
+/commercial/ /services/commercial-films/ 301
+/contact /#contact 301
+/contact/ /#contact 301
+/pricing / 301
+/pricing/ / 301
+/about-us / 301
+/about-us/ / 301
+/gallery / 301
+/gallery/ / 301
+/products / 301
+/products/ / 301
+/privacy-policy / 301
+/privacy-policy/ / 301
+/blog / 301
+/blog/ / 301

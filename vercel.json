@@ -13,7 +13,27 @@
     { "source": "/tesla", "destination": "/services/tesla/", "permanent": true },
     { "source": "/tesla/", "destination": "/services/tesla/", "permanent": true },
     { "source": "/commercial-films", "destination": "/services/commercial-films/", "permanent": true },
-    { "source": "/commercial-films/", "destination": "/services/commercial-films/", "permanent": true }
+    { "source": "/commercial-films/", "destination": "/services/commercial-films/", "permanent": true },
+    { "source": "/car-window-tinting", "destination": "/services/window-tinting/", "statusCode": 301 },
+    { "source": "/car-window-tinting/", "destination": "/services/window-tinting/", "statusCode": 301 },
+    { "source": "/tesla-services", "destination": "/services/tesla/", "statusCode": 301 },
+    { "source": "/tesla-services/", "destination": "/services/tesla/", "statusCode": 301 },
+    { "source": "/commercial", "destination": "/services/commercial-films/", "statusCode": 301 },
+    { "source": "/commercial/", "destination": "/services/commercial-films/", "statusCode": 301 },
+    { "source": "/contact", "destination": "/#contact", "statusCode": 301 },
+    { "source": "/contact/", "destination": "/#contact", "statusCode": 301 },
+    { "source": "/pricing", "destination": "/", "statusCode": 301 },
+    { "source": "/pricing/", "destination": "/", "statusCode": 301 },
+    { "source": "/about-us", "destination": "/", "statusCode": 301 },
+    { "source": "/about-us/", "destination": "/", "statusCode": 301 },
+    { "source": "/gallery", "destination": "/", "statusCode": 301 },
+    { "source": "/gallery/", "destination": "/", "statusCode": 301 },
+    { "source": "/products", "destination": "/", "statusCode": 301 },
+    { "source": "/products/", "destination": "/", "statusCode": 301 },
+    { "source": "/privacy-policy", "destination": "/", "statusCode": 301 },
+    { "source": "/privacy-policy/", "destination": "/", "statusCode": 301 },
+    { "source": "/blog", "destination": "/", "statusCode": 301 },
+    { "source": "/blog/", "destination": "/", "statusCode": 301 }
   ],
   "headers": [
     {
