@@ -17,3 +17,25 @@
 /terms-of-service/ /terms/ 308
 /legal /privacy/ 308
 /legal/ /privacy/ 308
+# WordPress URLs that 404. Both slash forms: html_handling only rewrites HTML
+# that exists, and none of these paths do. Destinations already use the
+# canonical trailing slash (auto-trailing-slash serves those with 200).
+# /privacy-policy, /terms-of-service and /legal stay as above.
+/car-window-tinting /services/window-tinting/ 301
+/car-window-tinting/ /services/window-tinting/ 301
+/tesla-services /services/tesla/ 301
+/tesla-services/ /services/tesla/ 301
+/commercial /services/commercial-films/ 301
+/commercial/ /services/commercial-films/ 301
+/contact /#contact 301
+/contact/ /#contact 301
+/pricing /services/window-tinting/ 301
+/pricing/ /services/window-tinting/ 301
+/about-us / 301
+/about-us/ / 301
+/gallery /services/window-tinting/ 301
+/gallery/ /services/window-tinting/ 301
+/products /services/window-tinting/ 301
+/products/ /services/window-tinting/ 301
+/blog / 301
+/blog/ / 301

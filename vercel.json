@@ -19,7 +19,25 @@
     { "source": "/terms-of-service", "destination": "/terms/", "permanent": true },
     { "source": "/terms-of-service/", "destination": "/terms/", "permanent": true },
     { "source": "/legal", "destination": "/privacy/", "permanent": true },
-    { "source": "/legal/", "destination": "/privacy/", "permanent": true }
+    { "source": "/legal/", "destination": "/privacy/", "permanent": true },
+    { "source": "/car-window-tinting", "destination": "/services/window-tinting/", "statusCode": 301 },
+    { "source": "/car-window-tinting/", "destination": "/services/window-tinting/", "statusCode": 301 },
+    { "source": "/tesla-services", "destination": "/services/tesla/", "statusCode": 301 },
+    { "source": "/tesla-services/", "destination": "/services/tesla/", "statusCode": 301 },
+    { "source": "/commercial", "destination": "/services/commercial-films/", "statusCode": 301 },
+    { "source": "/commercial/", "destination": "/services/commercial-films/", "statusCode": 301 },
+    { "source": "/contact", "destination": "/#contact", "statusCode": 301 },
+    { "source": "/contact/", "destination": "/#contact", "statusCode": 301 },
+    { "source": "/pricing", "destination": "/services/window-tinting/", "statusCode": 301 },
+    { "source": "/pricing/", "destination": "/services/window-tinting/", "statusCode": 301 },
+    { "source": "/about-us", "destination": "/", "statusCode": 301 },
+    { "source": "/about-us/", "destination": "/", "statusCode": 301 },
+    { "source": "/gallery", "destination": "/services/window-tinting/", "statusCode": 301 },
+    { "source": "/gallery/", "destination": "/services/window-tinting/", "statusCode": 301 },
+    { "source": "/products", "destination": "/services/window-tinting/", "statusCode": 301 },
+    { "source": "/products/", "destination": "/services/window-tinting/", "statusCode": 301 },
+    { "source": "/blog", "destination": "/", "statusCode": 301 },
+    { "source": "/blog/", "destination": "/", "statusCode": 301 }
   ],
   "headers": [
     {
