@@ -7,12 +7,14 @@
 // fold. Behind it, the service word set in the display face as outlined
 // type (the same treatment as the ticker strips) anchors the composition.
 import { Image } from 'astro:assets';
+import type { CopyParagraph } from '../consts';
+import CopyParagraphView from './CopyParagraph.astro';
 
 interface Props {
   kicker?: string;
   title: string;
   lead?: string;
-  paragraphs?: string[];
+  paragraphs?: (string | CopyParagraph)[];
   // An imported asset from src/assets — <Image> reads its intrinsic size, so
   // callers no longer pass width/height.
   imageSrc: ImageMetadata;
@@ -61,7 +63,7 @@ const wordSide = reverse ? 'left-0 -translate-x-[4%]' : 'right-0 translate-x-[4%
       {kicker && <span class="kicker mb-4 block text-accentDk">{kicker}</span>}
       <h2 class="headline text-[clamp(1.8rem,3.5vw,2.5rem)] text-ink" set:html={title} />
       {lead && <p class="mt-5 max-w-[56ch] text-lg font-semibold leading-snug text-ink">{lead}</p>}
-      {paragraphs.map((p) => <p class="mt-4 max-w-[62ch] leading-relaxed text-char">{p}</p>)}
+      {paragraphs.map((p) => <CopyParagraphView paragraph={p} class="mt-4 max-w-[62ch] leading-relaxed text-char" />)}
       {
         cta && (
           <a

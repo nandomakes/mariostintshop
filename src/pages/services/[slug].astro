@@ -9,6 +9,7 @@ import RelatedServices from '../../components/RelatedServices.astro';
 import QuoteCTA from '../../components/QuoteCTA.astro';
 import Footer from '../../components/Footer.astro';
 import CallFab from '../../components/CallFab.astro';
+import CopyParagraphView from '../../components/CopyParagraph.astro';
 import { SERVICES, SITE, IMAGES, CONTENT_UPDATED, faqPageSchema } from '../../consts';
 
 export function getStaticPaths() {
@@ -93,12 +94,29 @@ const schema = [
     <FeatureSplit
       kicker="About the service"
       title={`Why ${service.name}?`}
-      paragraphs={[service.intro]}
+      paragraphs={[service.intro, ...(service.introMore ?? [])]}
       imageSrc={splitImg.src}
       imageAlt={splitImg.alt}
       word={service.splitWord}
       cta={{ href: '#contact', label: 'Get Free Quote' }}
     />
+
+    {
+      service.sections && service.sections.length > 0 && (
+        <section class="border-t border-sand bg-whisper">
+          <div class="mx-auto max-w-3xl space-y-12 px-5 py-14 md:py-20">
+            {service.sections.map((section) => (
+              <div>
+                <h2 class="headline text-[clamp(1.5rem,3vw,2.2rem)] text-ink">{section.heading}</h2>
+                {section.paragraphs.map((p) => (
+                  <CopyParagraphView paragraph={p} class="mt-4 text-[15px] leading-relaxed text-char" />
+                ))}
+              </div>
+            ))}
+          </div>
+        </section>
+      )
+    }
 
     <!-- Feature highlights. Headings come from the service so each page targets
          its own keywords instead of all five sharing "Built to protect". -->

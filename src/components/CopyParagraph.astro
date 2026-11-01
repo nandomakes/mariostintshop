@@ -1,0 +1,28 @@
+---
+import { copySegments, type CopyParagraph } from '../consts';
+
+interface Props {
+  paragraph: string | CopyParagraph;
+  class?: string;
+}
+
+const { paragraph, class: className } = Astro.props;
+const segments = copySegments(typeof paragraph === 'string' ? { text: paragraph } : paragraph);
+---
+
+<p class={className}>
+  {
+    segments.map((seg) =>
+      seg.type === 'link' ? (
+        <a
+          href={seg.href}
+          class="font-bold text-accentDk underline decoration-accent/40 underline-offset-2 hover:text-ink"
+        >
+          {seg.value}
+        </a>
+      ) : (
+        seg.value
+      )
+    )
+  }
+</p>

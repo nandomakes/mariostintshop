@@ -249,6 +249,57 @@ export interface Feature {
   body: string;
 }
 
+/** Exact phrase inside a paragraph, turned into one internal link. */
+export interface InlineLink {
+  phrase: string;
+  href: string;
+}
+
+export interface CopyParagraph {
+  text: string;
+  links?: InlineLink[];
+}
+
+export interface CopySection {
+  heading: string;
+  paragraphs: CopyParagraph[];
+}
+
+export type CopySegment =
+  | { type: 'text'; value: string }
+  | { type: 'link'; value: string; href: string };
+
+/** Splits a paragraph around its inline links. Build fails if a phrase is missing or ambiguous. */
+export function copySegments(paragraph: CopyParagraph): CopySegment[] {
+  const links = paragraph.links ?? [];
+  if (links.length === 0) return [{ type: 'text', value: paragraph.text }];
+
+  const found: { start: number; end: number; href: string; phrase: string }[] = [];
+  for (const link of links) {
+    if (link.href === '/contact' || link.href === '/contact/' || link.href.startsWith('/contact/') || link.href.startsWith('/contact?')) {
+      throw new Error(`Refusing /contact link in copy: ${link.href}`);
+    }
+    const start = paragraph.text.indexOf(link.phrase);
+    if (start < 0) throw new Error(`Link phrase not found: "${link.phrase}"`);
+    if (paragraph.text.indexOf(link.phrase, start + link.phrase.length) !== -1) {
+      throw new Error(`Link phrase appears more than once: "${link.phrase}"`);
+    }
+    found.push({ start, end: start + link.phrase.length, href: link.href, phrase: link.phrase });
+  }
+  found.sort((a, b) => a.start - b.start);
+
+  const segments: CopySegment[] = [];
+  let cursor = 0;
+  for (const link of found) {
+    if (link.start < cursor) throw new Error(`Overlapping link phrases in: ${paragraph.text}`);
+    if (link.start > cursor) segments.push({ type: 'text', value: paragraph.text.slice(cursor, link.start) });
+    segments.push({ type: 'link', value: link.phrase, href: link.href });
+    cursor = link.end;
+  }
+  if (cursor < paragraph.text.length) segments.push({ type: 'text', value: paragraph.text.slice(cursor) });
+  return segments;
+}
+
 export interface Service {
   id: string;
   slug: string; // -> /services/{slug}
@@ -270,6 +321,10 @@ export interface Service {
    *  copy reads well on the page but runs past the ~155 chars Google shows. */
   metaDescription?: string;
   intro: string;
+  /** Paragraphs after `intro` in the opening split. */
+  introMore?: CopyParagraph[];
+  /** Extra H2 sections. Questions stay in `faqs`; the page already emits FAQPage. */
+  sections?: CopySection[];
   features: Feature[];
   process: string[];
   faqs: Faq[];
@@ -320,7 +375,13 @@ export const SERVICES: Service[] = [
     heroSubcopy:
       '3M car window tinting in Murfreesboro, TN — Ceramic IR film rejects up to 90% of infrared heat, blocks up to 99% of UV, and leaves GPS and cell signal clear.',
     metaDescription:
-      '3M car window tinting in Murfreesboro, TN. Ceramic IR rejects up to 90% of infrared heat and blocks up to 99% of UV, with no GPS or cell interference.',
+      '3M car window tinting in Murfreesboro, TN. Ceramic IR rejects up to 90% of infrared heat and blocks up to 99% of UV. Lifetime warranty available.',
+    introMore: [
+      {
+        text: 'Want to protect the paint too? See paint protection film.',
+        links: [{ phrase: 'paint protection film', href: '/services/paint-protection-film/' }],
+      },
+    ],
     intro:
       "Mario's Tint Shop installs 3M car window tint at 515 NW Broad St in Murfreesboro, TN. Ceramic IR film rejects up to 90% of infrared heat and blocks up to 99% of harmful UV rays, and the non-metallized film does not interfere with GPS, Bluetooth, cell phone, or satellite radio. Choose Silver (3M Obsidian carbon), Gold (3M CS IR nano ceramic), or Platinum (3M Ceramic IR). Tennessee law requires a minimum of 35% VLT on front side, rear side, and rear windows, and we help you pick a legal shade. Lifetime warranty is available. We serve Murfreesboro, Smyrna, Lebanon, Franklin, Nashville, and the surrounding Middle Tennessee area.",
     features: [
@@ -365,7 +426,7 @@ export const SERVICES: Service[] = [
     splitWord: 'PPF',
     kicker: 'Paint Protection',
     name: 'Paint Protection Film (PPF)',
-    metaTitle: "PPF & Clear Bra in Murfreesboro, TN | Mario's Tint Shop",
+    metaTitle: "PPF & Clear Bra near Nashville, TN | Mario's Tint Shop",
     short:
       'Professional clear bra installation by certified 3M installers — self-healing defense against scratches, UV damage, and rock chips.',
     meta: '3M Paint Protection Film · 10-year warranty',
@@ -378,6 +439,8 @@ export const SERVICES: Service[] = [
     ],
     heroSubcopy:
       "Premium self-healing paint protection film (clear bra) from 3M — safeguarding your car's factory paint against scratches, chips, and road hazards.",
+    metaDescription:
+      '3M self-healing paint protection film for drivers in Nashville, Murfreesboro and Middle Tennessee. 10-year 3M warranty. Free quote.',
     intro:
       "At Mario's Tint Shop we specialize in premium 3M paint protection film (PPF) — an invisible clear bra that protects your factory paint from scratches, chips, and road debris. We are certified 3M dealers and installers, with cutting-edge self-healing film where minor scratches vanish when exposed to heat.",
     features: [
@@ -394,6 +457,36 @@ export const SERVICES: Service[] = [
       'Meticulous hand installation with wrapped edges',
       'Curing and a final detail so the film disappears into the paint',
     ],
+    sections: [
+      {
+        heading: 'Serving Nashville, Murfreesboro & Middle Tennessee',
+        paragraphs: [
+          {
+            text: "Mario's Tint Shop installs 3M self-healing paint protection film at 515 NW Broad St in Murfreesboro, TN, for drivers from Nashville, Smyrna, La Vergne, Brentwood, Franklin, Lebanon, and across Middle Tennessee. Open Monday–Friday 8–5 and Saturday 8–12 by appointment.",
+          },
+        ],
+      },
+      {
+        heading: 'Self-healing PPF: what it means',
+        paragraphs: [
+          {
+            text: "Minor scratches and swirl marks on the film's surface disappear when exposed to heat, like warm water or sunlight. The paint underneath stays protected, and the film is virtually invisible once applied.",
+          },
+        ],
+      },
+      {
+        heading: 'How much does PPF cost?',
+        paragraphs: [
+          {
+            text: `Choose partial front, full front, track pack, or full body. Every quote is free. Call ${PHONE_DISPLAY} or get a free quote. Pair it with ceramic coating for easier cleaning.`,
+            links: [
+              { phrase: 'get a free quote', href: '/#contact' },
+              { phrase: 'ceramic coating', href: '/services/ceramic-coating/' },
+            ],
+          },
+        ],
+      },
+    ],
     faqs: [
       { q: 'What areas should I protect with PPF?', a: 'Popular options are a full-front package (bumper, hood, fenders, mirrors) for rock-chip zones, or full-body coverage for complete protection. We tailor coverage to how and where you drive.' },
       { q: 'How long does PPF last?', a: 'Quality PPF lasts 8–10 years and is backed by a manufacturer warranty against yellowing, cracking, and delamination.' },
@@ -401,6 +494,9 @@ export const SERVICES: Service[] = [
       { q: 'Does PPF go on before or after ceramic coating?', a: 'PPF always goes on first, with the ceramic coating applied over the film afterward. A coating is designed to repel everything that touches it, so putting one down first would stop the film from bonding to the paint.' },
       { q: 'Will removing PPF damage my paint?', a: 'No. Professionally installed 3M film is made to be removed by a trained installer without harming the factory paint. While it is on the car, that paint is shielded from the UV exposure and road debris the uncovered panels are taking.' },
       { q: 'Which areas do you serve?', a: 'We are based in Murfreesboro and regularly install PPF for customers from Smyrna, Lebanon, Franklin, La Vergne, Brentwood, Nashville, and across Rutherford County and Middle Tennessee.' },
+      { q: 'How much does PPF cost near Nashville?', a: `From a partial front to full body. Every quote is free: call ${PHONE_DISPLAY}.` },
+      { q: 'Is self-healing PPF worth it?', a: "Self-healing film lets minor scratches and swirl marks on the film vanish with heat from warm water or sunlight, so the car keeps looking new. It is backed by 3M's 10-year warranty against yellowing, cracking, and delamination." },
+      { q: 'What does the 10-year 3M warranty cover?', a: "Yellowing, cracking, and delamination of the film. If an issue ever comes up, bring the vehicle back and we'll make it right." },
     ],
     image: 'paint',
     splitImage: 'ppfWork',
@@ -437,6 +533,33 @@ export const SERVICES: Service[] = [
       '3M ceramic coating in Murfreesboro, TN. One layer lasts up to 3 years and two layers up to 5, on paint, PPF, glass, trim, and vinyl wrap.',
     intro:
       "Mario's Tint Shop installs 3M ceramic coating at 515 NW Broad St in Murfreesboro, TN. The formula bonds to paint, paint protection film, glass, trim, and vinyl wrap. It repels water and dirt, resists UV and chemical etching from bug splatter and bird droppings, and leaves a hydrophobic gloss. A single layer lasts up to 3 years and a dual layer up to 5 with proper maintenance. We decontaminate the paint and run multi-stage paint correction first, so swirls are removed rather than sealed in. Every vehicle is quoted for free.",
+    sections: [
+      {
+        heading: 'Ceramic coating vs PPF: which one?',
+        paragraphs: [
+          {
+            text: 'Ceramic coating gives a hydrophobic gloss and resists swirls, chemicals, and water spots, but it does not stop rock chips. Paint protection film stops rock chips. Many owners put PPF on high-impact areas and ceramic coating over the whole car.',
+            links: [{ phrase: 'Paint protection film', href: '/services/paint-protection-film/' }],
+          },
+        ],
+      },
+      {
+        heading: 'Ceramic coating over PPF',
+        paragraphs: [
+          {
+            text: 'Yes, it works. The film goes on first and the coating is applied over it afterward, so the film bonds to the paint, for easier cleaning and more gloss.',
+          },
+        ],
+      },
+      {
+        heading: 'How much does ceramic coating cost?',
+        paragraphs: [
+          {
+            text: `Every vehicle is quoted for free at ${PHONE_DISPLAY}.`,
+          },
+        ],
+      },
+    ],
     features: [
       { title: 'Superior Environmental Protection', body: 'Robust defense against dirt, road debris, UV rays, chemical etching from bug splatter, and corrosive bird droppings.' },
       { title: 'Long-Lasting Durability', body: 'A single layer protects for up to three years; a dual-layer application lasts up to five years with proper maintenance.' },
@@ -459,6 +582,8 @@ export const SERVICES: Service[] = [
       { q: 'Can you coat a car that already has swirls or scratches?', a: 'Yes. We decontaminate and run multi-stage paint correction before any coating goes on, because the coating seals in whatever is underneath it.' },
       { q: 'How do I look after a ceramic-coated car?', a: 'Wash with a pH-neutral soap and a clean wash mitt, and skip automatic brush washes — those cause most of the swirl marks we correct. No waxing is needed; the coating is the protection.' },
       { q: 'Which areas do you serve?', a: 'We are based in Murfreesboro and coat vehicles for customers from Smyrna, Lebanon, Franklin, La Vergne, Brentwood, Nashville, and across Rutherford County and Middle Tennessee.' },
+      { q: 'Can you put ceramic coating on PPF?', a: 'Yes. PPF goes on first and the ceramic coating goes over the film afterward, for easier cleaning and more gloss.' },
+      { q: 'Ceramic coating or PPF: which one do I need?', a: 'Ceramic coating resists swirls, chemicals, and water spots but does not stop rock chips. For impact protection, pair it with PPF, and many owners combine both.' },
     ],
     image: 'coating',
     splitImage: 'teslaSvc',
