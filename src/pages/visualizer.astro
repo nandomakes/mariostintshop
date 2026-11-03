@@ -8,7 +8,9 @@ import CallFab from '../components/CallFab.astro';
 import { SITE, IMAGES } from '../consts';
 import { PHOTO_VEHICLES } from '../lib/vehicles-photo';
 
-// 3D-only visualizer: one optimized GLB per category (public/models3d/*.glb).
+// Still frames of the same two camera angles the 3D viewer used (drag was
+// already disabled). Masks for each glass zone and PPF package are layered
+// on top. Regenerate with scripts/render-visualizer-frames.mjs.
 const VEHICLE_IDS = ['sedan', 'suv', 'sport', 'truck'];
 const VEHICLES = PHOTO_VEHICLES.filter((v) => VEHICLE_IDS.includes(v.id));
 
@@ -16,7 +18,7 @@ const title = `Window Tint & PPF Visualizer | ${SITE.brand}`;
 // ≤155 chars so Google shows it whole — the previous copy ran to ~218 and was
 // truncated mid-sentence in the SERP.
 const description =
-  'Preview 3M window tint shades and PPF coverage on a 3D car, then send your build to Mario’s Tint Shop in Murfreesboro, TN for a free quote.';
+  'Preview 3M window tint shades and PPF coverage on a car, then send your build to Mario’s Tint Shop in Murfreesboro, TN for a free quote.';
 
 // Mirrors the visual breadcrumb below.
 const schema = [
@@ -116,8 +118,8 @@ const PPF_PACKAGES = [
     <!-- Hero image band -->
     <section class="relative overflow-hidden border-b border-line bg-ink">
       <div class="absolute inset-0" aria-hidden="true">
-        <!-- Decorative only here (the 3D viewer is the real content), so this
-             one is lazy — unlike the homepage hero, it is not the LCP. -->
+        <!-- This band is the mobile LCP (measured). It has to be eager and
+             high priority; loading=lazy was holding the paint back. -->
         <Picture
           src={IMAGES.heroBg.src}
           alt=""
@@ -125,7 +127,8 @@ const PPF_PACKAGES = [
           fallbackFormat="webp"
           widths={[640, 1024, 1536]}
           sizes="100vw"
-          loading="lazy"
+          loading="eager"
+          fetchpriority="high"
           class="h-full w-full object-cover object-[center_62%] opacity-60"
         />
         <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-ink/70"></div>
@@ -148,7 +151,7 @@ const PPF_PACKAGES = [
         <p class="reveal mx-auto mt-5 max-w-[64ch] text-[15px] leading-relaxed text-char">
           Preview 3M window tint or paint protection film (PPF) on your car — switch between
           the two modes below. Select a car category, determine the coverage area, pick a
-          tint shade or PPF package, and rotate the 3D model to preview the look before you buy.
+          tint shade or PPF package, and switch between front and rear view to preview the look before you buy.
         </p>
       </div>
     </section>
@@ -290,7 +293,7 @@ const PPF_PACKAGES = [
             <button type="button" class="acc-toggle flex w-full items-center justify-between py-4 text-left" aria-expanded="true">
               <span>
                 <h2 class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the tint</h2>
-                <span class="mt-0.5 block text-xs text-ash">The shade applies live to the 3D model's glass.</span>
+                <span class="mt-0.5 block text-xs text-ash">The shade applies to the glass in the preview.</span>
               </span>
               <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
                 <path d="M5 12h14" /><path class="acc-vert" d="M12 5v14" />
@@ -363,7 +366,7 @@ const PPF_PACKAGES = [
             </span>
             <div class="min-w-0 flex-1 basis-40">
               <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-ink">Protecting the paint too?</p>
-              <p class="mt-0.5 text-xs leading-snug text-ash">Same 3D car — see which panels each PPF package covers.</p>
+              <p class="mt-0.5 text-xs leading-snug text-ash">Same preview — see which panels each PPF package covers.</p>
             </div>
             <button
               type="button" data-switch-mode="ppf"
@@ -382,7 +385,7 @@ const PPF_PACKAGES = [
                   {/* Distinct from the tint panel's "Select the coverage" —
                       two identical H2s muddied the document outline. */}
                   <h2 class="block text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Select the PPF coverage</h2>
-                  <span class="mt-0.5 block text-xs text-ash">Protected panels are highlighted in green on the model.</span>
+                  <span class="mt-0.5 block text-xs text-ash">Protected panels are highlighted in green on the preview.</span>
                 </span>
                 <svg class="acc-icon shrink-0 text-accentDk transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
                   <path d="M5 12h14" /><path class="acc-vert" d="M12 5v14" />
@@ -441,7 +444,7 @@ const PPF_PACKAGES = [
           </div>
         </div>
 
-        <!-- Preview column: 3D model on a white stage -->
+        <!-- Preview column: still frames on a white stage -->
         <div class="min-w-0 lg:order-2">
           <div class="border border-sand bg-whisper p-4 sm:p-6">
             <!-- Toolbar: angle toggle left · PDF download top-right -->
@@ -473,30 +476,28 @@ const PPF_PACKAGES = [
               </button>
             </div>
 
-            <div class="relative aspect-[4/3] w-full overflow-hidden border border-sand bg-white sm:aspect-[860/520]">
-              <model-viewer
-                id="car-3d-viewer"
-                class="absolute inset-0 h-full w-full"
-                style="background-color: #ffffff;"
-                src="/models3d/sedan.glb"
-                loading="eager"
-                bounds="tight"
-                shadow-intensity="0.9"
-                shadow-softness="0.8"
-                exposure="1.0"
-                tone-mapping="neutral"
-                environment-image="/models3d/studio-env.hdr"
-                camera-orbit="-35deg 84deg 70%"
-                field-of-view="22deg"
-                disable-zoom
-                disable-tap
-                interaction-prompt="none"
-                aria-label="3D vehicle with the selected tint applied to the glass"
-              ></model-viewer>
-              <div id="model-loading" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white">
-                <span class="model-spinner" aria-hidden="true"></span>
-                <span id="model-loading-pct" class="text-[11px] font-bold uppercase tracking-[0.14em] text-ink">0%</span>
-              </div>
+            <div id="stage" class="relative aspect-[4/3] w-full overflow-hidden border border-sand bg-white sm:aspect-[860/520]">
+              <picture class="absolute inset-0 block h-full w-full">
+                <source
+                  id="stage-avif"
+                  type="image/avif"
+                  srcset="/images/visualizer/sedan-front-640.avif 640w, /images/visualizer/sedan-front.avif 1290w"
+                  sizes="(min-width: 1024px) 640px, 100vw"
+                />
+                <img
+                  id="stage-base"
+                  src="/images/visualizer/sedan-front-640.webp"
+                  srcset="/images/visualizer/sedan-front-640.webp 640w, /images/visualizer/sedan-front.webp 1290w"
+                  sizes="(min-width: 1024px) 640px, 100vw"
+                  width="1290"
+                  height="780"
+                  alt="Sedan, front view, no tint selected"
+                  decoding="async"
+                  fetchpriority="low"
+                  class="h-full w-full object-contain"
+                />
+              </picture>
+              <div id="stage-layers" class="pointer-events-none absolute inset-0" aria-hidden="true"></div>
             </div>
             <p id="preview-hint" class="mt-2 text-[10px] leading-relaxed text-ash">
               Switch between front and rear view · pick a tint shade to see it on the glass
@@ -504,7 +505,7 @@ const PPF_PACKAGES = [
 
             <!-- Live summary -->
             <div class="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-sand pt-4">
-              <p id="build-summary" class="min-w-0 flex-1 text-xs font-semibold uppercase tracking-[0.08em] text-char"></p>
+              <p id="build-summary" class="min-w-0 flex-1 text-xs font-semibold uppercase tracking-[0.08em] text-char" aria-live="polite"></p>
               <span id="legal-badge" class="shrink-0 bg-accent/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-accentDk"></span>
             </div>
           </div>
@@ -523,7 +524,7 @@ const PPF_PACKAGES = [
 
           <p class="mx-auto mt-6 max-w-xl text-center text-[11px] leading-relaxed text-ash">
             Visual representations are shown for illustrative purposes only; vehicles are
-            generic 3D models and actual appearances treated with window film may vary.
+            generic vehicle previews and actual appearances treated with window film may vary.
           </p>
         </div>
       </div>
@@ -589,38 +590,9 @@ const PPF_PACKAGES = [
       }
     }
 
-    /* 3D model loading overlay */
-    #model-loading {
-      transition: opacity 200ms ease;
-    }
-    #model-loading[hidden] {
-      display: none;
-    }
-    .model-spinner {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      border: 3px solid var(--tw-color-sand, #eeeeee);
-      border-top-color: #00a8ff;
-      animation: model-spin 800ms linear infinite;
-    }
-    @keyframes model-spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .model-spinner {
-        animation-duration: 1600ms;
-      }
-    }
   </style>
 
   <script>
-    // model-viewer registers <model-viewer> as a custom element on import.
-    // Dynamic chunk: it loads after the page shell renders.
-    import('@google/model-viewer');
-
     // Logo for the PDF export. Imported (not hardcoded) so it resolves to the
     // hashed /_astro/ URL — a literal path would 404 after any asset change.
     import logoUrl from '../assets/images/logo-mario.webp';
@@ -663,163 +635,146 @@ const PPF_PACKAGES = [
 
     const summary = document.getElementById('build-summary')!;
     const badge = document.getElementById('legal-badge')!;
-    // ══ 3D viewer ═════════════════════════════════════════════════════
-    type GlbMaterial = {
-      name: string;
-      pbrMetallicRoughness: { setBaseColorFactor(rgba: number[]): void; baseColorFactor: number[] };
-    };
-    const viewer = document.getElementById('car-3d-viewer') as HTMLElement & {
-      src: string;
-      cameraOrbit: string;
-      cameraTarget: string;
-      jumpCameraToGoal(): void;
-      toDataURL(type?: string): string;
-      model?: { materials: GlbMaterial[] };
-    };
+    const stageBase = document.getElementById('stage-base') as HTMLImageElement;
+    const stageAvif = document.getElementById('stage-avif') as HTMLSourceElement;
+    const stageLayers = document.getElementById('stage-layers')!;
 
-    let currentSrc = '';
-
-    // ══ Loading overlay ═══════════════════════════════════════════════
-    const loadingEl = document.getElementById('model-loading')!;
-    const loadingPct = document.getElementById('model-loading-pct')!;
-    function showLoading() {
-      loadingPct.textContent = '0%';
-      loadingEl.hidden = false;
-    }
-    function hideLoading() {
-      loadingEl.hidden = true;
-    }
-    viewer.addEventListener('progress', (e: Event) => {
-      const detail = (e as CustomEvent<{ totalProgress: number }>).detail;
-      const pct = Math.round((detail?.totalProgress ?? 0) * 100);
-      loadingPct.textContent = `${pct}%`;
-    });
-
-    // Glass looks per shade — must match GLASS_LOOK in scripts/build-models.mjs.
-    const GLASS_LOOK: Record<string, number[]> = {
-      clear: [0.8, 0.84, 0.88, 0.08],
-      light: [0.5, 0.54, 0.58, 0.22],
-      medium: [0.17, 0.19, 0.21, 0.36],
-      dark: [0.02, 0.024, 0.03, 0.5],
-    };
-    // Each coverage zone owns a glass material, split at build time.
-    // glass_windshield and glass_lamps are never tinted.
-    const ZONE_MATERIAL: Record<string, string> = {
-      'front-side': 'glass_front',
-      'rear-side': 'glass_rearside',
-      rear: 'glass_rearwin',
-      visor: 'glass_visor',
+    // How strongly the black glass mask darkens the still. Clear stays a
+    // hint of film; dark reads as a tinted window on the photograph.
+    const TINT_OP: Record<string, number> = {
+      clear: 0.1,
+      light: 0.32,
+      medium: 0.55,
+      dark: 0.82,
     };
 
-    // Apply the selected shade to the selected zones' glass materials and
-    // reset unselected zones to clear. three.js re-syncs materials
-    // asynchronously while textures wire up and can overwrite live edits,
-    // so a permanent watchdog re-asserts the state every 700ms — any revert
-    // is corrected within a frame or two of it happening.
-    // Body paint looks — must match PPF_LOOK in scripts/build-models.mjs.
-    const PPF_LOOK: Record<string, number[]> = {
-      bare: [0.4851, 0.5149, 0.552, 1], // #b9bec4
-      covered: [0.0065, 0.4621, 0.0595, 1], // #13b545
-    };
-    const PPF_ZONES = [
-      'ppf_bumper_f', 'ppf_hood_f', 'ppf_hood_r', 'ppf_mirror',
-      'ppf_roof', 'ppf_rocker', 'ppf_side', 'ppf_rear',
-    ];
-
-    // Apply the selected shade to the selected zones' glass materials and
-    // reset unselected zones to clear, then shade the body panels covered by
-    // the chosen PPF package green. three.js re-syncs materials
-    // asynchronously while textures wire up and can overwrite live edits,
-    // so a permanent watchdog re-asserts the state every 700ms — any revert
-    // is corrected within a frame or two of it happening.
-    function applyTint3D() {
-      const materials = viewer.model?.materials;
-      if (!materials?.length) return;
-      const shadeLook = GLASS_LOOK[state.shade] ?? GLASS_LOOK.dark;
-      const wanted: Record<string, number[]> = {
-        glass_windshield: GLASS_LOOK.clear,
-        glass_lamps: GLASS_LOOK.clear,
-      };
-      // Both halves of the build stay applied whichever tab is open, so
-      // switching tabs never appears to undo what you already picked.
-      for (const [zone, matName] of Object.entries(ZONE_MATERIAL)) {
-        wanted[matName] = state.tintZones.has(zone) ? shadeLook : GLASS_LOOK.clear;
-      }
-      const covered = new Set(state.ppfZones);
-      for (const z of PPF_ZONES) wanted[z] = covered.has(z) ? PPF_LOOK.covered : PPF_LOOK.bare;
-      for (const mat of materials) {
-        const target = wanted[mat.name];
-        if (target) mat.pbrMetallicRoughness.setBaseColorFactor(target);
-      }
-    }
-    setInterval(applyTint3D, 700);
-
-    // Fixed ¾ camera angles. All four models face the same way.
-    const FRONT_THETA: Record<string, number> = { sedan: -35, suv: -35, sport: -35, truck: -35 };
     let angle: 'front' | 'rear' = 'front';
-    // Auto-framing centers the 3D bounding box, but a ¾ view carries more
-    // visual mass toward the near end — nudge the camera target 7% of the
-    // car's length toward the nose (sign flips with model facing + view).
-    let modelCenter: { x: number; y: number; z: number } | null = null;
-    let modelLength = 0;
-    function applyAngle() {
-      const front = FRONT_THETA[state.vehicle] ?? -35;
-      const theta = angle === 'front' ? front : front + 180;
-      viewer.cameraOrbit = `${theta}deg 84deg 70%`;
-      if (modelCenter) {
-        const facing = front === -35 ? 1 : -1;
-        const dir = facing * (angle === 'front' ? 1 : -1);
-        viewer.cameraTarget = `${modelCenter.x}m ${modelCenter.y}m ${modelCenter.z + dir * modelLength * 0.07}m`;
-      }
-      viewer.jumpCameraToGoal?.();
-    }
-    $$('.angle-btn').forEach((b) =>
-      b.addEventListener('click', () => {
-        angle = b.dataset.angle as 'front' | 'rear';
-        $$('.angle-btn').forEach((c) => c.setAttribute('aria-pressed', String(c === b)));
-        applyAngle();
-      })
-    );
+    let frameToken = 0;
+    let shownFrame = 'sedan-front';
 
-    let prefetched = false;
-    viewer.addEventListener('load', () => {
-      hideLoading();
-      applyTint3D();
-      // Capture the auto-framed center of THIS model, then re-frame with
-      // the nose-shift applied.
+    function frameFile(vehicle: string, view: 'front' | 'rear', ext: 'avif' | 'webp', small = false) {
+      return `/images/visualizer/${vehicle}-${view}${small ? '-640' : ''}.${ext}`;
+    }
+
+    function stageAlt() {
+      const view = angle === 'front' ? 'front view' : 'rear view';
+      const bits = [`${state.vehicleLabel}, ${view}`];
+      if (state.tintZones.size) {
+        const zones = [...state.tintZones].map((z) => ZONE_LABELS[z]).join(', ');
+        bits.push(`${state.shadeLabel} tint on ${zones}`);
+      } else {
+        bits.push('no tint selected');
+      }
+      if (state.ppf !== 'none') bits.push(`paint protection: ${state.ppfLabel}`);
+      return bits.join(', ');
+    }
+
+    // Masks are fetched only for the zones the visitor actually picks.
+    function syncLayers() {
+      const prefix = `/images/visualizer/${state.vehicle}-${angle}`;
+      const specs: { key: string; src: string; op: number }[] = [];
+      if (state.ppf !== 'none') {
+        specs.push({
+          key: `ppf-${state.vehicle}-${angle}-${state.ppf}`,
+          src: `${prefix}-ppf-${state.ppf}.webp`,
+          op: 1,
+        });
+      }
+      const op = TINT_OP[state.shade] ?? 0.55;
+      for (const zone of state.tintZones) {
+        specs.push({ key: `tint-${state.vehicle}-${angle}-${zone}`, src: `${prefix}-${zone}.webp`, op });
+      }
+      const keep = new Set(specs.map((s) => s.key));
+      for (const img of [...stageLayers.querySelectorAll('img')]) {
+        if (!keep.has(img.dataset.key || '')) img.remove();
+      }
+      for (const spec of specs) {
+        let img = stageLayers.querySelector<HTMLImageElement>(`img[data-key="${spec.key}"]`);
+        if (!img) {
+          img = document.createElement('img');
+          img.dataset.key = spec.key;
+          img.alt = '';
+          img.decoding = 'async';
+          img.className = 'absolute inset-0 h-full w-full object-contain';
+          img.src = spec.src;
+          stageLayers.appendChild(img);
+        }
+        img.dataset.op = String(spec.op);
+        img.style.opacity = String(spec.op);
+        stageLayers.appendChild(img);
+      }
+      stageBase.alt = stageAlt();
+    }
+
+    const preloaded = new Set<string>();
+    function preloadView(vehicle: string, view: 'front' | 'rear') {
+      const href = frameFile(vehicle, view, 'avif', true);
+      if (preloaded.has(href)) return;
+      preloaded.add(href);
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.type = 'image/avif';
+      link.href = href;
+      link.dataset.preload = href;
+      document.head.appendChild(link);
+    }
+
+    // Swap the still only after the next frame has decoded, so the box
+    // never collapses and the previous car stays put until the new one is ready.
+    async function showFrame() {
+      const vehicle = state.vehicle;
+      const view = angle;
+      const key = `${vehicle}-${view}`;
+      if (shownFrame === key) {
+        syncLayers();
+        return;
+      }
+      const token = ++frameToken;
+      const small = new Image();
+      small.src = frameFile(vehicle, view, 'webp', true);
       try {
-        const t = (viewer as any).getCameraTarget();
-        const d = (viewer as any).getDimensions();
-        modelCenter = { x: t.x, y: t.y, z: t.z };
-        modelLength = Math.max(d.x, d.z);
+        await small.decode();
       } catch {
-        modelCenter = null;
+        /* a failed decode still falls through to the src swap */
       }
-      applyAngle();
-      if (!prefetched) {
-        prefetched = true;
-        prefetchOthers();
-      }
+      if (token !== frameToken) return;
+      stageAvif.srcset = `${frameFile(vehicle, view, 'avif', true)} 640w, ${frameFile(vehicle, view, 'avif')} 1290w`;
+      stageBase.srcset = `${frameFile(vehicle, view, 'webp', true)} 640w, ${frameFile(vehicle, view, 'webp')} 1290w`;
+      stageBase.src = frameFile(vehicle, view, 'webp', true);
+      shownFrame = key;
+      syncLayers();
+      const other: 'front' | 'rear' = view === 'front' ? 'rear' : 'front';
+      preloadView(vehicle, other);
+    }
+
+    const angleGroup = document.querySelector<HTMLElement>('[aria-label="Vehicle angle"]')!;
+    const angleButtons = () => $$<HTMLButtonElement>('.angle-btn');
+    angleButtons().forEach((b, i) => {
+      b.tabIndex = i === 0 ? 0 : -1;
     });
-
-    function loadModel(vehicleId: string) {
-      const src = `/models3d/${vehicleId}.glb`;
-      if (currentSrc === src) return;
-      currentSrc = src;
-      modelCenter = null;
-      showLoading();
-      (viewer as any).cameraTarget = 'auto auto auto'; // re-resolve for the new model
-      viewer.src = src;
-      applyAngle();
+    function pressAngle(btn: HTMLButtonElement) {
+      angle = btn.dataset.angle as 'front' | 'rear';
+      angleButtons().forEach((c) => {
+        const on = c === btn;
+        c.setAttribute('aria-pressed', String(on));
+        c.tabIndex = on ? 0 : -1;
+      });
+      showFrame();
     }
-
-    // Warm the HTTP cache for the other models so switching vehicles is
-    // nearly instant (the GLBs are 2-3.7MB each; decode is the only cost left).
-    function prefetchOthers() {
-      for (const id of ['suv', 'sport', 'truck']) {
-        fetch(`/models3d/${id}.glb`, { priority: 'low' } as RequestInit).catch(() => {});
-      }
-    }
+    angleButtons().forEach((b) => b.addEventListener('click', () => pressAngle(b)));
+    angleGroup.addEventListener('keydown', (e) => {
+      const key = (e as KeyboardEvent).key;
+      const dir = key === 'ArrowRight' || key === 'ArrowDown' ? 1 : key === 'ArrowLeft' || key === 'ArrowUp' ? -1 : 0;
+      if (!dir) return;
+      const buttons = angleButtons();
+      const current = buttons.indexOf(document.activeElement as HTMLButtonElement);
+      if (current === -1) return;
+      e.preventDefault();
+      const next = buttons[(current + dir + buttons.length) % buttons.length];
+      next.focus();
+      pressAngle(next);
+    });
 
     // ══ Render cycle ═══════════════════════════════════════════════════
     const okBadge =
@@ -828,10 +783,12 @@ const PPF_PACKAGES = [
       'shrink-0 bg-[#FFF1CC] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#8A5B00]';
 
     function render() {
-      applyTint3D();
+      // While a new still is decoding, keep the previous masks. showFrame
+      // paints the new ones in the same turn it swaps the photograph.
+      if (shownFrame === `${state.vehicle}-${angle}`) syncLayers();
 
       // The summary describes the whole build, not just the open tab, since
-      // both halves are applied to the model at once.
+      // both halves are applied to the preview at once.
       const parts = [state.vehicleLabel];
       if (state.tintZones.size) {
         const zones = [...state.tintZones].map((z) => ZONE_LABELS[z]).join(', ');
@@ -915,8 +872,9 @@ const PPF_PACKAGES = [
           c.classList.toggle('bg-mint', on);
           c.classList.toggle('border-sand', !on);
         });
-        loadModel(id);
+        showFrame();
         render();
+        preloadView(id, 'front');
       })
     );
 
@@ -1026,18 +984,30 @@ const PPF_PACKAGES = [
       $$('.prio-chip').forEach((c) => c.setAttribute('aria-pressed', 'false'));
       $$('.ppf-tile').forEach((c) => c.setAttribute('aria-checked', String(c.dataset.ppf === 'none')));
       angle = 'front';
-      $$('.angle-btn').forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.angle === 'front')));
-      applyAngle();
+      $$('.angle-btn').forEach((c) => {
+        const on = c.dataset.angle === 'front';
+        c.setAttribute('aria-pressed', String(on));
+        c.tabIndex = on ? 0 : -1;
+      });
+      showFrame();
       render();
     });
 
     // ══ Boot ═══════════════════════════════════════════════════════════
-    // The initial model comes from the markup's src; its glass is harvested
-    // by the permanent 'load' listener above. If the custom element upgraded
-    // and loaded before this script attached the listener, harvest once now.
-    currentSrc = '/models3d/sedan.glb'; // matches the src baked into the markup
-    showLoading();
-    setMode('tint'); // also paints the active tab underline and calls render()
+    // The first still is in the HTML. Warm the other angle after idle so
+    // the toggle does not wait on a cold request, without competing with LCP.
+    setMode('tint');
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => preloadView('sedan', 'rear'));
+    } else {
+      setTimeout(() => preloadView('sedan', 'rear'), 600);
+    }
+    $$('.veh-chip').forEach((chip) => {
+      const id = chip.dataset.vehicle!;
+      const warm = () => preloadView(id, 'front');
+      chip.addEventListener('pointerenter', warm);
+      chip.addEventListener('focus', warm);
+    });
 
     // ══ PDF configuration download (SunTek-style summary sheet) ═════════
     document.getElementById('pdf-btn')!.addEventListener('click', async () => {
@@ -1126,15 +1096,33 @@ const PPF_PACKAGES = [
         doc.setTextColor(...PAPER);
         doc.text(new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }), W - 14, 13, { align: 'right' });
 
-        // Vehicle snapshot from the 3D viewer, fit within the box without
-        // stretching (the stage is 860:520 ≈ 1.65:1, not the box's own ratio).
+        // Vehicle snapshot from the still, with the tint and PPF layers
+        // flattened on top. Fit inside the box without stretching.
         try {
-          const shot = viewer.toDataURL('image/png');
+          const shotW = stageBase.naturalWidth || 1290;
+          const shotH = stageBase.naturalHeight || 780;
+          const flat = document.createElement('canvas');
+          flat.width = shotW;
+          flat.height = shotH;
+          const ctx = flat.getContext('2d')!;
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, shotW, shotH);
+          ctx.drawImage(stageBase, 0, 0, shotW, shotH);
+          for (const layer of stageLayers.querySelectorAll('img')) {
+            if (!layer.complete || !layer.naturalWidth) {
+              try { await layer.decode(); } catch { continue; }
+            }
+            ctx.save();
+            ctx.globalAlpha = Number(layer.dataset.op || '1');
+            ctx.drawImage(layer, 0, 0, shotW, shotH);
+            ctx.restore();
+          }
+          const shot = flat.toDataURL('image/png');
           const boxX = 14, boxY = 38, boxW = W - 28, boxH = 92;
           doc.setFillColor(...PAPER);
           doc.setDrawColor(...SAND);
           doc.rect(boxX, boxY, boxW, boxH, 'FD');
-          const shotRatio = viewer.clientWidth && viewer.clientHeight ? viewer.clientWidth / viewer.clientHeight : 860 / 520;
+          const shotRatio = shotW / shotH;
           const padding = 4;
           const availW = boxW - padding * 2;
           const availH = boxH - padding * 2;
@@ -1206,7 +1194,7 @@ const PPF_PACKAGES = [
         doc.text("Mario's Tint Shop · Murfreesboro, Tennessee", 14, y + 14);
         doc.setFontSize(7.5);
         doc.setTextColor(...SMOKE);
-        doc.text('Visual representations are illustrative only; vehicles are generic 3D models and actual film appearance may vary.', 14, y + 21);
+        doc.text('Visual representations are illustrative only; vehicles are generic previews and actual film appearance may vary.', 14, y + 21);
 
         doc.save('marios-tint-shop-configuration.pdf');
       } finally {
