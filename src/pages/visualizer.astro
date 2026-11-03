@@ -44,7 +44,7 @@ const TINT_ZONES = [
 ];
 
 // Coverage tiles: a dedicated sedan icon per zone with that zone's glass
-// highlighted in accent blue (public/images/vehicles/<file>.png).
+// highlighted in accent blue (public/images/vehicles/<file>.webp).
 const ZONE_ICON_FILE: Record<string, string> = {
   'front-side': 'front-side-windows',
   'rear-side': 'rear-side-windows',
@@ -124,6 +124,7 @@ const PPF_PACKAGES = [
           formats={['avif', 'webp']}
           fallbackFormat="webp"
           widths={[640, 1024, 1536]}
+          width={Math.min(1536, IMAGES.heroBg.src.width)}
           sizes="100vw"
           loading="lazy"
           class="h-full w-full object-cover object-[center_62%] opacity-60"
@@ -133,7 +134,7 @@ const PPF_PACKAGES = [
       <div class="relative mx-auto max-w-6xl px-5 pb-14 pt-24 md:pb-20 md:pt-32">
         <nav class="reveal text-[11px] font-bold uppercase tracking-[0.16em] text-smoke" aria-label="Breadcrumb">
           <a href="/" class="transition-colors hover:text-paper">Home</a>
-          <span class="mx-2 text-line">/</span>
+          <span class="mx-2 text-[#7D7D7D]">/</span>
           <span class="text-accent">Tint &amp; PPF visualizer</span>
         </nav>
       </div>
@@ -180,7 +181,7 @@ const PPF_PACKAGES = [
                     class="veh-thumb h-full w-full object-contain transition-[filter,opacity] duration-200"
                   />
                 </span>
-                <span class="text-[10px] font-bold uppercase tracking-[0.14em] text-ink transition-colors group-aria-checked:text-accentDk">
+                <span class="text-[10px] font-bold uppercase tracking-[0.14em] text-ink transition-colors group-aria-checked:text-accentText">
                   {v.label}
                 </span>
               </button>
@@ -203,7 +204,7 @@ const PPF_PACKAGES = [
               <span class="text-[10px] font-bold uppercase tracking-[0.16em] text-ash">Choose what to preview</span>
               <button
                 type="button" id="reset-btn"
-                class="pressable flex items-center gap-1.5 px-1 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-ash transition-colors hover:text-accentDk"
+                class="pressable flex items-center gap-1.5 px-1 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-ash transition-colors hover:text-accentText"
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
                 Start over
@@ -220,7 +221,7 @@ const PPF_PACKAGES = [
                 </span>
                 <span class="min-w-0">
                   <span class="block whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.04em] text-ink sm:text-[11px] sm:tracking-[0.1em]">Window Tint</span>
-                  <span class="block text-[10px] leading-tight text-ash group-aria-selected:text-ink/70">Glass shades</span>
+                  <span class="block text-[10px] leading-tight text-ash group-aria-selected:text-ink/75">Glass shades</span>
                 </span>
               </button>
               <button
@@ -233,7 +234,7 @@ const PPF_PACKAGES = [
                 </span>
                 <span class="min-w-0">
                   <span class="block whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.04em] text-ink sm:text-[11px] sm:tracking-[0.1em]">Paint Protection</span>
-                  <span class="block text-[10px] leading-tight text-ash group-aria-selected:text-ink/70">Body panels (PPF)</span>
+                  <span class="block text-[10px] leading-tight text-ash group-aria-selected:text-ink/75">Body panels (PPF)</span>
                 </span>
                 <!-- Attention marker: pulses until PPF is opened once. -->
                 <span class="mode-dot absolute right-2 top-2 flex h-2.5 w-2.5" aria-hidden="true">
@@ -269,14 +270,14 @@ const PPF_PACKAGES = [
                         class="zone-tile pressable group flex flex-col items-center gap-1 border border-sand bg-paper px-1.5 pb-2 pt-2.5 transition-colors duration-200 hover:border-ash/60 aria-pressed:border-accent aria-pressed:bg-mint"
                       >
                         <img
-                          src={`/images/vehicles/${z.iconFile}.png`}
+                          src={`/images/vehicles/${z.iconFile}.webp`}
                           alt=""
                           width="528"
                           height="191"
                           loading="lazy"
                           class="h-10 w-full object-contain"
                         />
-                        <span class="text-center text-[10px] font-bold leading-tight text-ink group-aria-pressed:text-accentDk">{z.label}</span>
+                        <span class="text-center text-[10px] font-bold leading-tight text-ink group-aria-pressed:text-accentText">{z.label}</span>
                       </button>
                     ))
                   }
@@ -367,7 +368,7 @@ const PPF_PACKAGES = [
             </div>
             <button
               type="button" data-switch-mode="ppf"
-              class="pressable w-full shrink-0 border border-accent px-3 py-2.5 text-center text-[10px] font-bold uppercase tracking-[0.12em] text-accentDk transition-colors duration-200 hover:bg-accent hover:text-ink sm:w-auto"
+              class="pressable w-full shrink-0 border border-accent px-3 py-2.5 text-center text-[10px] font-bold uppercase tracking-[0.12em] text-accentText transition-colors duration-200 hover:bg-accent hover:text-ink sm:w-auto"
             >
               Preview PPF <span class="font-black" aria-hidden="true">&gt;</span>
             </button>
@@ -433,7 +434,7 @@ const PPF_PACKAGES = [
               </div>
               <button
                 type="button" data-switch-mode="tint"
-                class="pressable w-full shrink-0 border border-accent px-3 py-2.5 text-center text-[10px] font-bold uppercase tracking-[0.12em] text-accentDk transition-colors duration-200 hover:bg-accent hover:text-ink sm:w-auto"
+                class="pressable w-full shrink-0 border border-accent px-3 py-2.5 text-center text-[10px] font-bold uppercase tracking-[0.12em] text-accentText transition-colors duration-200 hover:bg-accent hover:text-ink sm:w-auto"
               >
                 Preview Tint <span class="font-black" aria-hidden="true">&gt;</span>
               </button>
@@ -465,7 +466,7 @@ const PPF_PACKAGES = [
               <button
                 type="button"
                 id="pdf-btn"
-                class="pressable flex items-center gap-1.5 border border-sand bg-paper px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-200 hover:border-accent hover:text-accentDk"
+                class="pressable flex items-center gap-1.5 border border-sand bg-paper px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-200 hover:border-accent hover:text-accentText"
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
                 <span class="hidden sm:inline">Download PDF</span>
@@ -505,7 +506,7 @@ const PPF_PACKAGES = [
             <!-- Live summary -->
             <div class="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-sand pt-4">
               <p id="build-summary" class="min-w-0 flex-1 text-xs font-semibold uppercase tracking-[0.08em] text-char"></p>
-              <span id="legal-badge" class="shrink-0 bg-accent/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-accentDk"></span>
+              <span id="legal-badge" class="shrink-0 bg-accent/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-accentText"></span>
             </div>
           </div>
 
@@ -823,7 +824,7 @@ const PPF_PACKAGES = [
 
     // ══ Render cycle ═══════════════════════════════════════════════════
     const okBadge =
-      'shrink-0 bg-accent/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-accentDk';
+      'shrink-0 bg-accent/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-accentText';
     const warnBadge =
       'shrink-0 bg-[#FFF1CC] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#8A5B00]';
 

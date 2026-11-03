@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Picture } from 'astro:assets';
 import { TESTIMONIALS } from '../consts';
 import GoogleRatingBadge from './GoogleRatingBadge.astro';
 
@@ -17,7 +17,7 @@ const initials = (name: string) =>
 <section id="testimonials" class="hex-bg bg-paper">
   <div class="mx-auto max-w-6xl px-5 py-20 md:py-24">
     <div class="flex flex-col items-center text-center">
-      <p class="reveal kicker text-accentDk">Testimonials</p>
+      <p class="reveal kicker text-accentText">Testimonials</p>
       <h2 class="reveal headline mt-3 max-w-3xl text-[clamp(1.4rem,2.8vw,2.2rem)] text-ink">
         Real reviews from real people
       </h2>
@@ -39,10 +39,13 @@ const initials = (name: string) =>
             class="flex w-full shrink-0 flex-col bg-mint sm:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-3rem)/3)]"
           >
             {t.photo ? (
-              <Image
+              <Picture
                 src={t.photo.src}
                 alt={t.photo.alt}
+                formats={['avif', 'webp']}
+                fallbackFormat="webp"
                 widths={[400, 800]}
+                width={Math.min(800, t.photo.src.width)}
                 sizes="(min-width: 1024px) 384px, (min-width: 640px) 50vw, 100vw"
                 loading="lazy"
                 draggable={false}

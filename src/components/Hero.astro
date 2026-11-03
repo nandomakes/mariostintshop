@@ -9,13 +9,13 @@ import Ticker from './Ticker.astro';
   class="relative flex min-h-[calc(100svh-72px)] flex-col overflow-hidden bg-ink md:min-h-[calc(100svh-116px)]"
 >
   <!-- Full-bleed image with dark overlay for legibility -->
-  <div class="absolute inset-0" aria-hidden="true">
+  <div class="absolute inset-0">
     <!-- LCP element. Eager + high priority, and served as AVIF/WebP at the
          width the viewport actually needs — the 2752px original is only ever
          sent to displays that can use it. -->
     <Picture
       src={IMAGES.heroBg.src}
-      alt=""
+      alt={IMAGES.heroBg.alt}
       formats={['avif', 'webp']}
       fallbackFormat="webp"
       widths={[640, 1024, 1536, 2048, 2752]}
@@ -24,8 +24,8 @@ import Ticker from './Ticker.astro';
       fetchpriority="high"
       class="h-full w-full object-cover object-center"
     />
-    <div class="absolute inset-0 bg-black/45"></div>
-    <div class="absolute inset-0 bg-gradient-to-b from-ink/60 via-transparent to-ink"></div>
+    <div class="absolute inset-0 bg-black/45" aria-hidden="true"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-ink/60 via-transparent to-ink" aria-hidden="true"></div>
   </div>
 
   <div class="relative w-full flex-1 content-center px-4 py-10 text-left sm:px-5 sm:py-12 md:py-16">

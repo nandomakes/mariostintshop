@@ -12,7 +12,7 @@ const bandSeq = [...bandItems, ...bandItems, ...bandItems, ...bandItems];
     <!-- Two-column intro: title + CTA left, copy right -->
     <div class="grid gap-10 md:grid-cols-2 md:items-center">
       <div class="reveal">
-        <p class="kicker text-accentDk">About us</p>
+        <p class="kicker text-accentText">About us</p>
         <h2 class="headline mt-3 text-[clamp(1.4rem,2.8vw,2.2rem)] text-ink">
           Window tint and ceramic coating in Murfreesboro
         </h2>
@@ -33,7 +33,7 @@ const bandSeq = [...bandItems, ...bandItems, ...bandItems, ...bandItems];
               <li>
                 <a
                   href={`/services/${service.slug}/`}
-                  class="text-accentDk underline decoration-accent/40 underline-offset-2 transition-colors hover:text-ink"
+                  class="text-accentText underline decoration-accent/40 underline-offset-2 transition-colors hover:text-ink"
                 >
                   {service.name}
                 </a>
@@ -84,6 +84,7 @@ const bandSeq = [...bandItems, ...bandItems, ...bandItems, ...bandItems];
         src={IMAGES.install.src}
         alt={IMAGES.install.alt}
         widths={[400, 800]}
+        width={Math.min(800, IMAGES.install.src.width)}
         sizes="(min-width: 640px) 70vw, 85vw"
         loading="lazy"
         class="relative mx-auto w-[85%] object-contain sm:w-[70%]"
