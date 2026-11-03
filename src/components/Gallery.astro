@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Picture } from 'astro:assets';
 import { INSTAGRAM } from '../consts';
 import { getInstagramFeed } from '../lib/instagram';
 
@@ -72,10 +72,13 @@ const layoutMobile = [
                   class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
                 />
               ) : (
-                <Image
+                <Picture
                   src={img.src}
                   alt={img.alt}
+                  formats={['avif', 'webp']}
+                  fallbackFormat="webp"
                   widths={[300, 600]}
+                  width={Math.min(600, img.src.width)}
                   sizes="(min-width: 640px) 25vw, 50vw"
                   loading="lazy"
                   decoding="async"

@@ -55,7 +55,7 @@ const ICONS: Record<string, string> = {
   picked.length > 0 && (
     <section class="hex-bg border-t border-sand bg-paper">
       <div class="mx-auto max-w-6xl px-5 py-16 md:py-24">
-        <p class="reveal kicker text-center text-accentDk">Keep going</p>
+        <p class="reveal kicker text-center text-accentText">Keep going</p>
         <h2 class="reveal headline mt-3 mb-12 text-center text-[clamp(1.8rem,4vw,2.75rem)] text-ink">
           Pairs well with
         </h2>
@@ -74,6 +74,7 @@ const ICONS: Record<string, string> = {
                   alt=""
                   aria-hidden="true"
                   widths={[512, 1024]}
+                  width={Math.min(1024, IMAGES[svc.image].src.width)}
                   sizes="512px"
                   loading="lazy"
                   class="h-full w-full object-cover object-center opacity-[0.34] transition-opacity duration-500 group-hover:opacity-[0.55]"
@@ -100,7 +101,7 @@ const ICONS: Record<string, string> = {
                 <p class="mt-2 text-sm leading-relaxed text-char">{svc.short}</p>
               </span>
 
-              <span class="relative mt-5 inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-accentDk">
+              <span class="relative mt-5 inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-accentText">
                 Learn more
                 <svg
                   width="16"

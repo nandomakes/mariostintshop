@@ -1,6 +1,6 @@
 // Photo-calibrated overlay geometry for the tint/PPF visualizer.
 //
-// Each vehicle is a real 90°-profile render (public/images/vehicles/*.png,
+// Each vehicle is a real 90°-profile render (public/images/vehicles/*.webp,
 // 2064×816, drawn into an 860×340 viewBox at the same 2.529 aspect ratio, so
 // photo-px × 860/2064 = SVG-px). The glass zones below were auto-traced from
 // each render's bluish-glass pixels, so tint overlays land exactly on the real
@@ -233,7 +233,7 @@ const CFGS: Cfg[] = [
 export const PHOTO_VEHICLES: PhotoVehicle[] = CFGS.map((c) => ({
   id: c.id,
   label: c.label,
-  photo: `/images/vehicles/${c.id}-icon.png`,
+  photo: `/images/vehicles/${c.id}-icon.webp`,
   overlay: buildOverlay(c),
 }));
 
