@@ -120,7 +120,7 @@ import shopBayImg from './assets/images/marios-tint-shop-install-bay.jpg';
 export const IMAGES = {
   heroBg: {
     src: heroBgImg,
-    alt: '',
+    alt: "Matte black Lamborghini parked in front of Mario's Tint Shop at 515 NW Broad St in Murfreesboro",
   },
   // Satisfaction-badge image in the "Our services" section.
   preview: {

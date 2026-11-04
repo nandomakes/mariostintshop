@@ -6,7 +6,11 @@ export default {
       colors: {
         // "Neon Garage" — jet black + pure white + electric blue accent.
         accent: '#00A8FF', // electric blue: CTAs, icons, highlights
-        accentDk: '#0086D6', // pressed / hover blue
+        accentDk: '#0086D6', // pressed / hover fill — keep light enough for ink text
+        // Small text on paper/mint/whisper. accentDk is 3.9:1 on white.
+        // #006FB2 is the same hue, the lightest step that clears WCAG AA 4.5:1
+        // on white, whisper, mint, and the accent/15 badge wash.
+        accentText: '#006FB2',
         ink: '#111111', // jet black backgrounds
         coal: '#1A1A1A', // elevated dark surface
         line: '#2A2A2A', // borders / hairlines on dark
@@ -15,7 +19,7 @@ export default {
         mint: '#F0F7FD', // testimonial card surface (pale blue tint)
         whisper: '#F9F9F9', // input / light card surface
         sand: '#EEEEEE', // hairline borders on light
-        ash: '#888888', // muted text on light (dates, placeholders)
+        ash: '#707070', // muted text on light — 4.5:1 on white, whisper, and mint
         char: '#333333', // body text on light
       },
       fontFamily: {
