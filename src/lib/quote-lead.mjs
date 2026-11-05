@@ -2,11 +2,15 @@
 // - quote_form_click: the visitor opened TintWiz. Intention only, not a lead.
 // - generate_lead: the thank-you page, once per session, and only when the
 //   referrer hostname is exactly app.tintwiz.com. No personal data in either.
+//
+// Plain ESM so `node scripts/check-quote-lead.mjs` runs on Node 20 and 22
+// without --experimental-strip-types. Types live in quote-lead.d.mts.
 
 export const QUOTE_LEAD_STORAGE_KEY = 'quote_sent_lead_fired';
 export const TINTWIZ_HOST = 'app.tintwiz.com';
 
-export function referrerHostname(referrer: string | null | undefined): string | null {
+/** @param {string | null | undefined} referrer */
+export function referrerHostname(referrer) {
   if (!referrer) return null;
   try {
     return new URL(referrer).hostname;
@@ -16,26 +20,9 @@ export function referrerHostname(referrer: string | null | undefined): string | 
 }
 
 /** True only for a first fire in this session whose referrer host is TintWiz. */
-export function shouldFireGenerateLead(
-  referrer: string | null | undefined,
-  alreadyFired: boolean,
-): boolean {
+export function shouldFireGenerateLead(referrer, alreadyFired) {
   if (alreadyFired) return false;
   return referrerHostname(referrer) === TINTWIZ_HOST;
-}
-
-export interface AnchorClickInput {
-  type: string;
-  button: number;
-  href: string;
-  attributeHref: string | null;
-  quoteLocation: string | null;
-  text: string;
-}
-
-export interface TrackedEvent {
-  name: 'quote_form_click' | 'phone_call_click' | 'quote_cta_click';
-  params: Record<string, string>;
 }
 
 /**
@@ -43,7 +30,7 @@ export interface TrackedEvent {
  * clicks, and keyboard Enter. `auxclick` with button 1 is the middle click,
  * which does not also emit `click`. Any other aux button (context menu) is ignored.
  */
-export function classifyAnchorClick(input: AnchorClickInput): TrackedEvent | null {
+export function classifyAnchorClick(input) {
   if (input.type === 'auxclick' && input.button !== 1) return null;
   if (input.type !== 'click' && input.type !== 'auxclick') return null;
 
@@ -75,7 +62,7 @@ export function classifyAnchorClick(input: AnchorClickInput): TrackedEvent | nul
 }
 
 /** GA4 `location` for the quote link on this pathname. No personal data. */
-export function quoteLocationFromPath(pathname: string): string {
+export function quoteLocationFromPath(pathname) {
   const path = (pathname || '/').replace(/\/+$/, '') || '/';
   if (path === '/') return 'home';
   if (path === '/visualizer') return 'visualizer';

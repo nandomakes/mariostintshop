@@ -209,7 +209,7 @@ const ga4Id = import.meta.env.PUBLIC_GA4_ID ?? GA4_ID;
             gtag('config', ga4Id);
           </script>
           <script>
-            import { classifyAnchorClick } from '../lib/quote-lead';
+            import { classifyAnchorClick } from '../lib/quote-lead.mjs';
 
             // One listener pair for the whole document. `click` covers primary
             // click, modified click, and Enter. `auxclick` covers middle click.

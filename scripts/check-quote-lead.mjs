@@ -7,7 +7,7 @@ import {
   quoteLocationFromPath,
   referrerHostname,
   shouldFireGenerateLead,
-} from '../src/lib/quote-lead.ts';
+} from '../src/lib/quote-lead.mjs';
 
 const QUOTE_URL = 'https://app.tintwiz.com/web/cs/k555dou4xrsun17jpll6ltqkldyiejb8';
 

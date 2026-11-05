@@ -54,7 +54,7 @@ const description = `Thanks — we got your quote request. ${SITE.brand} will re
   <CallFab />
 
   <script>
-    import { QUOTE_LEAD_STORAGE_KEY, shouldFireGenerateLead } from '../lib/quote-lead';
+    import { QUOTE_LEAD_STORAGE_KEY, shouldFireGenerateLead } from '../lib/quote-lead.mjs';
 
     // Once per session, and only when this visit came from the TintWiz host.
     // A missing or trimmed referrer sends nothing beyond the normal page view.
