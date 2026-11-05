@@ -32,10 +32,7 @@ El CSP de `vercel.json` ya permite `googletagmanager.com` y `google-analytics.co
 Se registran `phone_call_click` (cualquier enlace `tel:`), `quote_cta_click`
 (cualquier enlace a `#contact`) y `quote_form_click` (el botón que abre el
 formulario de TintWiz en una pestaña nueva; parámetro `location`, sin datos
-personales). En `/quote-sent/`, `generate_lead` se dispara una sola vez por
-sesión y solo si el referrer es `app.tintwiz.com` (`location: quote_sent`).
-Si Tint Wiz no redirige a esa página, o el referrer llega vacío, ese evento
-no se envía.
+personales).
 
 ## SEO — archivos clave
 

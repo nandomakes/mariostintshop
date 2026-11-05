@@ -1,6 +1,6 @@
 // Confirms the built site no longer embeds the TintWiz iframe, that the seven
-// quote pages each have one outbound form link, and that /quote-sent/ is
-// noindex and absent from the sitemap.
+// quote pages each have one outbound form link, and that the dropped
+// confirmation route is not in the build or the sitemap.
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -92,53 +92,28 @@ for (const { file, html } of text) {
   if (extra.length) fail(`${rel} unexpectedly links to the quote form (${extra.length})`);
 }
 
-const thanksPath = path.join(root, 'quote-sent/index.html');
-if (!fs.existsSync(thanksPath)) {
-  fail('dist/quote-sent/index.html is missing');
-} else {
-  const html = fs.readFileSync(thanksPath, 'utf8');
-  const robots = html.match(/<meta\b[^>]*name="robots"[^>]*>/i)?.[0] ?? '';
-  if (!/content="noindex,\s*nofollow"/.test(robots)) {
-    fail(`quote-sent robots tag is missing noindex, nofollow: ${robots}`);
+const dropped = ['quote-' + 'sent', 'generate_' + 'lead', 'quote-' + 'lead'];
+if (fs.existsSync(path.join(root, dropped[0])) || fs.existsSync(path.join(root, `${dropped[0]}.html`))) {
+  fail('dist still contains the confirmation page');
+}
+const textExt = new Set(['.html', '.js', '.css', '.xml', '.txt', '.mjs', '.json', '.svg', '.webmanifest']);
+for (const file of files) {
+  const rel = path.relative(root, file);
+  for (const token of dropped) {
+    if (rel.includes(token)) fail(`dist path contains ${token}: ${rel}`);
   }
-  if (/rel="canonical"/i.test(html)) fail('quote-sent must not declare a canonical');
-  if (!html.includes('tel:+16154107170')) fail('quote-sent is missing the shop phone link');
-  if (!/href="\/"/.test(html)) fail('quote-sent is missing the link back home');
-  if (html.includes(QUOTE_URL)) fail('quote-sent must not link to the TintWiz form');
-  if (/<(?:pre|code)\b/i.test(html)) fail('quote-sent renders a code block');
-
-  const scripts = [...html.matchAll(/\bsrc="([^"]+\.js)"/g)].map((match) => match[1]);
-  const seen = new Set();
-  const bodies = [];
-  const queue = [...scripts];
-  while (queue.length) {
-    const src = queue.shift();
-    if (!src || seen.has(src)) continue;
-    seen.add(src);
-    const asset = path.join(root, src.replace(/^\//, ''));
-    if (!fs.existsSync(asset)) continue;
-    const code = fs.readFileSync(asset, 'utf8');
-    bodies.push(code);
-    for (const match of code.matchAll(/from\s*["'](\.[^"']+)["']/g)) {
-      const next = path.posix.normalize(path.posix.join(path.posix.dirname(src), match[1]));
-      queue.push(next.startsWith('/') ? next : `/${next}`);
-    }
+  if (!textExt.has(path.extname(file))) continue;
+  const body = fs.readFileSync(file, 'utf8');
+  for (const token of dropped) {
+    if (body.includes(token)) fail(`dist file contains ${token}: ${rel}`);
   }
-  const bundle = bodies.join('\n');
-  if (!bundle.includes('quote_sent_lead_fired')) fail('quote-sent script is missing the session key');
-  if (!bundle.includes('generate_lead')) fail('quote-sent script is missing generate_lead');
-  if (!bundle.includes('app.tintwiz.com')) fail('quote-sent script is missing the TintWiz host check');
-  if (!bundle.includes('quote_sent')) fail('quote-sent script is missing location quote_sent');
-  // The event name must sit behind the host check in the shared module, not as a
-  // bare call in the HTML.
-  if (html.includes('generate_lead')) fail('generate_lead is inlined into the quote-sent HTML');
 }
 
 const sitemaps = files.filter((file) => path.basename(file).startsWith('sitemap') && file.endsWith('.xml'));
 if (!sitemaps.length) fail('no sitemap xml in dist');
 for (const file of sitemaps) {
   const xml = fs.readFileSync(file, 'utf8');
-  if (xml.includes('quote-sent')) fail(`${path.basename(file)} lists /quote-sent/`);
+  if (xml.includes(dropped[0])) fail(`${path.basename(file)} lists the confirmation route`);
 }
 
 const headerCsp = fs.readFileSync(new URL('../public/_headers', import.meta.url), 'utf8');

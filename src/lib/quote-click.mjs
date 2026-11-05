@@ -1,29 +1,8 @@
-// Quote measurement. Two different events, on purpose:
-// - quote_form_click: the visitor opened TintWiz. Intention only, not a lead.
-// - generate_lead: the thank-you page, once per session, and only when the
-//   referrer hostname is exactly app.tintwiz.com. No personal data in either.
-//
-// Plain ESM so `node scripts/check-quote-lead.mjs` runs on Node 20 and 22
-// without --experimental-strip-types. Types live in quote-lead.d.mts.
+// Outbound quote click. Intention only: the visitor opened TintWiz.
+// Not a lead, and no personal data. Plain ESM so the check runs on Node 20
+// and 22 without experimental flags. Types live in quote-click.d.mts.
 
-export const QUOTE_LEAD_STORAGE_KEY = 'quote_sent_lead_fired';
 export const TINTWIZ_HOST = 'app.tintwiz.com';
-
-/** @param {string | null | undefined} referrer */
-export function referrerHostname(referrer) {
-  if (!referrer) return null;
-  try {
-    return new URL(referrer).hostname;
-  } catch {
-    return null;
-  }
-}
-
-/** True only for a first fire in this session whose referrer host is TintWiz. */
-export function shouldFireGenerateLead(referrer, alreadyFired) {
-  if (alreadyFired) return false;
-  return referrerHostname(referrer) === TINTWIZ_HOST;
-}
 
 /**
  * One result per link activation. `click` covers the primary button, modified

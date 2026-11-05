@@ -959,9 +959,8 @@ export const NAV_LINKS: {
 export const CAREERS_LINK = { href: '/careers/', label: 'Careers' };
 
 // Pages that do not render QuoteCTA. Header and footer "Get Free Quote" on
-// these routes goes to the homepage section instead of an on-page #contact.
-// /quote-sent is the thank-you page; it is not linked from the menu or footer.
-const PATHS_WITHOUT_QUOTE = new Set(['/404', '/privacy', '/terms', '/quote-sent']);
+// these routes goes to the homepage form instead of an on-page #contact.
+const PATHS_WITHOUT_QUOTE = new Set(['/404', '/privacy', '/terms']);
 
 export const quoteHrefFor = (pathname: string) =>
   PATHS_WITHOUT_QUOTE.has(pathname.replace(/\/+$/, '') || '/') ? '/#contact' : '#contact';
