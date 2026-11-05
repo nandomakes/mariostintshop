@@ -426,7 +426,7 @@ export const SERVICES: Service[] = [
     splitWord: 'PPF',
     kicker: 'Paint Protection',
     name: 'Paint Protection Film (PPF)',
-    metaTitle: "PPF & Clear Bra near Nashville, TN | Mario's Tint Shop",
+    metaTitle: "PPF & Clear Bra in Murfreesboro, TN | Mario's Tint Shop",
     short:
       'Professional clear bra installation by certified 3M installers — self-healing defense against scratches, UV damage, and rock chips.',
     meta: '3M Paint Protection Film · 10-year warranty',
