@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "node scripts/check-headers.mjs && astro check && astro build",
+    "build": "node scripts/check-headers.mjs && node scripts/check-quote-click.mjs && astro check && astro build && node scripts/check-quote-dist.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },

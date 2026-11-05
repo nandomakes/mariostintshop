@@ -1,10 +1,12 @@
 ---
 import { CONTACT, WHY_US, TINTWIZ_FORM_URL } from '../consts';
+import { quoteLocationFromPath } from '../lib/quote-click.mjs';
 
 interface Props {
   defaultService?: string; // named in the copy on per-service pages
 }
 const { defaultService } = Astro.props;
+const quoteLocation = quoteLocationFromPath(Astro.url.pathname);
 ---
 
 <section id="contact" class="bg-ink">
@@ -19,7 +21,7 @@ const { defaultService } = Astro.props;
         <p class="mt-5 max-w-[54ch] text-[15px] leading-relaxed text-smoke">
           Tell us about your vehicle{
             defaultService ? ` and your ${defaultService.toLowerCase()} job` : ' and what you want to protect'
-          } in the form. It goes straight to our shop
+          }. It goes straight to our shop
           and we reply the same business day with an honest recommendation and a
           clear price — no obligation.
         </p>
@@ -50,56 +52,22 @@ const { defaultService } = Astro.props;
         </p>
       </div>
 
-      <!-- Right: Tintwiz quote form, embedded. We don't control the form's
-           own CSS (cross-origin), so instead of letting it run long and
-           scroll internally, we scale the whole iframe down and compensate
-           its width/height so it still fills the card — same fields, more
-           compact. The iframe owns its own validation and submission;
-           nothing posts from this site. -->
-      <div class="reveal overflow-hidden bg-paper p-2 shadow-[0_30px_60px_-30px_rgba(0,0,0,0.6)] sm:p-4">
-        <h3 class="sr-only">Request a Quote</h3>
-        <div class="quotewrap w-full overflow-hidden">
-          <iframe
-            src={TINTWIZ_FORM_URL}
-            title="Request a quote from Mario's Tint Shop"
-            loading="lazy"
-            scrolling="no"
-            class="quoteiframe border-0"
-            referrerpolicy="strict-origin-when-cross-origin"
-          ></iframe>
-        </div>
-        <noscript>
-          <p class="p-4 text-sm text-char">
-            Our quote form needs JavaScript. Call us at {CONTACT.phoneDisplay} and
-            we'll take your details over the phone.
-          </p>
-        </noscript>
+      <!-- Right: the quote form lives on TintWiz. Same card, no embedded frame. -->
+      <div class="reveal min-w-0 bg-paper p-6 shadow-[0_30px_60px_-30px_rgba(0,0,0,0.6)] sm:p-8 lg:self-center">
+        <h3 class="headline text-[clamp(1.25rem,2.2vw,1.75rem)] text-ink">Request a Quote</h3>
+        <p class="mt-4 max-w-[42ch] text-[15px] leading-relaxed text-char">
+          The form opens in a new tab. Tell us about the vehicle and we'll follow up with a clear price — no obligation.
+        </p>
+        <a
+          href={TINTWIZ_FORM_URL}
+          target="_blank"
+          rel="noopener"
+          data-quote-location={quoteLocation}
+          class="pressable sticker mt-6 inline-block bg-accent px-8 py-3.5 text-center text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
+        >
+          Get Free Quote <span class="ml-0.5 font-black" aria-hidden="true">&gt;</span>
+        </a>
       </div>
     </div>
   </div>
 </section>
-
-<style>
-  /* The form's own CSS is cross-origin, so we scale the whole iframe and
-     compensate its width/height to fill the card. The scale factor has to
-     differ per breakpoint because it's tuned against the card's width. */
-  .quotewrap {
-    height: 540px;
-  }
-  .quoteiframe {
-    width: 160%;
-    height: 864px;
-    transform: scale(0.625);
-    transform-origin: top left;
-  }
-  @media (min-width: 640px) {
-    .quotewrap {
-      height: 548px;
-    }
-    .quoteiframe {
-      width: 138.9%;
-      height: 761px;
-      transform: scale(0.72);
-    }
-  }
-</style>
