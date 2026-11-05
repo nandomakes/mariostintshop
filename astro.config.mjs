@@ -13,9 +13,13 @@ export default defineConfig({
   integrations: [
     tailwind(),
     sitemap({
+      // /quote-sent/ is a noindex thank-you page. Keep it out of the sitemap
+      // even if a future page starts linking to it.
+      filter: (page) => new URL(page).pathname.replace(/\/+$/, '') !== '/quote-sent',
       // Static brochure site with no per-page content dates — the build date
       // is the honest lastmod signal.
       serialize(item) {
+        if (new URL(item.url).pathname.replace(/\/+$/, '') === '/quote-sent') return undefined;
         item.lastmod = new Date().toISOString();
         return item;
       },

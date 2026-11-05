@@ -29,9 +29,13 @@ el valor de `consts.ts` (con cadena vacía no se emite nada).
 
 El CSP de `vercel.json` ya permite `googletagmanager.com` y `google-analytics.com`.
 
-Se registran dos eventos automáticamente: `phone_call_click` (cualquier enlace
-`tel:`) y `quote_cta_click` (cualquier enlace a `#contact`). **El envío del
-formulario no se puede medir**: es un iframe de Tintwiz en otro dominio.
+Se registran `phone_call_click` (cualquier enlace `tel:`), `quote_cta_click`
+(cualquier enlace a `#contact`) y `quote_form_click` (el botón que abre el
+formulario de TintWiz en una pestaña nueva; parámetro `location`, sin datos
+personales). En `/quote-sent/`, `generate_lead` se dispara una sola vez por
+sesión y solo si el referrer es `app.tintwiz.com` (`location: quote_sent`).
+Si Tint Wiz no redirige a esa página, o el referrer llega vacío, ese evento
+no se envía.
 
 ## SEO — archivos clave
 

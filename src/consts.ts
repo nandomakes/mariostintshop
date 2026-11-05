@@ -40,10 +40,11 @@ export const GA4_ID = 'G-L5RB0B2JTL';
 // ── Contact / Phone ─────────────────────────────────────────────────
 export const PHONE_DISPLAY = '(615) 410-7170';
 export const PHONE_TEL = '+16154107170';
-// Tintwiz booking/quote form — the client's live estimator. Embedded as an
-// iframe in QuoteCTA. Replace only if Tintwiz issues a new embed URL.
+// TintWiz hosted quote form ("Mario's Tint Shop - Get in Contact").
+// QuoteCTA links out to this page in a new tab. Replace only if Tintwiz
+// issues a new form URL.
 export const TINTWIZ_FORM_URL =
-  'https://app.tintwiz.com/web/ce/k555dou4xrsun17jpll6ltqkldyiejb8';
+  'https://app.tintwiz.com/web/cs/k555dou4xrsun17jpll6ltqkldyiejb8';
 
 export const CONTACT = {
   address: '515 NW Broad St',
@@ -958,8 +959,9 @@ export const NAV_LINKS: {
 export const CAREERS_LINK = { href: '/careers/', label: 'Careers' };
 
 // Pages that do not render QuoteCTA. Header and footer "Get Free Quote" on
-// these routes goes to the homepage form instead of an on-page #contact.
-const PATHS_WITHOUT_QUOTE = new Set(['/404', '/privacy', '/terms']);
+// these routes goes to the homepage section instead of an on-page #contact.
+// /quote-sent is the thank-you page; it is not linked from the menu or footer.
+const PATHS_WITHOUT_QUOTE = new Set(['/404', '/privacy', '/terms', '/quote-sent']);
 
 export const quoteHrefFor = (pathname: string) =>
   PATHS_WITHOUT_QUOTE.has(pathname.replace(/\/+$/, '') || '/') ? '/#contact' : '#contact';

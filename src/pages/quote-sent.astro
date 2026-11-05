@@ -1,0 +1,83 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import CallFab from '../components/CallFab.astro';
+import Logo from '../components/Logo.astro';
+import { SITE, CONTACT } from '../consts';
+
+const title = `Quote request received | ${SITE.brand}`;
+const description = `Thanks — we got your quote request. ${SITE.brand} will reply soon.`;
+---
+
+<Layout title={title} description={description} noindex robots="noindex, nofollow">
+  <Header />
+  <main id="content">
+    <section class="relative overflow-hidden border-b border-line bg-ink">
+      <div class="relative mx-auto flex min-h-[70vh] max-w-3xl flex-col items-center justify-center px-5 py-24 text-center">
+        <nav class="reveal text-[11px] font-bold uppercase tracking-[0.16em] text-smoke" aria-label="Breadcrumb">
+          <a href="/" class="transition-colors hover:text-paper">Home</a>
+          <span class="mx-2 text-[#7D7D7D]">/</span>
+          <span class="text-accent">Quote request</span>
+        </nav>
+
+        <Logo class="reveal mt-8 h-14 w-auto opacity-90" />
+
+        <h1 class="reveal headline mt-8 text-[clamp(1.3rem,3vw,2rem)] text-paper">
+          Thanks, we got your quote request
+        </h1>
+        <p class="reveal mx-auto mt-4 max-w-[46ch] text-[15px] leading-relaxed text-smoke">
+          Mario will reply soon. If you would rather talk it through now, call the shop.
+        </p>
+
+        <div class="reveal mt-8 flex flex-col items-center gap-5">
+          <a
+            href="/"
+            class="pressable sticker bg-accent px-8 py-4 text-center text-xs font-bold uppercase tracking-[0.12em] text-ink transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accentDk"
+          >
+            Back to Home →
+          </a>
+          <p class="text-sm text-smoke">
+            Call us at
+            <a
+              href={`tel:${CONTACT.phoneTel}`}
+              class="font-bold text-accent underline underline-offset-4 hover:text-accentDk"
+            >
+              {CONTACT.phoneDisplay}
+            </a>
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+  <CallFab />
+
+  <script>
+    import { QUOTE_LEAD_STORAGE_KEY, shouldFireGenerateLead } from '../lib/quote-lead';
+
+    // Once per session, and only when this visit came from the TintWiz host.
+    // A missing or trimmed referrer sends nothing beyond the normal page view.
+    const w = window as Window & {
+      __quoteSentLeadFired?: boolean;
+      gtag?: (...args: unknown[]) => void;
+    };
+    if (!w.__quoteSentLeadFired) {
+      let already = false;
+      try {
+        already = sessionStorage.getItem(QUOTE_LEAD_STORAGE_KEY) === '1';
+      } catch {
+        already = false;
+      }
+      if (shouldFireGenerateLead(document.referrer, already)) {
+        w.__quoteSentLeadFired = true;
+        try {
+          sessionStorage.setItem(QUOTE_LEAD_STORAGE_KEY, '1');
+        } catch {
+          // Private mode can block storage. The window flag still limits this load.
+        }
+        w.gtag?.('event', 'generate_lead', { location: 'quote_sent' });
+      }
+    }
+  </script>
+</Layout>

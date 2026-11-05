@@ -15,8 +15,10 @@ import { SITE, CONTACT, PHONE_TEL, SERVICES, SOCIALS, TESTIMONIALS, GA4_ID, CONT
 interface Props {
   title?: string;
   description?: string;
-  /** Keep this page out of the index (used by 404). */
+  /** Keep this page out of the index (used by 404). Drops canonical and WebPage JSON-LD. */
   noindex?: boolean;
+  /** Full robots directive. Defaults from `noindex`. A noindex value also drops canonical. */
+  robots?: string;
   /** Extra JSON-LD nodes for this page (BreadcrumbList, FAQPage, …). */
   schema?: unknown[];
   /** ISO date for this page's WebPage node. Defaults to the site-wide content date. */
@@ -27,9 +29,13 @@ const {
   title = SITE.title,
   description = SITE.description,
   noindex = false,
+  robots,
   schema = [],
   dateModified = CONTENT_UPDATED,
 } = Astro.props;
+
+const robotsContent = robots ?? (noindex ? 'noindex, follow' : 'index, follow');
+const omitFromIndex = noindex || /\bnoindex\b/.test(robotsContent);
 
 const site = Astro.site ?? new URL(SITE.url);
 const canonical = new URL(Astro.url.pathname, site).href;
@@ -122,7 +128,7 @@ const webPage = {
   inLanguage: 'en-US',
 };
 
-const jsonLdNodes = [business, website, ...(noindex ? [] : [webPage]), ...schema];
+const jsonLdNodes = [business, website, ...(omitFromIndex ? [] : [webPage]), ...schema];
 
 // GA4. The property ID lives in consts; PUBLIC_GA4_ID overrides it so a
 // staging deploy can point elsewhere (or set it empty to disable the tag).
@@ -151,17 +157,13 @@ const ga4Id = import.meta.env.PUBLIC_GA4_ID ?? GA4_ID;
     <link rel="manifest" href="/site.webmanifest" />
     {/* A noindex page shouldn't declare itself the canonical of anything —
         404 used to emit rel=canonical to /404/. */}
-    {!noindex && <link rel="canonical" href={canonical} />}
+    {!omitFromIndex && <link rel="canonical" href={canonical} />}
     <meta name="generator" content={Astro.generator} />
 
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="author" content={SITE.brand} />
-    {noindex ? (
-      <meta name="robots" content="noindex, follow" />
-    ) : (
-      <meta name="robots" content="index, follow" />
-    )}
+    <meta name="robots" content={robotsContent} />
     <meta name="theme-color" content={SITE.themeColor} />
     <meta name="geo.region" content="US-TN" />
     <meta name="geo.placename" content="Murfreesboro" />
@@ -205,18 +207,46 @@ const ga4Id = import.meta.env.PUBLIC_GA4_ID ?? GA4_ID;
             };
             gtag('js', new Date());
             gtag('config', ga4Id);
+          </script>
+          <script>
+            import { classifyAnchorClick } from '../lib/quote-lead';
 
-            // The quote form is a cross-domain Tintwiz iframe, so its submit is
-            // invisible to us. These two are the conversions we CAN measure.
-            document.addEventListener('click', (e) => {
-              const a = e.target.closest('a');
-              if (!a) return;
-              if (a.href.startsWith('tel:')) {
-                gtag('event', 'phone_call_click', { link_url: a.href });
-              } else if (a.getAttribute('href')?.includes('#contact')) {
-                gtag('event', 'quote_cta_click', { link_text: a.textContent.trim() });
-              }
-            });
+            // One listener pair for the whole document. `click` covers primary
+            // click, modified click, and Enter. `auxclick` covers middle click.
+            // The flag stops a second registration from sending the event twice.
+            const w = window as Window & {
+              __mtsClickTracking?: boolean;
+              gtag?: (...args: unknown[]) => void;
+            };
+            if (!w.__mtsClickTracking) {
+              w.__mtsClickTracking = true;
+              let lastKey = '';
+              let lastAt = 0;
+              const onActivate = (event: Event) => {
+                const target = event.target;
+                if (!(target instanceof Element)) return;
+                const a = target.closest('a');
+                if (!a) return;
+                const mouse = event as MouseEvent;
+                const result = classifyAnchorClick({
+                  type: event.type,
+                  button: mouse.button ?? 0,
+                  href: a.href,
+                  attributeHref: a.getAttribute('href'),
+                  quoteLocation: a.getAttribute('data-quote-location'),
+                  text: a.textContent || '',
+                });
+                if (!result) return;
+                const key = `${result.name}:${result.params.location ?? ''}:${result.params.link_url ?? ''}:${result.params.link_text ?? ''}`;
+                const now = Date.now();
+                if (key === lastKey && now - lastAt < 50) return;
+                lastKey = key;
+                lastAt = now;
+                w.gtag?.('event', result.name, result.params);
+              };
+              document.addEventListener('click', onActivate);
+              document.addEventListener('auxclick', onActivate);
+            }
           </script>
         </>
       )
