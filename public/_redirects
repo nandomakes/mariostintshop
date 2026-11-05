@@ -1,3 +1,7 @@
+# IndexNow: la barra final se reescribe (200, no 301/302) al archivo de la llave.
+# El apex sigue siendo 301 a www en el Worker; www responde 200 text/plain.
+/ab9f4a4827772e697759a7154c75584c.txt/ /ab9f4a4827772e697759a7154c75584c.txt 200
+
 /sitemap.xml /sitemap-index.xml 308
 /window-tint/3m-films /services/window-tinting/ 301
 /window-tint/3m-films/ /services/window-tinting/ 301

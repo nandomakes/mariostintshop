@@ -27,4 +27,26 @@ if (vercelCsp !== headersCsp) {
   process.exit(1);
 }
 
-console.log('check-headers: CSP matches');
+// IndexNow key file: Content-Type must stay text/plain on both hosts.
+const indexNowPaths = [
+  '/ab9f4a4827772e697759a7154c75584c.txt',
+  '/ab9f4a4827772e697759a7154c75584c.txt/',
+];
+const indexNowType = 'text/plain; charset=utf-8';
+
+for (const path of indexNowPaths) {
+  const vercelType = vercel.headers
+    ?.find((block) => block.source === path)
+    ?.headers?.find((h) => h.key === 'Content-Type')?.value;
+  const headersHasType = headersFile.includes(`${path}\n  Content-Type: ${indexNowType}\n`)
+    || headersFile.includes(`${path}\n  Content-Type: ${indexNowType}`);
+
+  if (vercelType !== indexNowType || !headersHasType) {
+    console.error(`check-headers: IndexNow Content-Type missing or drifted for ${path}`);
+    console.error('--- vercel.json');
+    console.error(vercelType ?? '(missing)');
+    process.exit(1);
+  }
+}
+
+console.log('check-headers: CSP and IndexNow Content-Type match');
