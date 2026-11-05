@@ -26,3 +26,13 @@
 
 /site.webmanifest
   Cache-Control: public, max-age=604800
+
+# Llave pública de IndexNow (el archivo es la llave, 32 bytes, sin salto de línea).
+# El apex mariostintshop.com no llega aquí: el Worker responde 301 a www y www
+# sirve 200. La forma con barra final se reescribe en _redirects con código 200
+# (no es un redirect) al mismo archivo.
+/ab9f4a4827772e697759a7154c75584c.txt
+  Content-Type: text/plain; charset=utf-8
+
+/ab9f4a4827772e697759a7154c75584c.txt/
+  Content-Type: text/plain; charset=utf-8

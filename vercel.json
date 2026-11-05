@@ -39,6 +39,12 @@
     { "source": "/blog", "destination": "/", "statusCode": 301 },
     { "source": "/blog/", "destination": "/", "statusCode": 301 }
   ],
+  "rewrites": [
+    {
+      "source": "/ab9f4a4827772e697759a7154c75584c.txt/",
+      "destination": "/ab9f4a4827772e697759a7154c75584c.txt"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -72,6 +78,18 @@
       "source": "/(favicon.*|og-image.png|site.webmanifest)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=604800" }
+      ]
+    },
+    {
+      "source": "/ab9f4a4827772e697759a7154c75584c.txt",
+      "headers": [
+        { "key": "Content-Type", "value": "text/plain; charset=utf-8" }
+      ]
+    },
+    {
+      "source": "/ab9f4a4827772e697759a7154c75584c.txt/",
+      "headers": [
+        { "key": "Content-Type", "value": "text/plain; charset=utf-8" }
       ]
     }
   ]
