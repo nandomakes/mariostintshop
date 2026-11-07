@@ -32,7 +32,20 @@ El CSP de `vercel.json` ya permite `googletagmanager.com` y `google-analytics.co
 Se registran `phone_call_click` (cualquier enlace `tel:`), `quote_cta_click`
 (cualquier enlace a `#contact`) y `quote_form_click` (el botón que abre el
 formulario de TintWiz en una pestaña nueva; parámetro `location`, sin datos
-personales).
+personales). `phone_call_click` es un clic, no una llamada completada.
+
+## Llamadas desde el sitio (Google Ads)
+
+Preparado y **apagado**. No hay segundo cargador de gtag ni contenedor GTM.
+`AW-18560918238` solo se emite si, al construir, `PUBLIC_ADS_PHONE_CONVERSION`
+vale exactamente `on`. Esa variable es del build (Astro), no del runtime del
+Worker. El HTML, el NAP y el schema siguen con `(615) 410-7170` y
+`tel:+16154107170` hasta que Google devuelve un número de reenvío a un
+visitante que llegó desde un anuncio.
+
+La cuenta de Ads no quedó verificada en este cambio. No actives producción
+hasta confirmar duración, conteo, primaria/secundaria y auto-tagging.
+Pasos, rollback y lo que sigue bloqueado: `docs/ads-website-calls.md`.
 
 ## SEO — archivos clave
 
