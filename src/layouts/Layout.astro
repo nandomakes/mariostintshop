@@ -11,7 +11,7 @@ import '@fontsource/gabarito/latin-400.css';
 import specialGothicWoff2 from '@fontsource/special-gothic-expanded-one/files/special-gothic-expanded-one-latin-400-normal.woff2?url';
 import '../styles/global.css';
 import { SITE, CONTACT, PHONE_TEL, SERVICES, SOCIALS, TESTIMONIALS, GA4_ID, CONTENT_UPDATED } from '../consts';
-import { resolveAdsPhoneConfig, renderAdsPhoneHeadScript } from '../lib/ads-phone.mjs';
+import { adsPhoneForPage, renderAdsPhoneHeadScript } from '../lib/ads-phone.mjs';
 
 interface Props {
   title?: string;
@@ -137,7 +137,7 @@ const jsonLdNodes = [business, website, ...(omitFromIndex ? [] : [webPage]), ...
 // Website-call conversions, when PUBLIC_ADS_PHONE_CONVERSION is exactly "on",
 // are extra config commands on this same tag. See docs/ads-website-calls.md.
 const ga4Id = import.meta.env.PUBLIC_GA4_ID ?? GA4_ID;
-const adsPhone = ga4Id ? resolveAdsPhoneConfig(import.meta.env.PUBLIC_ADS_PHONE_CONVERSION) : null;
+const adsPhone = adsPhoneForPage(ga4Id, import.meta.env.PUBLIC_ADS_PHONE_CONVERSION);
 const adsPhoneScript = adsPhone ? renderAdsPhoneHeadScript(adsPhone) : '';
 ---
 

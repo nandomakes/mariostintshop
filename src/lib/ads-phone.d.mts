@@ -19,6 +19,7 @@ export interface ForwardingResult {
 
 export function adsPhoneConversionEnabled(flag: string | undefined): boolean;
 export function resolveAdsPhoneConfig(flag: string | undefined): AdsPhoneConfig | null;
+export function adsPhoneForPage(ga4Id: string | undefined, flag: string | undefined): AdsPhoneConfig | null;
 export function assertAdsPhoneConfig(config: AdsPhoneConfig): AdsPhoneConfig;
 export function applyForwardingNumber(
   doc: Document,

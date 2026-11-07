@@ -2,7 +2,9 @@
 // The browser pass stubs gtag and aborts every measurement host so the test
 // never sends a hit to production Ads or GA4 and never clicks an ad.
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
+import { loadEnv } from 'vite';
 import puppeteer from 'puppeteer-core';
 import { classifyAnchorClick } from '../src/lib/quote-click.mjs';
 import {
@@ -10,12 +12,15 @@ import {
   ADS_PHONE_DIGITS,
   ADS_PHONE_DISPLAY,
   ADS_PHONE_SEND_TO,
+  adsPhoneForPage,
   renderAdsPhoneHeadScript,
   resolveAdsPhoneConfig,
 } from '../src/lib/ads-phone.mjs';
 
 const chrome = process.env.CHROME_PATH || '/usr/bin/google-chrome';
 const distMode = process.argv.includes('--dist');
+const browserMode = process.argv.includes('--browser');
+const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 
 let failed = 0;
 function fail(message) {
@@ -157,12 +162,71 @@ function checkGateAndSnippet() {
   if (click && JSON.stringify(click).includes('conversion')) fail('phone click is classified as a conversion');
 
   const layout = fs.readFileSync(new URL('../src/layouts/Layout.astro', import.meta.url), 'utf8');
-  if (!layout.includes('resolveAdsPhoneConfig') || !layout.includes('renderAdsPhoneHeadScript')) {
-    fail('Layout does not gate the phone snippet on the existing tag');
+  if (!layout.includes('adsPhoneForPage') || !layout.includes('renderAdsPhoneHeadScript')) {
+    fail('Layout does not use the shared GA4 gate');
   }
   if (layout.includes('GTM-') || layout.includes('gtag/js?id=AW')) fail('Layout adds GTM or a second loader');
   const privacySrc = fs.readFileSync(new URL('../src/pages/privacy/index.astro', import.meta.url), 'utf8');
-  if (!privacySrc.includes('resolveAdsPhoneConfig')) fail('privacy disclosure is not tied to the same gate');
+  if (!privacySrc.includes('adsPhoneForPage')) fail('privacy disclosure does not use the shared GA4 gate');
+  if (adsPhoneForPage('', 'on') !== null || adsPhoneForPage(undefined, 'on') !== null) {
+    fail('empty GA4 id still enables the Ads phone config');
+  }
+  if (!adsPhoneForPage('G-L5RB0B2JTL', 'on')) fail('GA4 id plus flag on did not enable the config');
+  if (adsPhoneForPage('G-L5RB0B2JTL', '') !== null) fail('empty Ads flag enabled the config');
+}
+
+const PUBLIC_ENV_KEYS = ['PUBLIC_ADS_PHONE_CONVERSION', 'PUBLIC_GA4_ID'];
+
+function withPublicShell(overrides, fn) {
+  const saved = new Map();
+  for (const key of PUBLIC_ENV_KEYS) saved.set(key, process.env[key]);
+  try {
+    for (const key of PUBLIC_ENV_KEYS) {
+      if (!Object.prototype.hasOwnProperty.call(overrides, key) || overrides[key] === undefined) {
+        delete process.env[key];
+      } else {
+        process.env[key] = overrides[key];
+      }
+    }
+    return fn();
+  } finally {
+    for (const [key, value] of saved) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+  }
+}
+
+function checkEnvPrecedence() {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ads-phone-env-'));
+  const file = path.join(dir, '.env.production');
+  fs.writeFileSync(file, 'PUBLIC_ADS_PHONE_CONVERSION=on\nPUBLIC_GA4_ID=G-FROMFILE\n');
+  try {
+    withPublicShell({}, () => {
+      const env = loadEnv('production', dir, 'PUBLIC_');
+      if (env.PUBLIC_ADS_PHONE_CONVERSION !== 'on' || env.PUBLIC_GA4_ID !== 'G-FROMFILE') {
+        fail(`.env.production was not read: ${JSON.stringify(env)}`);
+      }
+    });
+    withPublicShell({ PUBLIC_ADS_PHONE_CONVERSION: 'off', PUBLIC_GA4_ID: 'G-SHELL' }, () => {
+      const env = loadEnv('production', dir, 'PUBLIC_');
+      if (env.PUBLIC_ADS_PHONE_CONVERSION !== 'off' || env.PUBLIC_GA4_ID !== 'G-SHELL') {
+        fail(`shell did not override .env.production: ${JSON.stringify(env)}`);
+      }
+    });
+    withPublicShell({ PUBLIC_ADS_PHONE_CONVERSION: '', PUBLIC_GA4_ID: '' }, () => {
+      const env = loadEnv('production', dir, 'PUBLIC_');
+      if (env.PUBLIC_ADS_PHONE_CONVERSION !== '' || env.PUBLIC_GA4_ID !== '') {
+        fail(`empty shell did not override .env.production: ${JSON.stringify(env)}`);
+      }
+    });
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+function publicBuildEnv() {
+  return loadEnv('production', repoRoot, 'PUBLIC_');
 }
 
 function fixtureHtml(script) {
@@ -334,8 +398,11 @@ async function checkDist() {
     fail('dist/ is missing');
     return;
   }
-  const enabled = process.env.PUBLIC_ADS_PHONE_CONVERSION === 'on';
-  const ga4Env = process.env.PUBLIC_GA4_ID;
+  const loaded = publicBuildEnv();
+  const enabled = loaded.PUBLIC_ADS_PHONE_CONVERSION === 'on';
+  const ga4Env = Object.prototype.hasOwnProperty.call(loaded, 'PUBLIC_GA4_ID')
+    ? loaded.PUBLIC_GA4_ID
+    : undefined;
   const ga4Id = ga4Env === undefined ? 'G-L5RB0B2JTL' : ga4Env;
   const htmlFiles = walk(dist.pathname).filter((file) => file.endsWith('.html'));
   if (!htmlFiles.length) fail('dist has no html');
@@ -392,8 +459,9 @@ async function checkDist() {
     }
   }
 
+  if (!browserMode) return;
   if (!fs.existsSync(chrome)) {
-    fail(`chrome missing at ${chrome}`);
+    fail(`chrome missing at ${chrome}; set CHROME_PATH. npm run build does not need it.`);
     return;
   }
   const samples = [
@@ -510,8 +578,11 @@ async function checkDist() {
 checkCsp();
 if (!distMode) {
   checkGateAndSnippet();
-  if (!fs.existsSync(chrome)) fail(`chrome missing at ${chrome}`);
-  else await checkBrowser();
+  checkEnvPrecedence();
+  if (browserMode) {
+    if (!fs.existsSync(chrome)) fail(`chrome missing at ${chrome}; set CHROME_PATH`);
+    else await checkBrowser();
+  }
 } else {
   await checkDist();
 }

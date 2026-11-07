@@ -95,7 +95,17 @@ Before setting the flag on a production build, confirm in customer
 
    ```bash
    PUBLIC_ADS_PHONE_CONVERSION=on npm run build
+   npm run check:ads-browser
    ```
+
+   `npm run build` does not launch a browser. `npm run check:ads-browser`
+   does. It needs Google Chrome. The default binary is
+   `/usr/bin/google-chrome` (the `google-chrome-stable` package on
+   Debian/Ubuntu; on macOS,
+   `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`). If the
+   binary is somewhere else, set `CHROME_PATH` to that file before the
+   browser command. Those checks abort measurement hosts. They do not click
+   an ad.
 
 3. Preview only as a non-production Worker version. Do not click a live ad
    (that spends money and is a real click). Do not POST a synthetic
@@ -106,15 +116,20 @@ Before setting the flag on a production build, confirm in customer
    swap requires an ad click, which needs an explicit spend approval.
 5. Promote only after that preview looks right.
 
-The privacy page discloses the Ads call tag only on builds where the flag is
-`on`. It does not add a cookie banner and does not set Consent Mode to
-granted or denied, so the existing GA4 tag is unchanged.
+The privacy page uses the same gate as the tag: the flag is `on` and a GA4
+id is present. An empty `PUBLIC_GA4_ID` removes the Google tag, and the
+privacy page keeps the sentence that this site does not run an advertising
+pixel. The page does not add a cookie banner and does not set Consent Mode
+to granted or denied.
 
 ## Rollback
 
 1. Build again **without** `PUBLIC_ADS_PHONE_CONVERSION` and deploy that
-   output. The `AW-` commands disappear. The CSP hosts can stay; they do
-   not call Google unless a tag asks.
+   output. `npm run build` is enough; it does not need Chrome or
+   `CHROME_PATH`. The `AW-` commands disappear. The CSP hosts can stay; they
+   do not call Google unless a tag asks. `npm run check:ads-browser` is an
+   optional check of that output, and that command is the one that needs
+   Chrome.
 2. Purge the edge cache so old HTML is not served.
 3. Testers who already received a forwarding number may still have Google's
    `gwcc` cookie. Clearing it returns the published number. Rollback does

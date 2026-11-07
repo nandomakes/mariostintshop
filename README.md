@@ -38,10 +38,11 @@ personales). `phone_call_click` es un clic, no una llamada completada.
 
 Preparado y **apagado**. No hay segundo cargador de gtag ni contenedor GTM.
 `AW-18560918238` solo se emite si, al construir, `PUBLIC_ADS_PHONE_CONVERSION`
-vale exactamente `on`. Esa variable es del build (Astro), no del runtime del
-Worker. El HTML, el NAP y el schema siguen con `(615) 410-7170` y
-`tel:+16154107170` hasta que Google devuelve un número de reenvío a un
-visitante que llegó desde un anuncio.
+vale exactamente `on` y hay un id de GA4. Esa variable es del build (Astro),
+no del runtime del Worker. El HTML estático sigue con `(615) 410-7170` y
+`tel:+16154107170`. Si Google devuelve un número de reenvío, cambian el texto
+visible, el `aria-label` y los enlaces `tel:` de ese número. El JSON-LD no
+cambia: `telephone` permanece `+16154107170`.
 
 La cuenta de Ads no quedó verificada en este cambio. No actives producción
 hasta confirmar duración, conteo, primaria/secundaria y auto-tagging.

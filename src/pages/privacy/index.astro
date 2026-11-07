@@ -1,14 +1,15 @@
 ---
 import LegalPage from '../../components/LegalPage.astro';
 import { SITE, CONTACT, SOCIALS, GA4_ID } from '../../consts';
-import { resolveAdsPhoneConfig } from '../../lib/ads-phone.mjs';
+import { adsPhoneForPage } from '../../lib/ads-phone.mjs';
 
 const title = `Privacy Policy | ${SITE.brand}`;
 // Kept under ~155 characters so Google can show it whole.
 const description =
   "How Mario's Tint Shop in Murfreesboro, TN handles website information, including job applications, TintWiz quotes, and Google Analytics.";
 
-const adsPhone = resolveAdsPhoneConfig(import.meta.env.PUBLIC_ADS_PHONE_CONVERSION);
+const ga4Id = import.meta.env.PUBLIC_GA4_ID ?? GA4_ID;
+const adsPhone = adsPhoneForPage(ga4Id, import.meta.env.PUBLIC_ADS_PHONE_CONVERSION);
 const tintwizPrivacy = 'https://tintwiz.com/privacy-policy';
 const resendPrivacy = 'https://resend.com/legal/privacy-policy';
 const cloudflarePrivacy = 'https://www.cloudflare.com/privacypolicy/';

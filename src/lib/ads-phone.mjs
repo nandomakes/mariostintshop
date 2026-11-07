@@ -43,6 +43,13 @@ export function resolveAdsPhoneConfig(flag) {
   };
 }
 
+// One gate for the tag and the privacy disclosure. An empty GA4 id removes
+// the loader, so the Ads config and the Ads sentence stay off together.
+export function adsPhoneForPage(ga4Id, flag) {
+  if (!ga4Id) return null;
+  return resolveAdsPhoneConfig(flag);
+}
+
 export function assertAdsPhoneConfig(config) {
   if (!config || typeof config !== 'object') {
     throw new Error('ads phone config missing');
