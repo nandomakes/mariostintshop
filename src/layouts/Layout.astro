@@ -11,6 +11,7 @@ import '@fontsource/gabarito/latin-400.css';
 import specialGothicWoff2 from '@fontsource/special-gothic-expanded-one/files/special-gothic-expanded-one-latin-400-normal.woff2?url';
 import '../styles/global.css';
 import { SITE, CONTACT, PHONE_TEL, SERVICES, SOCIALS, TESTIMONIALS, GA4_ID, CONTENT_UPDATED } from '../consts';
+import { adsPhoneForPage, renderAdsPhoneHeadScript } from '../lib/ads-phone.mjs';
 
 interface Props {
   title?: string;
@@ -132,9 +133,12 @@ const jsonLdNodes = [business, website, ...(omitFromIndex ? [] : [webPage]), ...
 
 // GA4. The property ID lives in consts; PUBLIC_GA4_ID overrides it so a
 // staging deploy can point elsewhere (or set it empty to disable the tag).
-// The CSP in vercel.json already allows googletagmanager/google-analytics.
-// This is the site's ONLY Google tag — don't add a second one anywhere.
+// This is the site's ONLY Google loader — don't add a second gtag.js or GTM.
+// Website-call conversions, when PUBLIC_ADS_PHONE_CONVERSION is exactly "on",
+// are extra config commands on this same tag. See docs/ads-website-calls.md.
 const ga4Id = import.meta.env.PUBLIC_GA4_ID ?? GA4_ID;
+const adsPhone = adsPhoneForPage(ga4Id, import.meta.env.PUBLIC_ADS_PHONE_CONVERSION);
+const adsPhoneScript = adsPhone ? renderAdsPhoneHeadScript(adsPhone) : '';
 ---
 
 <!doctype html>
@@ -208,6 +212,7 @@ const ga4Id = import.meta.env.PUBLIC_GA4_ID ?? GA4_ID;
             gtag('js', new Date());
             gtag('config', ga4Id);
           </script>
+          {adsPhoneScript && <script is:inline set:html={adsPhoneScript} />}
           <script>
             import { classifyAnchorClick } from '../lib/quote-click.mjs';
 
@@ -242,6 +247,7 @@ const ga4Id = import.meta.env.PUBLIC_GA4_ID ?? GA4_ID;
                 if (key === lastKey && now - lastAt < 50) return;
                 lastKey = key;
                 lastAt = now;
+                // phone_call_click is a click. It is not an Ads call conversion.
                 w.gtag?.('event', result.name, result.params);
               };
               document.addEventListener('click', onActivate);

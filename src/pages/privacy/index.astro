@@ -1,12 +1,15 @@
 ---
 import LegalPage from '../../components/LegalPage.astro';
 import { SITE, CONTACT, SOCIALS, GA4_ID } from '../../consts';
+import { adsPhoneForPage } from '../../lib/ads-phone.mjs';
 
 const title = `Privacy Policy | ${SITE.brand}`;
 // Kept under ~155 characters so Google can show it whole.
 const description =
   "How Mario's Tint Shop in Murfreesboro, TN handles website information, including job applications, TintWiz quotes, and Google Analytics.";
 
+const ga4Id = import.meta.env.PUBLIC_GA4_ID ?? GA4_ID;
+const adsPhone = adsPhoneForPage(ga4Id, import.meta.env.PUBLIC_ADS_PHONE_CONVERSION);
 const tintwizPrivacy = 'https://tintwiz.com/privacy-policy';
 const resendPrivacy = 'https://resend.com/legal/privacy-policy';
 const cloudflarePrivacy = 'https://www.cloudflare.com/privacypolicy/';
@@ -20,8 +23,8 @@ const gaOptOut = 'https://tools.google.com/dlpage/gaoptout';
   heading="Privacy Policy"
   crumb="Privacy Policy"
   path="/privacy/"
-  updatedLabel="Last updated: October 30, 2026"
-  dateModified="2026-10-30"
+  updatedLabel={adsPhone ? 'Last updated: November 7, 2026' : 'Last updated: October 30, 2026'}
+  dateModified={adsPhone ? '2026-11-07' : '2026-10-30'}
   related={{ href: '/terms/', label: 'Terms of Service' }}
 >
   <h2>What this policy covers</h2>
@@ -95,9 +98,17 @@ const gaOptOut = 'https://tools.google.com/dlpage/gaoptout';
   <p>
     We use Google Analytics 4 to understand how the site is used. The measurement ID is {GA4_ID}. The tag loads from googletagmanager.com when you open a page. It sets analytics cookies (such as a cookie named <span class="font-semibold">_ga</span> and a cookie for this property). We have not changed Google's default cookie lifetime in the tag.
   </p>
-  <p>
-    We use it for page views and for three actions: a click on a phone number, a click on a quote button that opens the TintWiz form, and a successful job-application submit. The application event includes the job title only — not your name, email, phone, or resume. This website does not run an advertising pixel and does not show ads.
-  </p>
+  {
+    adsPhone ? (
+      <p>
+        We use it for page views and for three actions: a click on a phone number, a click on a quote button that opens the TintWiz form, and a successful job-application submit. The application event includes the job title only — not your name, email, phone, or resume. This version of the site also configures that same Google tag for Google Ads website call conversions ({adsPhone.conversionId}). After a click on one of our ads, Google may replace the shop phone number on the page, and the tel link, with a Google forwarding number. Google Ads counts a call only when someone dials that forwarding number and the call lasts at least as long as the setting on that conversion action. A click on a phone number in Analytics is still only a click, not a completed call. The Ads configuration can set advertising cookies (such as cookies whose names start with _gcl) and, if remarketing is on in the Google Ads account, can add the visit to an advertising list. We do not show ads on this website.
+      </p>
+    ) : (
+      <p>
+        We use it for page views and for three actions: a click on a phone number, a click on a quote button that opens the TintWiz form, and a successful job-application submit. The application event includes the job title only — not your name, email, phone, or resume. This website does not run an advertising pixel and does not show ads.
+      </p>
+    )
+  }
   <p>
     Google's privacy policy is at{' '}
     <a href={googlePrivacy} target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>.

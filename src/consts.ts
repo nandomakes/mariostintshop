@@ -36,6 +36,8 @@ export const CONTENT_UPDATED = '2026-10-18';
 // which is how you'd point a staging deploy at a separate property (or set it
 // to an empty string to switch the tag off entirely).
 export const GA4_ID = 'G-L5RB0B2JTL';
+// Google Ads website-call tracking is not configured here and is off unless
+// the build sets PUBLIC_ADS_PHONE_CONVERSION=on. See src/lib/ads-phone.mjs.
 
 // ── Contact / Phone ─────────────────────────────────────────────────
 export const PHONE_DISPLAY = '(615) 410-7170';
